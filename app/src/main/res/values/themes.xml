@@ -1,0 +1,41 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.FDSMeshLibDemo" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--控制各个控件被选中时的颜色-->
+        <item name="colorAccent">@color/color_92e5e9</item>
+        <!--状态栏颜色-->
+        <item name="colorPrimaryDark">@color/bg</item>
+        <!--底部导航栏颜色-->
+        <item name="android:navigationBarColor">@color/bg</item>
+        <!--页面背景色-->
+        <item name="android:windowBackground">@color/bg</item>
+        <!--控制各个控件被选中时的颜色-->
+        <item name="colorPrimary">@color/color_92e5e9</item>
+        <item name="colorPrimaryVariant">@color/color_92e5e9</item>
+        <item name="colorOnPrimary">@color/color_92e5e9</item>
+        <item name="backgroundColor">@color/color_92e5e9</item>
+    </style>
+
+    <style name="Dialog_bocop">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item><!--是否浮现在activity之上-->
+        <item name="android:windowIsTranslucent">false</item><!--半透明-->
+        <item name="android:windowBackground">@android:color/transparent</item><!--背景透明-->
+        <item name="android:backgroundDimEnabled">true</item><!--模糊-->
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <!-- ProgressBar -->
+    <style name="CustomProgressStyle" parent="@android:style/Widget.DeviceDefault.ProgressBar.Large">
+        <item name="android:minWidth">60dp</item>
+        <item name="android:maxWidth">60dp</item>
+        <item name="android:minHeight">60dp</item>
+        <item name="android:maxHeight">60dp</item>
+    </style>
+
+    <style name="bomToTopDialogAnim">
+        <item name="android:windowEnterAnimation">@anim/bom_dialog_show</item>
+        <item name="android:windowExitAnimation">@anim/bom_dialog_dismiss</item>
+    </style>
+</resources>

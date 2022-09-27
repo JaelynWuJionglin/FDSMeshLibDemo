@@ -1,0 +1,40 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+//######################################## 本地库 ##################################################
+//自定义加载库函数
+def addLibraries(libName) {
+    //包含依赖
+    include ':'+libName
+    //指定名称的路径信息
+    project(":"+libName).projectDir=file(BASE_SDK_path + File.separator + libName)
+    //打印辅助信息
+    //println(libName+" added")
+}
+
+//指定外部工程项目根路径
+ext.BASE_SDK_path = "../LsBaseMesh"
+
+//添加外部依赖module名称
+addLibraries("LsTiBleMeshLib")
+addLibraries("GodoxMeshLib")
+//######################################## END ####################################################
+
+rootProject.name = "FDSMeshLibDemo"
+include ':app'
+include ':LsTiBleMeshLib'
+include ':GodoxMeshLib'
