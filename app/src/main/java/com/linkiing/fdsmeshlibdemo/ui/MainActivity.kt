@@ -24,6 +24,10 @@ class MainActivity : BaseActivity() {
         App.getInstance().getMeshLogin().init()
 
         initRecyclerView()
+        //跳转到功能列表
+        testOnclick.setOnClickListener{
+            goActivity(ModeListActivity::class.java, false)
+        }
     }
 
     private fun initRecyclerView() {

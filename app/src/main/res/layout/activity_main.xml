@@ -22,5 +22,14 @@
         android:paddingStart="15dp">
 
     </androidx.recyclerview.widget.RecyclerView>
+    <TextView
+        android:id="@+id/testOnclick"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:background="@color/white"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试功能列表"/>
 
 </LinearLayout>
