@@ -60,4 +60,7 @@ dependencies {
     //权限
     implementation 'com.github.getActivity:XXPermissions:13.2'
 
+    //mmkv
+    implementation 'com.tencent:mmkv:1.2.14'
+
 }
