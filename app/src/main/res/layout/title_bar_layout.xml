@@ -15,13 +15,13 @@
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:ellipsize="end"
+        android:gravity="center"
         android:maxLines="1"
         android:text="@string/app_name"
         android:textColor="@color/black"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:layout_centerInParent="true"/>
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tv_end"

@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.app
 
 import com.godox.sdk.MeshApp
 import com.godox.sdk.api.FDSMeshApi
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.utils.BleUtils
 import com.telink.ble.mesh.util.CrashLogUtil
 import com.telink.ble.mesh.util.LOGUtils
@@ -19,6 +20,9 @@ class App: MeshApp() {
     override fun onCreate() {
         super.onCreate()
         mThis = this
+
+        //MMKV
+        MMKVSp.instance.init(this)
 
         //保存SDK Crash日志
         CrashLogUtil.instance.init(this)

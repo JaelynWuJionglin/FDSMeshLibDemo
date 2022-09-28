@@ -1,15 +1,20 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.hjq.permissions.OnPermissionCallback
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.adapter.StudioAdapter
+import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_studio.*
 
 class MainActivity : BaseActivity() {
+    private lateinit var studioAdapter: StudioAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +23,17 @@ class MainActivity : BaseActivity() {
         //初始化设备自动连接
         App.getInstance().getMeshLogin().init()
 
-        lr_studio1.setOnClickListener {
+        initRecyclerView()
+    }
+
+    private fun initRecyclerView() {
+        studioAdapter = StudioAdapter()
+        val manager = LinearLayoutManager(this)
+        manager.orientation = LinearLayoutManager.VERTICAL
+        recyclerView_studio.layoutManager = manager
+        recyclerView_studio.adapter = studioAdapter
+
+        studioAdapter.setOnItemClickListener {
             //权限请求
             PermissionsUtils.blePermissions(this, object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
@@ -30,10 +45,6 @@ class MainActivity : BaseActivity() {
                     super.onDenied(permissions, never)
                 }
             })
-        }
-
-        bt_test.setOnClickListener {
-
         }
     }
 

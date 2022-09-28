@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
@@ -10,7 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.linkiing.fdsmeshlibdemo.R
 
-class TitleBar(context: Context, attrs: AttributeSet?) : RelativeLayout(context, attrs) {
+class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, attrs) {
     private var back: ImageView
     private var titleText: TextView
     private var endText: TextView
@@ -23,9 +24,19 @@ class TitleBar(context: Context, attrs: AttributeSet?) : RelativeLayout(context,
         titleText = view.findViewById(R.id.title_text)
         lrScan = view.findViewById(R.id.lr_scan)
 
+        initTypedArray(attrs)
+
         back.setOnClickListener {
             (context as Activity).finish()
         }
+    }
+
+    //typedArray
+    @SuppressLint("Recycle")
+    private fun initTypedArray(attrs: AttributeSet) {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.TitleBar)
+        val text = typedArray.getString(R.styleable.TitleBar_titleBar_titleText)
+        titleText.text = text
     }
 
     fun initTitleBar(titleTextId: Int, endTextId: Int, isEdit: Boolean) {

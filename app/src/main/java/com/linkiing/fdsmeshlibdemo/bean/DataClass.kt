@@ -11,3 +11,12 @@ data class DeviceLisBean(
 ) {
     var isChecked = false
 }
+
+/**
+ * studio列表
+ */
+data class StudioListBean(
+    var name: String = ""
+){
+    var meshJsonStr = ""
+}
