@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
+import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
@@ -38,7 +39,7 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
 
     override fun onResume() {
         super.onResume()
-        App.getInstance().getMeshLogin().autoConnect()
+        MeshLogin.instance.autoConnect()
         studioDeviceAdapter.update()
     }
 
@@ -132,6 +133,6 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
         super.onDestroy()
         fdsAddOrRemoveDeviceApi.destroy()
         FDSMeshApi.instance.removeFDSNodeStatusChangeCallBack(this)
-        App.getInstance().getMeshLogin().disconnect()
+        MeshLogin.instance.disconnect()
     }
 }

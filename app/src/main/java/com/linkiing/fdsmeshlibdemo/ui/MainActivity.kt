@@ -20,9 +20,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //初始化设备自动连接
-        App.getInstance().getMeshLogin().init()
-
         initRecyclerView()
         //跳转到功能列表
         testOnclick.setOnClickListener{
@@ -55,8 +52,5 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         LOGUtils.d("MainActivity onDestroy()")
-
-        //销毁设备自动连接
-        App.getInstance().getMeshLogin().destroy()
     }
 }

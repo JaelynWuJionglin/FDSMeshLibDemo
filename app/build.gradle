@@ -45,17 +45,17 @@ dependencies {
 
     //SDK需要#######################################################################################
     //引入aar包
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
+//    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     //加密（SDK需要）
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+//    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+//    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
 
     //gson（SDK需要）
     implementation 'com.google.code.gson:gson:2.9.0'
     //END###########################################################################################
 
-//    implementation project(path: ':GodoxMeshLib')
+    implementation project(path: ':GodoxMeshLib')
 
     //权限
     implementation 'com.github.getActivity:XXPermissions:13.2'
