@@ -9,47 +9,36 @@
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        app:titleBar_titleText="节点"/>
+        app:titleBar_titleText="Studio"/>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:gravity="center_vertical">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingBottom="15dp">
 
-        <TextView
+        <com.linkiing.fdsmeshlibdemo.view.MainTabItem
+            android:id="@+id/tab_devices"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            android:text="设备列表"/>
+            app:tab_ck="true"
+            app:tab_image="@drawable/main_tab_device"
+            app:tab_name="节点" />
 
-        <TextView
-            android:id="@+id/tv_add_dev"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:background="@drawable/blue_round_bg"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:text="添加设备"/>
+        <com.linkiing.fdsmeshlibdemo.view.MainTabItem
+            android:id="@+id/tab_group"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:tab_image="@drawable/main_tab_group"
+            app:tab_name="组别" />
+
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@drawable/line_grey"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_devices"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"/>
-
 </LinearLayout>

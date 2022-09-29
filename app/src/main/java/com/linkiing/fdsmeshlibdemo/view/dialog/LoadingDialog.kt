@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 
 class LoadingDialog(private val context: Context) {
     private var mDialog: Dialog? = null
@@ -22,7 +23,7 @@ class LoadingDialog(private val context: Context) {
     private var runnable: Runnable = Runnable {
         dismissDialog()
         if (toastMsgStr != "") {
-            Toast.makeText(context,toastMsgStr,Toast.LENGTH_SHORT).show()
+            ConstantUtils.toast(context,toastMsgStr)
         }
         if (isCallback) {
             timeOutCallbacks(true)

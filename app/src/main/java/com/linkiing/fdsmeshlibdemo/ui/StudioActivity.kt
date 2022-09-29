@@ -1,36 +1,23 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.listener.NodeStatusChangeListener
+import android.view.View
+import androidx.fragment.app.FragmentActivity
 import com.base.mesh.api.main.MeshLogin
-import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
-import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
-import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
-import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
-import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.linkiing.fdsmeshlibdemo.view.dialog.BottomMenuDialog
-import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
-import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
+import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
+import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
 import com.telink.ble.mesh.util.LOGUtils
-import com.tencent.mmkv.MMKV
 import kotlinx.android.synthetic.main.activity_studio.*
-import kotlinx.android.synthetic.main.activity_studio.recyclerView_devices
 
-class StudioActivity : BaseActivity(), NodeStatusChangeListener {
-    private lateinit var studioDeviceAdapter: StudioDeviceAdapter
-    private lateinit var bottomMenuDialog: BottomMenuDialog
-    private lateinit var loadingDialog: LoadingDialog
-    private lateinit var inputTextDialog: InputTextDialog
-    private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
-    private var fdsNodeInfo: FDSNodeInfo? = null
+class StudioActivity : FragmentActivity(), View.OnClickListener {
+    private val deviceFragment = DeviceFragment()
+    private val groupFragment = GroupFragment()
+    private var nowFragment:BaseFragment? = null
+    private var tabId: Int = -1
     private var index = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,14 +25,12 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
         setContentView(R.layout.activity_studio)
 
         initView()
-        initRecyclerView()
         initListener()
     }
 
     override fun onResume() {
         super.onResume()
         MeshLogin.instance.autoConnect()
-        studioDeviceAdapter.update()
     }
 
     private fun initView() {
@@ -54,103 +39,58 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
             finish()
         }
 
-        loadingDialog = LoadingDialog(this)
-        bottomMenuDialog = BottomMenuDialog(this)
-
-        inputTextDialog = InputTextDialog(this)
-        inputTextDialog.setTitleText("重命名节点？")
-    }
-
-    private fun initRecyclerView() {
-        studioDeviceAdapter = StudioDeviceAdapter()
-        val manager = LinearLayoutManager(this)
-        manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices.layoutManager = manager
-        recyclerView_devices.adapter = studioDeviceAdapter
-
-        studioDeviceAdapter.setItemLongClickListener {
-            fdsNodeInfo = it
-            bottomMenuDialog.showDialog()
-        }
-        studioDeviceAdapter.setItemClickListener {
-            if (it.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-                ConstantUtils.toastFail(getString(R.string.equipment_not_online_text))
-            } else {
-                val bundle=Bundle()
-                bundle.putInt("address",it.meshAddress)
-                bundle.putString("typeName",it.name);
-                goActivityBundle(ModeListActivity::class.java,false,bundle)
-            }
-
-        }
+        setTab(0)
     }
 
     private fun initListener() {
-        FDSMeshApi.instance.addFDSNodeStatusChangeCallBack(this)
+        tab_devices.setOnClickListener(this)
+        tab_group.setOnClickListener(this)
+    }
 
-        tv_add_dev.setOnClickListener {
-            goActivity(AddDeviceActivity::class.java, false)
+    private fun setTab(id: Int) {
+        if (id == tabId) {
+            return
         }
+        this.tabId = id
+        tab_devices.setCk(id == 0)
+        tab_group.setCk(id == 1)
+        if (id == 0) {
+            showFragment(deviceFragment)
+        } else if (id == 1) {
+            showFragment(groupFragment)
+        }
+    }
 
-        inputTextDialog.setOnDialogListener {
-            if (fdsNodeInfo != null) {
-                /*
-                 * 重名了节点
-                 * type == "", 则不修改类型
-                 */
-                FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
-                studioDeviceAdapter.update()
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.tab_devices -> {
+                setTab(0)
             }
-        }
-
-        bottomMenuDialog.setOnDialogListener {
-            when (it) {
-                BottomMenuDialog.MENU_DELETE -> {
-                    //从Mesh中删除设备
-                    if (fdsNodeInfo != null) {
-                        loadingDialog.showDialog()
-                        fdsAddOrRemoveDeviceApi.deviceRemoveNetWork(
-                            fdsNodeInfo!!,
-                            false,
-                            object : FDSRemoveNodeCallBack {
-
-                                /*
-                                 * 删除设备完成回调
-                                 * isAllSuccess 是否全部退网成功
-                                 * fdsNodes 未退网成功的节点列表
-                                 */
-                                override fun onComplete(
-                                    isAllSuccess: Boolean,
-                                    fdsNodes: MutableList<FDSNodeInfo>,
-                                ) {
-                                    LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
-                                    studioDeviceAdapter.update()
-                                    loadingDialog.dismissDialog()
-                                }
-                            })
-                    }
-                }
-                BottomMenuDialog.MENU_RENAME -> {
-                    if (fdsNodeInfo != null) {
-                        inputTextDialog.setDefText(fdsNodeInfo!!.name)
-                        inputTextDialog.showDialog()
-                    }
-                }
-                BottomMenuDialog.MENU_BLE_UPGRADE -> {
-                    Toast.makeText(this, "功能开发中，敬请期待！", Toast.LENGTH_SHORT).show()
-                }
-                BottomMenuDialog.MENU_MCU_UPGRADE -> {
-                    Toast.makeText(this, "功能开发中，敬请期待！", Toast.LENGTH_SHORT).show()
-                }
+            R.id.tab_group -> {
+                setTab(1)
             }
         }
     }
 
-    override fun onNodeStatusChange(meshAddress: Int) {
-        //节点在线状态改变
-        LOGUtils.d("StudioActivity =====================> onNodeStatusChange()")
-        studioDeviceAdapter.update(meshAddress)
+    private fun showFragment(fragment:BaseFragment){
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        //先hide之前的fragment
+        if (nowFragment != null) {
+            if (nowFragment!!.isAdded && nowFragment!!.isVisible){
+                fragmentTransaction.hide(nowFragment!!)
+            }
+        }
+
+        //添加新的fragment
+        if (!fragment.isAdded){
+            fragmentTransaction.add(R.id.frameLayout,fragment)
+        }else{
+            fragmentTransaction.show(fragment)
+        }
+        nowFragment = fragment
+        fragmentTransaction.commit()
     }
+
 
     override fun finish() {
         super.finish()
@@ -160,7 +100,6 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
             val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
             val studioList = MMKVSp.instance.getStudioList()
             for (bean in studioList) {
-                LOGUtils.e("=======================>bean.index${bean.index} index:$index")
                 if (bean.index == index) {
                     bean.meshJsonStr = meshJsonStr
                 }
@@ -171,8 +110,6 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        fdsAddOrRemoveDeviceApi.destroy()
-        FDSMeshApi.instance.removeFDSNodeStatusChangeCallBack(this)
         MeshLogin.instance.disconnect()
     }
 }

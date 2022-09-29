@@ -102,7 +102,7 @@ class LightFXListActivity : BaseActivity() {
                     fdsCommandApi.changeLightFXRGBChase(address,71,3,15,2,2,3,fdColorChaseList)
                 }
             }
-            ConstantUtils.toastSuccess(getString(R.string.sending_completed_text))
+            ConstantUtils.toast(this,getString(R.string.sending_completed_text))
         }
     }
 

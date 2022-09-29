@@ -82,7 +82,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                 }
             }
             if(it in 0..6){
-                ConstantUtils.toastSuccess(getString(R.string.sending_completed_text))
+                ConstantUtils.toast(this,getString(R.string.sending_completed_text))
             }
         }
 
@@ -123,7 +123,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                 }
             }
             if (it in 1..6) {
-                ConstantUtils.toastSuccess(getString(R.string.sending_completed_text))
+                ConstantUtils.toast(this,getString(R.string.sending_completed_text))
             }
         }
     }
@@ -166,7 +166,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(state: Int, hour: Int, minute: Int, option: Int, power: Int) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toastSuccess("充电状态：${state}，使用时间小时部分：${hour}，" +
+        ConstantUtils.toast(this,"充电状态：${state}，使用时间小时部分：${hour}，" +
                 "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}")
     }
 
@@ -176,7 +176,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(version: String) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toastSuccess(getString(R.string.firmware_version_text) + version)
+        ConstantUtils.toast(this,getString(R.string.firmware_version_text) + version)
     }
 
     /**
@@ -187,7 +187,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(productVersion: String, mcuVersion: String) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toastSuccess("产品版本：${productVersion}，MCU方案版本：${mcuVersion}")
+        ConstantUtils.toast(this,"产品版本：${productVersion}，MCU方案版本：${mcuVersion}")
     }
 
 }
