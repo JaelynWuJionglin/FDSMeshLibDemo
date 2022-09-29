@@ -1,7 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.callbacks.FDSBatteryPowerCallBack
@@ -13,7 +12,6 @@ import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**
