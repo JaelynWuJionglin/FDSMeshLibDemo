@@ -16,7 +16,9 @@ data class DeviceLisBean(
  * studio列表
  */
 data class StudioListBean(
-    var name: String = ""
+    var index: Int = 0
 ){
+    var name: String = ""
     var meshJsonStr = ""
+    var choose = false
 }

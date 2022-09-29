@@ -4,11 +4,12 @@ import android.content.Context
 import android.text.TextUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.telink.ble.mesh.util.LOGUtils
 import com.tencent.mmkv.MMKV
 
 /**
- * mmkv数据缓存
+ * mmkv数据保存
  */
 class MMKVSp {
     private lateinit var kv: MMKV
@@ -28,17 +29,17 @@ class MMKVSp {
         kv = MMKV.defaultMMKV()
     }
 
-    fun setStudioList(studioList: MutableList<String>) {
+    fun setStudioList(studioList: MutableList<StudioListBean>) {
         val str = gson.toJson(studioList)
         kv.encode(KV_StudioList,str)
     }
 
-    fun getStudioList(): MutableList<String> {
+    fun getStudioList(): MutableList<StudioListBean> {
         val str = kv.decodeString(KV_StudioList)
         return if (TextUtils.isEmpty(str)) {
             mutableListOf()
         } else {
-            val type = object : TypeToken<List<String>>() {}.type
+            val type = object : TypeToken<List<StudioListBean>>() {}.type
             gson.fromJson(str, type)
         }
     }

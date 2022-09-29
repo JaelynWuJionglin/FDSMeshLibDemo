@@ -8,37 +8,50 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.telink.ble.mesh.util.LOGUtils
 
 class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
     private var studioList = MMKVSp.instance.getStudioList()
-    private var onItemClickListener: (String) -> Unit = {}
+    private var onItemClickListener: (StudioListBean) -> Unit = {}
 
     init {
         if (studioList.isEmpty()) {
-            addStudio("Studio-1")
+            val studioListBean = StudioListBean(getStudioNextIndex())
+            studioListBean.name = "Studio-1"
+            studioListBean.meshJsonStr = FDSMeshApi.instance.getInitMeshJson()
+            addStudio(studioListBean)
         }
         LOGUtils.d("StudioDeviceAdapter studioList.size:${studioList.size}")
+    }
+
+    fun updateData(){
+        studioList = MMKVSp.instance.getStudioList()
         notifyDataSetChanged()
     }
 
-    fun setOnItemClickListener(onItemClickListener: (String) -> Unit) {
+    fun setOnItemClickListener(onItemClickListener: (StudioListBean) -> Unit) {
         this.onItemClickListener = onItemClickListener
     }
 
-    fun addStudio(name: String){
-        for (s in studioList) {
-            if (s == name) {
-                return
-            }
-        }
-        studioList.add(name)
+    fun addStudio(studioListBean: StudioListBean) {
+        studioList.add(studioListBean)
         MMKVSp.instance.setStudioList(studioList)
-        for ((index, str) in studioList.withIndex()) {
-            if (str == name) {
-                notifyItemChanged(index)
+        notifyDataSetChanged()
+    }
+
+    fun getStudioNextIndex(): Int {
+        return if (studioList.isEmpty()) {
+            1
+        } else {
+            var index = 1
+            for (bean in studioList) {
+                if (bean.index > index) {
+                    index = bean.index
+                }
             }
+            index+1
         }
     }
 
@@ -50,16 +63,30 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        val str = studioList[position]
-        holder.tv_name.text = str
+        val bean = studioList[position]
+        holder.tv_name.text = if (bean.name == "") {
+            "Studio-${bean.index}"
+        } else {
+            bean.name
+        }
 
-        //长按事件
-        holder.itemView.setOnLongClickListener {
-            onItemClickListener(str)
-            false
+        LOGUtils.e("=====> position:$position  studioList.size:${studioList.size}")
+        if (position == studioList.size - 1) {
+            holder.view_line.visibility = View.GONE
+        } else {
+            holder.view_line.visibility = View.VISIBLE
+        }
+
+        //点击事件
+        holder.itemView.setOnClickListener {
+            onItemClickListener(bean)
+            for (studio in studioList) {
+                studio.choose = studio.name == bean.name
+            }
+            MMKVSp.instance.setStudioList(studioList)
         }
         holder.itemView.setOnClickListener{
-            onItemClickListener(str)
+            onItemClickListener(bean)
         }
     }
 
@@ -69,5 +96,6 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
 
     class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
+        val view_line = itemView.findViewById<View>(R.id.view_line)
     }
 }

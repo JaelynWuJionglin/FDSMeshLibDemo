@@ -13,12 +13,14 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.app.App
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.BottomMenuDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.util.LOGUtils
+import com.tencent.mmkv.MMKV
 import kotlinx.android.synthetic.main.activity_studio.*
 import kotlinx.android.synthetic.main.activity_studio.recyclerView_devices
 
@@ -29,6 +31,7 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
     private lateinit var inputTextDialog: InputTextDialog
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var fdsNodeInfo: FDSNodeInfo? = null
+    private var index = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,11 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
     }
 
     private fun initView() {
+        index = intent.getIntExtra("index", 0)
+        if (index == 0) {
+            finish()
+        }
+
         loadingDialog = LoadingDialog(this)
         bottomMenuDialog = BottomMenuDialog(this)
 
@@ -142,6 +150,23 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
         //节点在线状态改变
         LOGUtils.d("StudioActivity =====================> onNodeStatusChange()")
         studioDeviceAdapter.update(meshAddress)
+    }
+
+    override fun finish() {
+        super.finish()
+
+        if (index != 0){
+            //保存当前MeshJson数据
+            val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
+            val studioList = MMKVSp.instance.getStudioList()
+            for (bean in studioList) {
+                LOGUtils.e("=======================>bean.index${bean.index} index:$index")
+                if (bean.index == index) {
+                    bean.meshJsonStr = meshJsonStr
+                }
+            }
+            MMKVSp.instance.setStudioList(studioList)
+        }
     }
 
     override fun onDestroy() {
