@@ -9,7 +9,11 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
+import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import kotlinx.android.synthetic.main.light_fx_list_activity.*
 import kotlinx.android.synthetic.main.mode_list_activity.*
+import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
 
 /**
  * 修改灯光特效列表页
@@ -17,17 +21,25 @@ import kotlinx.android.synthetic.main.mode_list_activity.*
 class LightFXListActivity : BaseActivity() {
     private lateinit var modelAdapterV3: ModelAdapter
     private var modelListV3: MutableList<ModelInfo> = mutableListOf()
-    private var address=-1//传入的地址
+    private var address = -1//传入的地址
+    private var typeName=""//传入的设备名称与组名称
     private  val fdColorFadeIn:FDSColorBlockBean=FDSColorBlockBean()
     private  val fdColorFadeInList:MutableList<FDSColorBlockBean> = mutableListOf()
     private  val fdColorFlowList:MutableList<FDSColorBlockBean> = mutableListOf()
     private  val fdColorChaseList:MutableList<FDSColorBlockBean> = mutableListOf()
+    private val fdsCommandApi:FDSCommandApi=FDSCommandApi.instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.light_fx_list_activity)
+
         initData()
+        initView()
         initRecyclerView()
+    }
+
+    private fun initView() {
+        titleBar.initTitleBar(typeName,0,false)
     }
 
     private fun initRecyclerView() {
@@ -39,79 +51,84 @@ class LightFXListActivity : BaseActivity() {
         modelAdapterV3.setOnItemClickListener{it,address->
             when(it){
                 0->{//闪光灯
-                    FDSCommandApi.instance.changeLightFXFlash(address,60,5,1,0,0,0,200,60);
+                    fdsCommandApi.changeLightFXFlash(address,60,5,1,0,0,0,200,60);
                 }
                 1->{//雷闪电
-                    FDSCommandApi.instance.changeLightFXLightning(address,61,5,2,1,1,210);
+                    fdsCommandApi.changeLightFXLightning(address,61,5,2,0,0,210);
                 }
                 2->{//多云
-                    FDSCommandApi.instance.changeLightFXCloudy(address,62,7,3,20)
+                    fdsCommandApi.changeLightFXCloudy(address,62,7,3,20)
                 }
                 3->{//坏灯泡
-                    FDSCommandApi.instance.changeLightFXBrokenBulb(address,63,8,4,1,300,51)
+                    fdsCommandApi.changeLightFXBrokenBulb(address,63,8,4,1,300,51)
                 }
                 4->{//电视机
-                    FDSCommandApi.instance.changeLightFXTV(address,64,9,5,1)
+                    fdsCommandApi.changeLightFXTV(address,64,9,5,1)
                 }
                 5->{//蜡烛
-                    FDSCommandApi.instance.changeLightFXCandle(address,65,1,6)
+                    fdsCommandApi.changeLightFXCandle(address,65,1,6)
                 }
                 6->{//火
-                    FDSCommandApi.instance.changeLightFXFire(address,66,2,7)
+                    fdsCommandApi.changeLightFXFire(address,66,2,7)
                 }
                 7->{//烟花
-                    FDSCommandApi.instance.changeLightFXFirework(address,67,3,8,1)
+                    fdsCommandApi.changeLightFXFirework(address,67,3,8,1)
                 }
                 8->{//爆炸
-                    FDSCommandApi.instance.changeLightFXExplode(address,68,4,9,2,1,1,300,50)
+                    fdsCommandApi.changeLightFXExplode(address,68,4,9,2,0,1,300,50)
                 }
                 9->{//焊接
-                    FDSCommandApi.instance.changeLightFXWelding(address,69,5,10,0,200,51)
+                    fdsCommandApi.changeLightFXWelding(address,69,5,10,1,200,51)
                 }
                 10->{//警车
-                    FDSCommandApi.instance.changeLightFXPoliceCar(address,67,6,2,2)
+                    fdsCommandApi.changeLightFXPoliceCar(address,67,6,2,0)
                 }
                 11->{//SOS
-                    FDSCommandApi.instance.changeLightFXSOS(address,68,7,0,200,52)
+                    fdsCommandApi.changeLightFXSOS(address,68,7,0,200,52)
                 }
                 12->{//彩光循环
-                    FDSCommandApi.instance.changeLightFXRGBCycle(address,67,8,11,50)
+                    fdsCommandApi.changeLightFXRGBCycle(address,67,8,11,50)
                 }
                 13->{//激光彩灯
-                    FDSCommandApi.instance.changeLightFXLaser(address,68,9,12,51)
+                    fdsCommandApi.changeLightFXLaser(address,68,9,12,51)
                 }
                 14->{//彩光渐入
-                    FDSCommandApi.instance.changeLightFXRGBFadeIn(address,69,1,13,0,2,fdColorFadeIn,fdColorFadeInList)
+                    fdsCommandApi.changeLightFXRGBFadeIn(address,69,1,13,1,2,fdColorFadeIn,fdColorFadeInList)
                 }
                 15->{//彩光流动
-                    FDSCommandApi.instance.changeLightFXRGBFlow(address,70,2,14,1,3,fdColorFlowList)
+                    fdsCommandApi.changeLightFXRGBFlow(address,70,2,14,1,3,fdColorFlowList)
                 }
                 16->{//彩光追逐
-                    FDSCommandApi.instance.changeLightFXRGBChase(address,71,3,15,2,2,3,fdColorChaseList)
+                    fdsCommandApi.changeLightFXRGBChase(address,71,3,15,2,2,3,fdColorChaseList)
                 }
             }
+            ConstantUtils.toastSuccess(getString(R.string.sending_completed_text))
         }
     }
 
     private fun initData(){
+        val bundle=intent.extras
+        address= bundle!!.getInt("address")
+        typeName= bundle.getString("typeName")!!
+
         //v3添加
-        modelListV3.add(modelData(2,"闪光灯",address))
-        modelListV3.add(modelData(2,"雷闪电",address))
-        modelListV3.add(modelData(2,"多云",address))
-        modelListV3.add(modelData(2,"坏灯泡",address))
-        modelListV3.add(modelData(2,"电视机",address))
-        modelListV3.add(modelData(2,"蜡烛",address))
-        modelListV3.add(modelData(2,"火",address))
-        modelListV3.add(modelData(2,"烟花",address))
-        modelListV3.add(modelData(2,"爆炸",address))
-        modelListV3.add(modelData(2,"焊接",address))
-        modelListV3.add(modelData(2,"警车",address))
-        modelListV3.add(modelData(2,"SOS",address))
-        modelListV3.add(modelData(2,"彩光循环",address))
-        modelListV3.add(modelData(2,"激光彩灯",address))
-        modelListV3.add(modelData(2,"彩光渐入",address))
-        modelListV3.add(modelData(2,"彩光流动",address))
-        modelListV3.add(modelData(2,"彩光追逐",address))
+        modelListV3.add(modelData("闪光灯",address))
+        modelListV3.add(modelData("雷闪电",address))
+        modelListV3.add(modelData("多云",address))
+        modelListV3.add(modelData("坏灯泡",address))
+        modelListV3.add(modelData("电视机",address))
+        modelListV3.add(modelData("蜡烛",address))
+        modelListV3.add(modelData("火",address))
+        modelListV3.add(modelData("烟花",address))
+        modelListV3.add(modelData("爆炸",address))
+        modelListV3.add(modelData("焊接",address))
+        modelListV3.add(modelData("警车",address))
+        modelListV3.add(modelData("SOS",address))
+        modelListV3.add(modelData("彩光循环",address))
+        modelListV3.add(modelData("激光彩灯",address))
+        modelListV3.add(modelData("彩光渐入",address))
+        modelListV3.add(modelData("彩光流动",address))
+        modelListV3.add(modelData("彩光追逐",address))
 
         //彩光渐入背景色
         fdColorFadeIn.option=0

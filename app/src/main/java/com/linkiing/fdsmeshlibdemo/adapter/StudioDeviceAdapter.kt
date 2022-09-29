@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
@@ -17,6 +18,7 @@ import com.telink.ble.mesh.util.LOGUtils
 class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>() {
     private var fdsNodeList = FDSMeshApi.instance.getFDSNodes()
     private var itemLongClickListener: (FDSNodeInfo) -> Unit = {}
+    private var itemClickListener: (FDSNodeInfo) -> Unit = {}
 
     fun update(){
         fdsNodeList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
@@ -34,6 +36,9 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
     fun setItemLongClickListener(itemLongClickListener: (FDSNodeInfo) -> Unit) {
         this.itemLongClickListener = itemLongClickListener
+    }
+    fun setItemClickListener(itemClickListener: (FDSNodeInfo) -> Unit) {
+        this.itemClickListener = itemClickListener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
@@ -75,13 +80,18 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
         //Switch
         holder.iv_switch.setOnCheckedChangeListener { compoundButton, b ->
-
+            //设备开关灯
+            FDSCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress,b)
         }
 
         //长按事件
         holder.itemView.setOnLongClickListener {
             itemLongClickListener(fdsNodeInfo)
             false
+        }
+        //点击事件
+        holder.itemView.setOnClickListener {
+            itemClickListener(fdsNodeInfo)
         }
     }
 

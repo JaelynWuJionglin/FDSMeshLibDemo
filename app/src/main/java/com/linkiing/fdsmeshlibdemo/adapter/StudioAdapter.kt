@@ -58,6 +58,9 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             onItemClickListener(str)
             false
         }
+        holder.itemView.setOnClickListener{
+            onItemClickListener(str)
+        }
     }
 
     override fun getItemCount(): Int {

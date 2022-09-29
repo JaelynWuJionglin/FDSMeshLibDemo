@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.main.MeshLogin
@@ -13,6 +14,7 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.BottomMenuDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
@@ -62,6 +64,17 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
             fdsNodeInfo = it
             bottomMenuDialog.showDialog()
         }
+        studioDeviceAdapter.setItemClickListener {
+            if (it.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
+                ConstantUtils.toastFail(getString(R.string.equipment_not_online_text))
+            } else {
+                val bundle=Bundle()
+                bundle.putInt("address",it.meshAddress)
+                bundle.putString("typeName",it.name);
+                goActivityBundle(ModeListActivity::class.java,false,bundle)
+            }
+
+        }
     }
 
     private fun initListener() {
@@ -77,7 +90,7 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
                  * 重名了节点
                  * type == "", 则不修改类型
                  */
-                FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!,it,"")
+                FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
                 studioDeviceAdapter.update()
             }
         }
@@ -98,8 +111,10 @@ class StudioActivity : BaseActivity(), NodeStatusChangeListener {
                                  * isAllSuccess 是否全部退网成功
                                  * fdsNodes 未退网成功的节点列表
                                  */
-                                override fun onComplete(isAllSuccess: Boolean,
-                                                        fdsNodes: MutableList<FDSNodeInfo>) {
+                                override fun onComplete(
+                                    isAllSuccess: Boolean,
+                                    fdsNodes: MutableList<FDSNodeInfo>,
+                                ) {
                                     LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
                                     studioDeviceAdapter.update()
                                     loadingDialog.dismissDialog()

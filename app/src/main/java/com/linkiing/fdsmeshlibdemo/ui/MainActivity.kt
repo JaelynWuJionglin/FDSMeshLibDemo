@@ -23,7 +23,10 @@ class MainActivity : BaseActivity() {
         initRecyclerView()
         //跳转到功能列表
         testOnclick.setOnClickListener{
-            goActivity(ModeListActivity::class.java, false)
+            val bundle=Bundle()
+            bundle.putInt("address",-1)
+            bundle.putString("typeName","节点");
+            goActivityBundle(ModeListActivity::class.java,false,bundle)
         }
     }
 

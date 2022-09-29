@@ -7,7 +7,10 @@
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/arrow_right_24.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/back_img.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/blue_round_bg.xml" value="0.2115" />
+        <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/checked_image_off.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/checked_image_on.xml" value="0.2115" />
+        <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/ic_baseline_close.xml" value="0.2115" />
+        <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/ic_baseline_tick.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/ic_bulb.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/ic_group.xml" value="0.2115" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2115" />
@@ -22,11 +25,13 @@
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/device_fragment.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/group_fragment.xml" value="0.33" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/item_main_tab.xml" value="0.3338541666666667" />
+        <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/layout_device_item.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/layout_main_bottom_bar.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/layout_model_item.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/layout_studio_item.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/light_fx_list_activity.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/mode_list_activity.xml" value="0.3338541666666667" />
+        <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/layout/title_bar_layout.xml" value="0.3338541666666667" />
         <entry key="..\:/demo_workspace/MeshProject/FDSMeshLibDemo/app/src/main/res/menu/bottom_navigation.xml" value="0.3338541666666667" />
       </map>
     </option>

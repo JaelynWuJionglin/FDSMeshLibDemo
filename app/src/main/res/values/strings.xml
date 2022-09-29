@@ -4,4 +4,7 @@
     <string name="cancel_text">取消</string>
     <string name="notifyTitle">提示</string>
     <string name="gpsNotifyMsg">当前应用需要打开定位功能,请点击设置-定位服务-打开定位功能</string>
+    <string name="sending_completed_text">发送完成</string>
+    <string name="equipment_not_online_text">设备不在线，请稍后</string>
+    <string name="firmware_version_text">蓝牙固件版本：</string>
 </resources>
