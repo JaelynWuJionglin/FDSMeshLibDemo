@@ -5,24 +5,29 @@ import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.linkiing.fdsmeshlibdemo.R
 
 class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, attrs) {
     private var back: ImageView
     private var titleText: TextView
     private var endText: TextView
-    private var lrScan: LinearLayout
+    private var lrEndImage: LinearLayout
+    private var ivEndImage: ImageView
 
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.title_bar_layout, this)
         back = view.findViewById(R.id.back)
         endText = view.findViewById(R.id.tv_end)
         titleText = view.findViewById(R.id.title_text)
-        lrScan = view.findViewById(R.id.lr_scan)
+        lrEndImage = view.findViewById(R.id.lr_end_image)
+        ivEndImage = view.findViewById(R.id.iv_end_image)
 
         initTypedArray(attrs)
 
@@ -39,7 +44,7 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         titleText.text = text
     }
 
-    fun initTitleBar(titleTextId: Int, endTextId: Int, isEdit: Boolean) {
+    fun initTitleBar(titleTextId: Int, @StringRes endTextId: Int) {
         if (titleTextId == 0) {
             titleText.text = ""
         } else {
@@ -53,13 +58,13 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         setEndImage(false)
     }
 
-    fun initTitleBar(titleTextValue: String, endTextValue: String, isEdit: Boolean) {
+    fun initTitleBar(titleTextValue: String, endTextValue: String) {
         titleText.text = titleTextValue
         endText.text = endTextValue
         setEndImage(false)
     }
 
-    fun initTitleBar(titleTextStr: String, endTextId: Int, isEdit: Boolean) {
+    fun initTitleBar(titleTextStr: String, @StringRes endTextId: Int) {
         titleText.text = titleTextStr
         if (endTextId == 0) {
             endText.text = ""
@@ -69,10 +74,17 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         setEndImage(false)
     }
 
-    fun initTitleBar(titleTextId: Int, isEdit: Boolean, isEndImage: Boolean) {
-        titleText.setText(titleTextId)
+    fun initTitleBar(isBack:Boolean, @DrawableRes endImageViewId: Int) {
+        if (isBack) {
+            back.visibility = View.VISIBLE
+        } else {
+            back.visibility = View.GONE
+        }
         endText.text = ""
-        setEndImage(isEndImage)
+        setEndImage(endImageViewId != 0)
+        if(endImageViewId != 0) {
+            ivEndImage.setBackgroundResource(endImageViewId)
+        }
     }
 
     fun setTitle(text: String) {
@@ -83,12 +95,12 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         return titleText;
     }
 
-    fun setTitle(titleTextId: Int) {
+    fun setTitle(@StringRes titleTextId: Int) {
         titleText.setText(titleTextId)
     }
 
     private fun setEndImage(isEndImage: Boolean) {
-        lrScan.visibility = if (isEndImage) {
+        lrEndImage.visibility = if (isEndImage) {
             VISIBLE
         } else {
             GONE
@@ -100,6 +112,6 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
     }
 
     fun setOnEndImageListener(listener: OnClickListener) {
-        lrScan.setOnClickListener(listener)
+        lrEndImage.setOnClickListener(listener)
     }
 }

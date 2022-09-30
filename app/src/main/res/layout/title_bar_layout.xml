@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="45dp">
+    android:layout_height="45dp"
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/back"
@@ -36,7 +37,7 @@
         android:visibility="gone"/>
 
     <LinearLayout
-        android:id="@+id/lr_scan"
+        android:id="@+id/lr_end_image"
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
@@ -44,6 +45,7 @@
         android:visibility="gone">
 
         <ImageView
+            android:id="@+id/iv_end_image"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/ic_launcher_background"
@@ -54,6 +56,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@drawable/line_grey"
+        android:background="@color/grey_line"
         android:layout_alignParentBottom="true"/>
 </RelativeLayout>

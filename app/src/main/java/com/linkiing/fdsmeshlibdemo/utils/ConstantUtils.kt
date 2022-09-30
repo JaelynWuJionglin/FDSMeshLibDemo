@@ -1,6 +1,7 @@
 package com.linkiing.fdsmeshlibdemo.utils
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.widget.Toast
 
 object ConstantUtils {
@@ -13,5 +14,16 @@ object ConstantUtils {
             toast?.cancel()
         }
         toast?.show()
+    }
+
+    /*获取app版本字符串*/
+    fun getAppVerStr(context: Context): String {
+        return try {
+            val manager = context.packageManager.getPackageInfo(context.packageName, 0)
+            manager.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            "Unknown"
+        }
     }
 }

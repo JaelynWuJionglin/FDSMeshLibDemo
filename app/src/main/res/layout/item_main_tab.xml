@@ -23,5 +23,5 @@
         android:text="节点"
         android:textColor="@color/main_tab_color"
         android:textSize="12dp"
-        android:layout_marginTop="6dp"/>
+        android:layout_marginTop="3dp"/>
 </LinearLayout>

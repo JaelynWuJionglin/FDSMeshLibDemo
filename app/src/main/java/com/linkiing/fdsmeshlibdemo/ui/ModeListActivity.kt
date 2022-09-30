@@ -38,7 +38,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
 
     private fun initView() {
         loadingDialog = LoadingDialog(this)
-        mode_titleBar.initTitleBar(typeName,0,false)
+        mode_titleBar.initTitleBar(typeName,0)
     }
 
     private fun initRecyclerView() {

@@ -55,8 +55,10 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
         tab_devices.setCk(id == 0)
         tab_group.setCk(id == 1)
         if (id == 0) {
+            titleBar?.setTitle("节点")
             showFragment(deviceFragment)
         } else if (id == 1) {
+            titleBar?.setTitle("组别")
             showFragment(groupFragment)
         }
     }

@@ -55,9 +55,9 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
         //在线状态
         if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-            holder.iv_light.setBackgroundResource(R.drawable.light_off)
+            holder.iv_light.setBackgroundResource(R.drawable.device_off)
         } else {
-            holder.iv_light.setBackgroundResource(R.drawable.light_on)
+            holder.iv_light.setBackgroundResource(R.drawable.device_on)
         }
 
         //开光状态

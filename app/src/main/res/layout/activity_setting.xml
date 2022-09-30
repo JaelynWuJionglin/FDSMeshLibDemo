@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.linkiing.fdsmeshlibdemo.view.TitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:titleBar_titleText="Setting"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/white_round_bg"
+        android:orientation="vertical"
+        android:paddingStart="10dp">
+
+        <com.linkiing.fdsmeshlibdemo.view.MenuItem
+            android:id="@+id/mesh_lib_ver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu_text="@string/mesh_lib_ver"
+            app:menu_image_end="@drawable/arrow_right"
+            app:menu_text_end="v1.0.0"/>
+
+        <View
+            android:id="@+id/tv_line"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/grey_line"
+            android:layout_marginStart="10dp"/>
+
+        <com.linkiing.fdsmeshlibdemo.view.MenuItem
+            android:id="@+id/my_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu_text="@string/my_about"
+            app:menu_image_end="@drawable/arrow_right"
+            app:menu_text_end="v1.0.0"/>
+
+    </LinearLayout>
+
+</LinearLayout>

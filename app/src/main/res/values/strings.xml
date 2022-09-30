@@ -7,4 +7,6 @@
     <string name="sending_completed_text">发送完成</string>
     <string name="equipment_not_online_text">设备不在线，请稍后</string>
     <string name="firmware_version_text">蓝牙固件版本：</string>
+    <string name="mesh_lib_ver">MESH库版本</string>
+    <string name="my_about">关于软件</string>
 </resources>

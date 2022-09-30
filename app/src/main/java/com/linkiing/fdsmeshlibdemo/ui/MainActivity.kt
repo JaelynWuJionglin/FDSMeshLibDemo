@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSMeshApi
@@ -17,6 +18,7 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_studio.*
+import kotlinx.android.synthetic.main.activity_main.titleBar as titleBar1
 
 class MainActivity : BaseActivity() {
     private lateinit var studioAdapter: StudioAdapter
@@ -37,6 +39,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initView() {
+        titleBar?.initTitleBar(false, R.drawable.settings_image)
+
+        titleBar?.setOnEndImageListener{
+            goActivity(SettingActivity::class.java,false)
+        }
+
         inputTextDialog = InputTextDialog(this)
         inputTextDialog.setTitleText("新增Studio")
         inputTextDialog.setOnDialogListener {

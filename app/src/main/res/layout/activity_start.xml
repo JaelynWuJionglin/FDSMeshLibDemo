@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_92e5e9"
+        android:textSize="46sp"
+        android:text="FDS Mesh"
+        android:textStyle="italic|bold"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/tv_time_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="— 2022-V1.0.1 —"
+        android:textColor="@color/black1"
+        android:textSize="16sp"
+        android:layout_below="@+id/tv_name"
+        android:layout_alignEnd="@+id/tv_name"/>
+
+</RelativeLayout>

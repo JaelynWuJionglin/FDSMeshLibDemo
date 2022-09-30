@@ -6,11 +6,12 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="55dp"
         android:orientation="horizontal"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:background="@color/white1">
 
         <TextView
             android:layout_width="0dp"
@@ -37,7 +38,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@drawable/line_grey"/>
+        android:background="@color/grey_line"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_devices"

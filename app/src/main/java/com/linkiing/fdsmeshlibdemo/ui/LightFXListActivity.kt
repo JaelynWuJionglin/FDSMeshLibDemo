@@ -39,7 +39,7 @@ class LightFXListActivity : BaseActivity() {
     }
 
     private fun initView() {
-        titleBar.initTitleBar(typeName,0,false)
+        titleBar.initTitleBar(typeName,0)
     }
 
     private fun initRecyclerView() {
