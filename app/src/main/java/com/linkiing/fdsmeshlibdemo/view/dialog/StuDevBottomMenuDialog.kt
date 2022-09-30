@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.bottom_dialog_layout.*
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.*
 
-class BottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout.bottom_dialog_layout),
+class StuDevBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout.stu_dev_bottom_dialog_layout),
     View.OnClickListener {
     private var listener: (Int) -> Unit = {}
 

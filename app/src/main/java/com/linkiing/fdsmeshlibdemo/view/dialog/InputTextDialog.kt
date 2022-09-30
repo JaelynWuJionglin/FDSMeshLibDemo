@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.view.dialog
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.annotation.StringRes
 import com.linkiing.fdsmeshlibdemo.R
 import kotlinx.android.synthetic.main.input_text_dialog_layout.*
@@ -39,8 +40,11 @@ class InputTextDialog(context: Context)
     /**
      * 设置默认文字
      */
-    fun setDefText(str:String):InputTextDialog{
-        defText = str
+    fun setDefText(str:String?):InputTextDialog{
+        if (!TextUtils.isEmpty(str)){
+            defText = str!!
+        }
+        
         if (et_input!=null){
             et_input.setText(defText)
         }

@@ -85,8 +85,8 @@ class AddDeviceActivity: BaseActivity() {
 
                 //节点设置默认名称
                 for (fdsNode in fdsNodes) {
-                    val type = fdsNode.type
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode,"GD_LED_$type","")
+                    val symbol = fdsNode.symbol
+                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode,"GD_LED_$symbol","")
                 }
 
                 addDevicesAdapter.removeItemAtInNetWork(fdsNodes)

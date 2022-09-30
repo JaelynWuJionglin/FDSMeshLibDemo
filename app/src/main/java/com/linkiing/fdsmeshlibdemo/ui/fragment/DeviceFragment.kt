@@ -2,7 +2,6 @@ package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.main.MeshLogin
@@ -16,16 +15,16 @@ import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.linkiing.fdsmeshlibdemo.view.dialog.BottomMenuDialog
+import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.device_fragment.*
 
 class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
-    private lateinit var bottomMenuDialog: BottomMenuDialog
+    private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
-    private lateinit var inputTextDialog: InputTextDialog
+    private lateinit var renameTextDialog: InputTextDialog
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi:FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
@@ -46,10 +45,10 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
     private fun initView() {
         loadingDialog = LoadingDialog(requireContext())
-        bottomMenuDialog = BottomMenuDialog(mContext)
+        stuDevBottomMenuDialog = StuDevBottomMenuDialog(mContext)
 
-        inputTextDialog = InputTextDialog(mContext)
-        inputTextDialog.setTitleText("重命名节点？")
+        renameTextDialog = InputTextDialog(mContext)
+        renameTextDialog.setTitleText("重命名节点？")
 
         fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(mActivity)
     }
@@ -63,7 +62,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
         studioDeviceAdapter?.setItemLongClickListener {
             fdsNodeInfo = it
-            bottomMenuDialog.showDialog()
+            stuDevBottomMenuDialog.showDialog()
         }
 
         studioDeviceAdapter?.setItemClickListener {
@@ -72,10 +71,9 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
             } else {
                 val bundle= Bundle()
                 bundle.putInt("address",it.meshAddress)
-                bundle.putString("typeName",it.name);
+                bundle.putString("typeName",it.deviceName);
                 goActivityBundle(ModeListActivity::class.java,false,bundle)
             }
-
         }
     }
 
@@ -86,7 +84,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
             goActivity(AddDeviceActivity::class.java, false)
         }
 
-        inputTextDialog.setOnDialogListener {
+        renameTextDialog.setOnDialogListener {
             if (fdsNodeInfo != null) {
                 /*
                  * 重名了节点
@@ -97,9 +95,9 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
             }
         }
 
-        bottomMenuDialog.setOnDialogListener {
+        stuDevBottomMenuDialog.setOnDialogListener {
             when (it) {
-                BottomMenuDialog.MENU_DELETE -> {
+                StuDevBottomMenuDialog.MENU_DELETE -> {
                     //从Mesh中删除设备
                     if (fdsNodeInfo != null) {
                         loadingDialog.showDialog()
@@ -124,16 +122,16 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                             })
                     }
                 }
-                BottomMenuDialog.MENU_RENAME -> {
+                StuDevBottomMenuDialog.MENU_RENAME -> {
                     if (fdsNodeInfo != null) {
-                        inputTextDialog.setDefText(fdsNodeInfo!!.name)
-                        inputTextDialog.showDialog()
+                        renameTextDialog.setDefText(fdsNodeInfo!!.deviceName)
+                        renameTextDialog.showDialog()
                     }
                 }
-                BottomMenuDialog.MENU_BLE_UPGRADE -> {
+                StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     ConstantUtils.toast(mContext,"功能开发中，敬请期待！")
                 }
-                BottomMenuDialog.MENU_MCU_UPGRADE -> {
+                StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {
                     ConstantUtils.toast(mContext,"功能开发中，敬请期待！")
                 }
             }

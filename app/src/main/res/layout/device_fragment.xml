@@ -32,7 +32,7 @@
             android:paddingEnd="15dp"
             android:textSize="12sp"
             android:textColor="@color/white"
-            android:text="添加设备"/>
+            android:text="+ 添加设备"/>
     </LinearLayout>
 
     <View

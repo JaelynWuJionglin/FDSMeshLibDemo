@@ -50,14 +50,14 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val fdsNodeInfo = fdsNodeList[position]
-        holder.tv_name.text = fdsNodeInfo.name
-        holder.tv_mac.text = fdsNodeInfo.macAddress
+        holder.tv_name.text = fdsNodeInfo.deviceName
+        holder.tv_mac.text = "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.symbol}"
 
         //在线状态
         if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-            holder.iv_light.setBackgroundResource(R.drawable.device_off)
+            holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
         } else {
-            holder.iv_light.setBackgroundResource(R.drawable.device_on)
+            holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
         }
 
         //开光状态

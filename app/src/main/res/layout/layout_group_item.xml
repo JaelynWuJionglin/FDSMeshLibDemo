@@ -25,20 +25,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:text="GD_LED_0000"
+            android:text="Group-1"
             android:textColor="@color/black"
             android:textSize="14sp"
-            app:layout_constraintBottom_toTopOf="@+id/tv_mac"
+            app:layout_constraintBottom_toTopOf="@+id/tv_msg"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toEndOf="@+id/iv_light"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_mac"
+            android:id="@+id/tv_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:text="00:00:00:00:00:00"
+            android:text="0个节点"
             android:textColor="@color/grey"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -46,11 +46,11 @@
             app:layout_constraintStart_toEndOf="@+id/iv_light"
             app:layout_constraintTop_toBottomOf="@+id/tv_name" />
 
-        <ImageView
-            android:id="@+id/iv_check"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@drawable/checked_image_off"
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/iv_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
