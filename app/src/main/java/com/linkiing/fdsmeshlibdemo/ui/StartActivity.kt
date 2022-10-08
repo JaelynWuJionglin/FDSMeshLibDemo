@@ -5,9 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import com.linkiing.fdsmeshlib.BuildConfig
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import kotlinx.android.synthetic.main.activity_start.*
 
 
@@ -28,7 +28,7 @@ class StartActivity: BaseActivity() {
         setContentView(R.layout.activity_start)
 
         @SuppressLint("SetTextI18n")
-        tv_time_version?.text = "2022-V${BuildConfig.sdkVersionName}"
+        tv_time_version?.text = "2022-V${ConstantUtils.getAppVerStr(this)}"
 
         handler.postDelayed({
             goActivity(MainActivity::class.java, true)
