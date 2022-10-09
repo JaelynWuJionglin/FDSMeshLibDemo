@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.bean
 
+import com.godox.sdk.model.FDSNodeInfo
 import com.telink.ble.mesh.entity.AdvertisingDevice
 
 /**
@@ -17,8 +18,24 @@ data class DeviceLisBean(
  */
 data class StudioListBean(
     var index: Int = 0
-){
+) {
     var name: String = ""
     var meshJsonStr = ""
     var choose = false
 }
+
+/**
+ * ModelInfo
+ */
+data class ModelInfo(
+
+    /**
+     * 类型名字
+     */
+    var name: String = "",
+
+    /**
+     * 设备/组地址
+     */
+    var address: Int = -1,
+)

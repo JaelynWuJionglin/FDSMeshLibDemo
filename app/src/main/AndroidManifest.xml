@@ -2,15 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.linkiing.fdsmeshlibdemo">
-
-    <!--网络-->
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--定位 蓝牙需要-->
+    <!-- 网络 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 定位 蓝牙需要 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- 蓝牙 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 蓝牙 -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
@@ -18,7 +13,6 @@
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <!--<uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />-->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
@@ -32,49 +26,45 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FDSMeshLibDemo"
         tools:targetApi="31">
-
         <activity
-            android:name="com.linkiing.fdsmeshlibdemo.ui.StartActivity"
+            android:name=".ui.StartActivity"
             android:exported="true"
-            android:theme="@style/Theme.StartActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.SettingActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.StudioActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.AddDeviceActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.ModeListActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.LightFXListActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".ui.AddDeviceInGroupActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

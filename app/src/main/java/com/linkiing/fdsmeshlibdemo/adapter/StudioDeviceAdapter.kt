@@ -26,9 +26,9 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         notifyDataSetChanged()
     }
 
-    fun update(meshAddress: Int){
+    fun update(meshAddressList: MutableList<Int>){
         for ((index, dev) in fdsNodeList.withIndex()) {
-            if (dev.meshAddress == meshAddress) {
+            if (listHaveMeshAddress(dev.meshAddress,meshAddressList)) {
                 notifyItemChanged(index)
             }
         }
@@ -39,6 +39,15 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     }
     fun setItemClickListener(itemClickListener: (FDSNodeInfo) -> Unit) {
         this.itemClickListener = itemClickListener
+    }
+
+    private fun listHaveMeshAddress(meshAddress: Int, meshAddressList: MutableList<Int>): Boolean {
+        for (address in meshAddressList){
+            if (address == meshAddress) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {

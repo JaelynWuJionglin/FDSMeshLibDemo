@@ -138,10 +138,10 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
         }
     }
 
-    override fun onNodeStatusChange(meshAddress: Int) {
+    override fun onNodeStatusChange(meshAddressList: MutableList<Int>) {
         //节点在线状态改变
         LOGUtils.d("StudioActivity =====================> onNodeStatusChange()")
-        studioDeviceAdapter?.update(meshAddress)
+        studioDeviceAdapter?.update(meshAddressList)
     }
 
     override fun onDestroy() {
