@@ -7,21 +7,23 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.bean.DeviceLisBean
+import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 import com.telink.ble.mesh.entity.AdvertisingDevice
 
-class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
-    private val devList = mutableListOf<DeviceLisBean>()
+class GroupDeviceAdapter(private val groupAddress: Int) : RecyclerView.Adapter<GroupDeviceAdapter.MyHolder>() {
+    private var devList = getFDSNodeList()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 
-    fun addDevices(advertisingDevice: AdvertisingDevice, type: String) {
-        if (haveDevice(advertisingDevice)) {
-            return
-        }
-        devList.add(DeviceLisBean(advertisingDevice, type))
-        notifyItemChanged(devList.size - 1)
+    fun update(){
+        devList = getFDSNodeList()
+        notifyDataSetChanged()
+    }
+
+    fun setIsAllCheckListener(isAllCheckListener: (Boolean) -> Unit) {
+        this.isAllCheckListener = isAllCheckListener
     }
 
     fun allCheck(isAllCheck: Boolean) {
@@ -31,37 +33,26 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         notifyDataSetChanged()
     }
 
-    fun removeItemAtInNetWork(fdsNodes: MutableList<FDSNodeInfo>) {
-        val iterator = devList.iterator()
-        while (iterator.hasNext()) {
-            val dev = iterator.next()
-            for (fdsNode in fdsNodes) {
-                if (fdsNode.macAddress == dev.advertisingDevice.device.address) {
-                    iterator.remove()
-                }
-            }
-        }
-        notifyDataSetChanged()
-    }
-
-    fun clearList() {
-        devList.clear()
-        notifyDataSetChanged()
-    }
-
-    fun setIsAllCheckListener(isAllCheckListener: (Boolean) -> Unit) {
-        this.isAllCheckListener = isAllCheckListener
-    }
-
     /**
      * 获取选中的设备列表
      */
-    fun getCheckDevices(): MutableList<AdvertisingDevice> {
-        val list = mutableListOf<AdvertisingDevice>()
+    fun getCheckDevices(): MutableList<FDSNodeInfo> {
+        val list = mutableListOf<FDSNodeInfo>()
         for (bean in devList) {
             if (bean.isChecked) {
-                list.add(bean.advertisingDevice)
+                list.add(bean.fdsNodeInfo)
             }
+        }
+        return list
+    }
+
+    private fun getFDSNodeList(): MutableList<FDSNodeBean> {
+        val list = arrayListOf<FDSNodeBean>()
+        val nodes = FDSMeshApi.instance.getGroupFDSNodes(groupAddress)
+        for (node in nodes) {
+            val nodeBean = FDSNodeBean(node)
+            nodeBean.isChecked = false
+            list.add(nodeBean)
         }
         return list
     }
@@ -75,18 +66,6 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         return true
     }
 
-    private fun haveDevice(advertisingDevice: AdvertisingDevice): Boolean {
-        if (devList.isEmpty()) {
-            return false
-        }
-        for (bean in devList) {
-            if (bean.advertisingDevice.device.address == advertisingDevice.device.address) {
-                return true
-            }
-        }
-        return false
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_select_device_item, parent, false)
@@ -96,8 +75,9 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
-        holder.tv_name.text = "GD_LED_${deviceBean.deviceType}"
-        holder.tv_mac.text = deviceBean.advertisingDevice.device.address
+        holder.tv_name.text = deviceBean.fdsNodeInfo.deviceName
+        holder.tv_mac.text = deviceBean.fdsNodeInfo.macAddress
+
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
         } else {

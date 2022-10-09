@@ -2,23 +2,17 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSMeshApi
 import com.hjq.permissions.OnPermissionCallback
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioAdapter
-import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
-import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_studio.*
-import kotlinx.android.synthetic.main.activity_main.titleBar as titleBar1
 
 class MainActivity : BaseActivity() {
     private lateinit var studioAdapter: StudioAdapter
@@ -90,14 +84,6 @@ class MainActivity : BaseActivity() {
         bt_add_studio.setOnClickListener {
             inputTextDialog.setDefText("Studio-${studioAdapter.getStudioNextIndex()}")
             inputTextDialog.showDialog()
-        }
-
-        //跳转到功能列表
-        testOnclick.setOnClickListener {
-            val bundle=Bundle()
-            bundle.putInt("address",-1)
-            bundle.putString("typeName","节点");
-            goActivityBundle(ModeListActivity::class.java,false,bundle)
         }
     }
 

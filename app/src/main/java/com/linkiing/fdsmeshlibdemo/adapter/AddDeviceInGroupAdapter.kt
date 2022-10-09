@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 
 class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyHolder>() {
-    private var devList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
+    private var devList = getFDSNodeList()
     private var checkListener: (FDSNodeInfo) -> Unit = {}
 
     fun update(){
-        devList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
+        devList = getFDSNodeList()
         notifyDataSetChanged()
     }
 
@@ -23,20 +24,31 @@ class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyH
         this.checkListener = checkListener
     }
 
+    private fun getFDSNodeList(): MutableList<FDSNodeBean> {
+        val list = arrayListOf<FDSNodeBean>()
+        val nodes = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
+        for (node in nodes) {
+            val nodeBean = FDSNodeBean(node)
+            nodeBean.isChecked = false
+            list.add(nodeBean)
+        }
+        return list
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.layout_add_device_in_group_item, parent, false)
+            .inflate(R.layout.layout_select_device_item, parent, false)
         return MyHolder(view)
     }
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        val fdsNodeInfo = devList[position]
-        holder.tv_name.text = fdsNodeInfo.deviceName
-        holder.tv_mac.text = fdsNodeInfo.macAddress
+        val device = devList[position]
+        holder.tv_name.text = device.fdsNodeInfo.deviceName
+        holder.tv_mac.text = device.fdsNodeInfo.macAddress
 
         holder.itemView.setOnClickListener {
-            checkListener(fdsNodeInfo)
+            checkListener(device.fdsNodeInfo)
         }
     }
 

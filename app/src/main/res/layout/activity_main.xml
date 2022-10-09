@@ -26,18 +26,6 @@
         android:background="@drawable/white_round_bg"
         tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/testOnclick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recyclerView_studio"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:background="@color/white"
-        android:padding="10dp"
-        android:text="测试功能列表"
-        android:textSize="16sp" />
-
     <Button
         android:id="@+id/bt_add_studio"
         android:layout_width="match_parent"

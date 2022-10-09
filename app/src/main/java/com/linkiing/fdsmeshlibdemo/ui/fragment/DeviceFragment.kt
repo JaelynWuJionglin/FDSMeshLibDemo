@@ -43,6 +43,13 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
         studioDeviceAdapter?.update()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            studioDeviceAdapter?.update()
+        }
+    }
+
     private fun initView() {
         loadingDialog = LoadingDialog(requireContext())
         stuDevBottomMenuDialog = StuDevBottomMenuDialog(mContext)
@@ -71,7 +78,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
             } else {
                 val bundle= Bundle()
                 bundle.putInt("address",it.meshAddress)
-                bundle.putString("typeName",it.deviceName);
+                bundle.putString("typeName",it.deviceName)
                 goActivityBundle(ModeListActivity::class.java,false,bundle)
             }
         }

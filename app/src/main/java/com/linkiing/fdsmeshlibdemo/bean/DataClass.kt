@@ -39,3 +39,10 @@ data class ModelInfo(
      */
     var address: Int = -1,
 )
+
+/**
+ * FDSNodeBean
+ */
+data class FDSNodeBean(var fdsNodeInfo: FDSNodeInfo){
+    var isChecked = false
+}

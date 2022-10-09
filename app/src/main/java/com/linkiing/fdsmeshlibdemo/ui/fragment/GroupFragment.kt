@@ -1,30 +1,19 @@
 package com.linkiing.fdsmeshlibdemo.ui.fragment
 
-import android.app.Activity
-import android.app.Activity.RESULT_OK
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
-import com.godox.sdk.model.FDSNodeInfo
-import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioGroupAdapter
-import com.linkiing.fdsmeshlibdemo.ui.AddDeviceInGroupActivity
+import com.linkiing.fdsmeshlibdemo.ui.GroupActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
-import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
-import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.group_fragment.*
 
 class GroupFragment : BaseFragment(R.layout.group_fragment) {
@@ -32,9 +21,8 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
     private lateinit var stuGpBottomMenuDialog: StuGpBottomMenuDialog
     private lateinit var createGroupTextDialog: InputTextDialog
     private lateinit var renameTextDialog: InputTextDialog
-    private var groupAdapter: StudioGroupAdapter? = null
+    private var studioGroupAdapter: StudioGroupAdapter? = null
     private var fdsGroupInfo: FDSGroupInfo? = null
-    private var addDevInGroupActivityLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,6 +30,11 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
         initView()
         initRecyclerView()
         initListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        studioGroupAdapter?.update()
     }
 
     private fun initView() {
@@ -56,18 +49,18 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
     }
 
     private fun initRecyclerView() {
-        groupAdapter = StudioGroupAdapter()
+        studioGroupAdapter = StudioGroupAdapter()
         val manager = LinearLayoutManager(mContext)
         manager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_group?.layoutManager = manager
-        recyclerView_group?.adapter = groupAdapter
+        recyclerView_group?.adapter = studioGroupAdapter
 
-        groupAdapter?.setItemLongClickListener {
+        studioGroupAdapter?.setItemLongClickListener {
             fdsGroupInfo = it
             stuGpBottomMenuDialog.showDialog()
         }
 
-        groupAdapter?.setItemClickListener {
+        studioGroupAdapter?.setItemClickListener {
             val bundle = Bundle()
             bundle.putInt("address", it.address)
             bundle.putString("typeName", it.name)
@@ -77,21 +70,21 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
 
     private fun initListener() {
         tv_add_group?.setOnClickListener {
-            createGroupTextDialog.setDefText("Group-${groupAdapter?.itemCount?.plus(1)}")
+            createGroupTextDialog.setDefText("Group-${studioGroupAdapter?.itemCount?.plus(1)}")
             createGroupTextDialog.showDialog()
         }
 
         createGroupTextDialog.setOnDialogListener {
             val fdsGroupInfo = FDSMeshApi.instance.createGroup(it)
             if (fdsGroupInfo != null) {
-                groupAdapter?.update()
+                studioGroupAdapter?.update()
             }
         }
 
         renameTextDialog.setOnDialogListener {
             if (TextUtils.isEmpty(it) && fdsGroupInfo != null) {
                 FDSMeshApi.instance.renameGroup(fdsGroupInfo!!, it)
-                groupAdapter?.update(fdsGroupInfo!!.address)
+                studioGroupAdapter?.update(fdsGroupInfo!!.address)
             }
         }
 
@@ -100,7 +93,7 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
                 StuGpBottomMenuDialog.MENU_DELETE -> {
                     if (fdsGroupInfo != null) {
                         FDSMeshApi.instance.removeGroup(fdsGroupInfo!!)
-                        groupAdapter?.update()
+                        studioGroupAdapter?.update()
                     }
                 }
                 StuGpBottomMenuDialog.MENU_RENAME -> {
@@ -110,36 +103,11 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
                     }
                 }
                 StuGpBottomMenuDialog.MENU_EDIT -> {
-                    addDevInGroupActivityLauncher?.launch(Intent(context, AddDeviceInGroupActivity::class.java))
-                }
-            }
-        }
-
-        addDevInGroupActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK){
-                val fdsNodeInfo = result.data?.getSerializableExtra("fdsNodeInfo") as FDSNodeInfo
-                if (fdsGroupInfo != null) {
-                    loadingDialog.showDialog()
-
-                    LOGUtils.i("=======> fdsNodeInfo:${Gson().toJson(fdsNodeInfo)}")
-
-                    /*
-                     * 设备订阅组
-                     */
-                    FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, true) {
-                        loadingDialog.dismissDialog()
-                        groupAdapter?.update()
-
-                        ConstantUtils.toast(
-                            mContext, if (it) {
-                                "订阅成功！"
-                            } else {
-                                "订阅失败！"
-                            }
-                        )
+                    if (fdsGroupInfo != null) {
+                        val bundle= Bundle()
+                        bundle.putInt("address",fdsGroupInfo!!.address)
+                        goActivityBundle(GroupActivity::class.java,false,bundle)
                     }
-                } else {
-                    ConstantUtils.toast(mContext,"添加失败！")
                 }
             }
         }
