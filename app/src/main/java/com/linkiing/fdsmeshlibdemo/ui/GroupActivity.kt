@@ -107,8 +107,6 @@ class GroupActivity : BaseActivity() {
         if (fdsGroupInfo != null) {
             loadingDialog.showDialog()
 
-            LOGUtils.i("=======> fdsNodeInfo:${Gson().toJson(fdsNodeInfo)}")
-
             /*
              * 设备订阅组
              */

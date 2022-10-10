@@ -70,7 +70,6 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             bean.name
         }
 
-        LOGUtils.e("=====> position:$position  studioList.size:${studioList.size}")
         if (position == studioList.size - 1) {
             holder.view_line.visibility = View.GONE
         } else {
