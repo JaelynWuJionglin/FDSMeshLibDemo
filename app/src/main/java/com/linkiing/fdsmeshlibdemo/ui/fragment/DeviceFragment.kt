@@ -1,6 +1,8 @@
 package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
@@ -11,6 +13,7 @@ import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
@@ -28,6 +31,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi:FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
+    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,6 +91,12 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
     private fun initListener() {
         FDSMeshApi.instance.addFDSNodeStatusChangeCallBack(this)
 
+        tv_refresh.setOnClickListener {
+            //刷新设备在线状态
+            val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
+            LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
+        }
+
         tv_add_dev.setOnClickListener {
             goActivity(AddDeviceActivity::class.java, false)
         }
@@ -94,7 +104,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
         renameTextDialog.setOnDialogListener {
             if (fdsNodeInfo != null) {
                 /*
-                 * 重名了节点
+                 * 重命名节点
                  * type == "", 则不修改类型
                  */
                 FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
@@ -147,8 +157,41 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
     override fun onNodeStatusChange(meshAddressList: MutableList<Int>) {
         //节点在线状态改变
-        LOGUtils.d("StudioActivity =====================> onNodeStatusChange()")
         studioDeviceAdapter?.update(meshAddressList)
+
+        for (meshAddress in meshAddressList) {
+            val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(meshAddress)
+            if (fdsNodeInfo != null && fdsNodeInfo.getFDSNodeState() != FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
+                val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
+                LOGUtils.i("onNodeStatusChange() =========> " +
+                        "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
+                if (isFDSNodeConfigPublish) {
+                    return
+                }
+
+                /**
+                 * 配置节点主动上报在线状态
+                 */
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true,fdsNodeInfo)
+                if (isOk) {
+                    publishFdsNodeInfoList.add(fdsNodeInfo)
+                }
+                LOGUtils.v("configFDSNodePublishState() =====> isOk:$isOk")
+            }
+        }
+    }
+
+    private fun isFDSNodeConfigPublish(fdsNodeInfo: FDSNodeInfo): Boolean {
+        if (publishFdsNodeInfoList.isEmpty()){
+            return false
+        }
+        for (fdsNode in publishFdsNodeInfoList) {
+            if (fdsNode.meshAddress == fdsNodeInfo.meshAddress) {
+                return true
+            }
+        }
+
+        return false
     }
 
     override fun onDestroy() {

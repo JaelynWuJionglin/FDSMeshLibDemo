@@ -69,12 +69,11 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
             holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
         }
 
-        //开光状态
+        //开关状态
         holder.iv_switch.isChecked = fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_ON
 
         val connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
         if (connectedFDSNodeInfo != null){
-            LOGUtils.e("StudioDeviceAdapter connectedFDSNodeInfo:$connectedFDSNodeInfo")
             if (connectedFDSNodeInfo.macAddress == fdsNodeInfo.macAddress){
                 //直连设备
                 holder.tv_name.setTextColor(ContextCompat.getColor(holder.itemView.context,R.color.red))
@@ -90,6 +89,9 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         //Switch
         holder.iv_switch.setOnCheckedChangeListener { compoundButton, b ->
             //设备开关灯
+            if (!compoundButton.isPressed) {
+                return@setOnCheckedChangeListener
+            }
             FDSCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress,b)
         }
 

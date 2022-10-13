@@ -100,7 +100,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                     goActivityBundle(LightFXListActivity::class.java,false,bundle)
                 }
                 1 -> {//修改灯光色卡
-                    fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 220, 1, 0, 0);
+                    fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 10, 1, 0, 0);
                 }
                 2 -> {//修改灯光XYZ
                     fdsCommandApi.changeLightXY(address, 56, 6, 1100, 2200)
