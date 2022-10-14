@@ -16,12 +16,13 @@ import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
 
-class AddDeviceActivity: BaseActivity() {
+class AddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
     private val searchDevices = FDSSearchDevicesApi()
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var isAllCheck = false
+    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,7 @@ class AddDeviceActivity: BaseActivity() {
     private fun scanDevices() {
         searchDevices.startScanDevice(this, "GD_LED", 20 * 1000, object : FDSBleDevCallBack {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                addDevicesAdapter.addDevices(advertisingDevice,type)
+                addDevicesAdapter.addDevices(advertisingDevice, type)
             }
 
             override fun onScanTimeOut() {
@@ -68,10 +69,10 @@ class AddDeviceActivity: BaseActivity() {
 
         //添加设备到mesh
         val deviceList = addDevicesAdapter.getCheckDevices()
-        if (deviceList.isEmpty()){
+        if (deviceList.isEmpty()) {
             return
         }
-        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack {
+        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack() {
             /*
              * 入网完成回调
              * isAllSuccess 是否全部入网成功
@@ -86,16 +87,38 @@ class AddDeviceActivity: BaseActivity() {
                 //节点设置默认名称
                 for (fdsNode in fdsNodes) {
                     val symbol = fdsNode.symbol
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode,"GD_LED_$symbol","")
+                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_$symbol", "")
                 }
 
                 addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
                 loadingDialog.dismissDialog()
             }
+
+            /*
+             * 单个设备入网成功返回
+             */
+            override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
+                super.onFDSNodeSuccess(fdsNodeInfo)
+                //设备成功入网，配置打开设备主动上报在线状态
+                val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
+                LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
+                if (isFDSNodeConfigPublish) {
+                    return
+                }
+
+                /**
+                 * 配置节点主动上报在线状态
+                 */
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo)
+                if (isOk) {
+                    publishFdsNodeInfoList.add(fdsNodeInfo)
+                }
+                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+            }
         })
     }
 
-    private fun initListener(){
+    private fun initListener() {
         iv_check.setOnClickListener {
             val isCheck = !isAllCheck
             setCheck(isCheck)
@@ -116,8 +139,20 @@ class AddDeviceActivity: BaseActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun isFDSNodeConfigPublish(fdsNodeInfo: FDSNodeInfo): Boolean {
+        if (publishFdsNodeInfoList.isEmpty()) {
+            return false
+        }
+        for (fdsNode in publishFdsNodeInfoList) {
+            if (fdsNode.meshAddress == fdsNodeInfo.meshAddress) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun finish() {
+        super.finish()
         searchDevices.stopScan()
         fdsAddOrRemoveDeviceApi.destroy()
     }

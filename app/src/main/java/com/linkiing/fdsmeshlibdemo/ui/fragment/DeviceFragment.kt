@@ -31,7 +31,6 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi:FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
-    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -121,12 +120,12 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
                             fdsNodeInfo!!,
                             false,
-                            object : FDSRemoveNodeCallBack {
+                            object : FDSRemoveNodeCallBack() {
 
                                 /*
                                  * 删除设备完成回调
                                  * isAllSuccess 是否全部退网成功
-                                 * fdsNodes 未退网成功的节点列表
+                                 * fdsNodes 退网成功的节点列表
                                  */
                                 override fun onComplete(
                                     isAllSuccess: Boolean,
@@ -161,37 +160,10 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
         for (meshAddress in meshAddressList) {
             val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(meshAddress)
-            if (fdsNodeInfo != null && fdsNodeInfo.getFDSNodeState() != FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-                val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
-                LOGUtils.i("onNodeStatusChange() =========> " +
-                        "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
-                if (isFDSNodeConfigPublish) {
-                    return
-                }
-
-                /**
-                 * 配置节点主动上报在线状态
-                 */
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true,fdsNodeInfo)
-                if (isOk) {
-                    publishFdsNodeInfoList.add(fdsNodeInfo)
-                }
-                LOGUtils.v("configFDSNodePublishState() =====> isOk:$isOk")
+            if (fdsNodeInfo != null) {
+                LOGUtils.i("onNodeStatusChange() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} ")
             }
         }
-    }
-
-    private fun isFDSNodeConfigPublish(fdsNodeInfo: FDSNodeInfo): Boolean {
-        if (publishFdsNodeInfoList.isEmpty()){
-            return false
-        }
-        for (fdsNode in publishFdsNodeInfoList) {
-            if (fdsNode.meshAddress == fdsNodeInfo.meshAddress) {
-                return true
-            }
-        }
-
-        return false
     }
 
     override fun onDestroy() {
