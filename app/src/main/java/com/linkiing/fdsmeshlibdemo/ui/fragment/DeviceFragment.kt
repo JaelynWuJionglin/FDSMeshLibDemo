@@ -119,7 +119,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         loadingDialog.showDialog()
                         fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
                             fdsNodeInfo!!,
-                            false,
+                            true,
                             object : FDSRemoveNodeCallBack() {
 
                                 /*

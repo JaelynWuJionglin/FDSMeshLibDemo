@@ -12,6 +12,7 @@ import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**
@@ -166,8 +167,9 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(state: Int, hour: Int, minute: Int, option: Int, power: Int) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toast(this,"充电状态：${state}，使用时间小时部分：${hour}，" +
-                "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}")
+        val msg = "充电状态：${state}，使用时间小时部分：${hour}，" + "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
+        LOGUtils.d(msg)
+        ConstantUtils.toast(this,msg)
     }
 
     /**
@@ -176,7 +178,9 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(version: String) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toast(this,getString(R.string.firmware_version_text) + version)
+        val msg = "固件版本:$version"
+        LOGUtils.d(msg)
+        ConstantUtils.toast(this,msg)
     }
 
     /**
@@ -187,7 +191,9 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(productVersion: String, mcuVersion: String) {
         loadingDialog.dismissDialog()
-        ConstantUtils.toast(this,"产品版本：${productVersion}，MCU方案版本：${mcuVersion}")
+        val msg = "产品版本:$productVersion  MCU方案版本:$mcuVersion"
+        LOGUtils.d(msg)
+        ConstantUtils.toast(this,msg)
     }
 
 }
