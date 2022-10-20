@@ -81,7 +81,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
             } else {
                 val bundle= Bundle()
                 bundle.putInt("address",it.meshAddress)
-                bundle.putString("typeName",it.deviceName)
+                bundle.putString("typeName",it.name)
                 goActivityBundle(ModeListActivity::class.java,false,bundle)
             }
         }
@@ -140,7 +140,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                 }
                 StuDevBottomMenuDialog.MENU_RENAME -> {
                     if (fdsNodeInfo != null) {
-                        renameTextDialog.setDefText(fdsNodeInfo!!.deviceName)
+                        renameTextDialog.setDefText(fdsNodeInfo!!.name)
                         renameTextDialog.showDialog()
                     }
                 }

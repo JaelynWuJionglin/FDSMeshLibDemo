@@ -75,7 +75,7 @@ class GroupDeviceAdapter(private val groupAddress: Int) : RecyclerView.Adapter<G
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
-        holder.tv_name.text = deviceBean.fdsNodeInfo.deviceName
+        holder.tv_name.text = deviceBean.fdsNodeInfo.name
         holder.tv_mac.text = deviceBean.fdsNodeInfo.macAddress
 
         if (deviceBean.isChecked) {

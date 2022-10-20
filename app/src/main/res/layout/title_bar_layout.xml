@@ -31,10 +31,9 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:text="删除"
+        android:text=""
         android:textColor="@color/black"
-        android:textSize="12sp"
-        android:visibility="gone"/>
+        android:textSize="12sp"/>
 
     <LinearLayout
         android:id="@+id/lr_end_image"

@@ -9,4 +9,5 @@
     <string name="firmware_version_text">蓝牙固件版本：</string>
     <string name="mesh_lib_ver">MESH库版本</string>
     <string name="my_about">关于软件</string>
+    <string name="shear_json">分享当前JSON</string>
 </resources>

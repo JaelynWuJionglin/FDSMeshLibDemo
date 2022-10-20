@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.api.FDSMeshApi
@@ -13,15 +14,32 @@ import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 
 class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyHolder>() {
     private var devList = getFDSNodeList()
-    private var checkListener: (FDSNodeInfo) -> Unit = {}
+    private var isAllCheckListener: (Boolean) -> Unit = {}
 
-    fun update(){
+    fun update() {
         devList = getFDSNodeList()
         notifyDataSetChanged()
     }
 
-    fun setCheckListener(checkListener: (FDSNodeInfo) -> Unit) {
-        this.checkListener = checkListener
+    fun allCheck(isAllCheck: Boolean) {
+        for (bean in devList) {
+            bean.isChecked = isAllCheck
+        }
+        notifyDataSetChanged()
+    }
+
+    fun getCheckDevices(): MutableList<FDSNodeInfo> {
+        val list = arrayListOf<FDSNodeInfo>()
+        for (fdsNodeBean in devList) {
+            if (fdsNodeBean.isChecked) {
+                list.add(fdsNodeBean.fdsNodeInfo )
+            }
+        }
+        return list
+    }
+
+    fun setIsAllCheckListener(isAllCheckListener: (Boolean) -> Unit) {
+        this.isAllCheckListener = isAllCheckListener
     }
 
     private fun getFDSNodeList(): MutableList<FDSNodeBean> {
@@ -35,6 +53,15 @@ class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyH
         return list
     }
 
+    private fun isAllCheck(): Boolean{
+        for (bean in devList) {
+            if (!bean.isChecked) {
+                return false
+            }
+        }
+        return true
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_select_device_item, parent, false)
@@ -44,11 +71,21 @@ class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyH
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val device = devList[position]
-        holder.tv_name.text = device.fdsNodeInfo.deviceName
+        holder.tv_name.text = device.fdsNodeInfo.name
         holder.tv_mac.text = device.fdsNodeInfo.macAddress
 
+        if (device.isChecked) {
+            holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
+        } else {
+            holder.iv_check.setBackgroundResource(R.drawable.checked_image_off)
+        }
+
         holder.itemView.setOnClickListener {
-            checkListener(device.fdsNodeInfo)
+            val isCheck = device.isChecked
+            device.isChecked = !isCheck
+            notifyItemChanged(position)
+
+            isAllCheckListener(isAllCheck())
         }
     }
 
@@ -59,5 +96,6 @@ class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyH
     class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
         val tv_mac = itemView.findViewById<TextView>(R.id.tv_mac)
+        val iv_check = itemView.findViewById<ImageView>(R.id.iv_check)
     }
 }

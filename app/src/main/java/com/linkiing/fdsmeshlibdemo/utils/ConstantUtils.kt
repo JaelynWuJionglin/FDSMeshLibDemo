@@ -1,8 +1,14 @@
 package com.linkiing.fdsmeshlibdemo.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import java.io.File
 
 object ConstantUtils {
     private var toast: Toast? = null
@@ -23,6 +29,20 @@ object ConstantUtils {
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
             "Unknown"
+        }
+    }
+
+    fun shareFile(activity: Activity, file: File) {
+        if (file.exists()) {
+            val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                FileProvider.getUriForFile(activity, activity.packageName + ".fileProvider", file)
+            } else {
+                Uri.fromFile(file)
+            }
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "*/*"
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            activity.startActivity(Intent.createChooser(intent, "share"))
         }
     }
 }

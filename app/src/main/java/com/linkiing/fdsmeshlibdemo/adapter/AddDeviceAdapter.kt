@@ -98,6 +98,7 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         val deviceBean = devList[position]
         holder.tv_name.text = "GD_LED_${deviceBean.deviceType}"
         holder.tv_mac.text = deviceBean.advertisingDevice.device.address
+
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
         } else {

@@ -2,6 +2,8 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,10 +26,14 @@ import kotlinx.android.synthetic.main.activity_group.iv_check
 
 class GroupActivity : BaseActivity() {
     private lateinit var loadingDialog: LoadingDialog
+    private var fdsGroupInfo: FDSGroupInfo? = null
     private var groupAdapter: GroupDeviceAdapter? = null
     private var groupAddress = 0
     private var addDevInGroupActivityLauncher: ActivityResultLauncher<Intent>? = null
     private var isAllCheck = false
+    private var checkDeviceList = mutableListOf<FDSNodeInfo>()
+    private var index = 0
+    private var mHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +48,12 @@ class GroupActivity : BaseActivity() {
         groupAddress = intent.getIntExtra("address", 0)
         if (groupAddress == 0) {
             finish()
+            return
+        }
+        fdsGroupInfo = FDSMeshApi.instance.getGroupByAddress(groupAddress)
+        if (fdsGroupInfo == null) {
+            finish()
+            return
         }
 
         loadingDialog = LoadingDialog(this)
@@ -76,19 +88,19 @@ class GroupActivity : BaseActivity() {
         }
 
         bt_remove_device.setOnClickListener {
-            val fdsNodes = groupAdapter?.getCheckDevices()
-            if (fdsNodes != null && fdsNodes.isNotEmpty()) {
-                val fdsNodeInfo = fdsNodes[0]
-                setSubscribe(fdsNodeInfo,false)
+            val checkDeviceList = groupAdapter?.getCheckDevices()
+            if (checkDeviceList != null && checkDeviceList.isNotEmpty()) {
+                startSubscribe(checkDeviceList, false)
             }
         }
 
         addDevInGroupActivityLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    val fdsNodeInfo =
-                        result.data?.getSerializableExtra("fdsNodeInfo") as FDSNodeInfo
-                    setSubscribe(fdsNodeInfo, true)
+                    val checkDeviceList = result.data?.getSerializableExtra("checkDeviceList")
+                    if (checkDeviceList != null && checkDeviceList is MutableList<*>) {
+                        startSubscribe(checkDeviceList as MutableList<FDSNodeInfo>, true)
+                    }
                 }
             }
     }
@@ -102,34 +114,13 @@ class GroupActivity : BaseActivity() {
         }
     }
 
-    private fun setSubscribe(fdsNodeInfo: FDSNodeInfo, isSubscribe: Boolean) {
-        val fdsGroupInfo = FDSMeshApi.instance.getGroupByAddress(groupAddress)
-        if (fdsGroupInfo != null) {
+    private fun startSubscribe(checkDeviceList: MutableList<FDSNodeInfo>, isSubscribe: Boolean) {
+        if (fdsGroupInfo != null && checkDeviceList.isNotEmpty()) {
             loadingDialog.showDialog()
+            this.checkDeviceList = checkDeviceList
+            this.index = 0
 
-            /*
-             * 设备订阅组
-             */
-            FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo, isSubscribe) {
-                loadingDialog.dismissDialog()
-                groupAdapter?.update()
-
-                ConstantUtils.toast(
-                    this, if (it) {
-                        if (isSubscribe) {
-                            "订阅成功！"
-                        } else {
-                            "取消订阅成功！"
-                        }
-                    } else {
-                        if (isSubscribe) {
-                            "订阅失败！"
-                        } else {
-                            "取消订阅失败！"
-                        }
-                    }
-                )
-            }
+            nextSubscribe(isSubscribe)
         } else {
             ConstantUtils.toast(
                 this, if (isSubscribe) {
@@ -140,4 +131,31 @@ class GroupActivity : BaseActivity() {
             )
         }
     }
+
+    /**
+     * 设备订阅组
+     */
+    private fun nextSubscribe(isSubscribe: Boolean) {
+        if (index >= checkDeviceList.size) {
+            loadingDialog.dismissDialog()
+            groupAdapter?.update()
+
+            //一次执行完成
+            ConstantUtils.toast(
+                this,
+                if (isSubscribe) {
+                    "订阅完成！"
+                } else {
+                    "取消订阅完成！"
+                }
+            )
+        } else {
+            val fdsNodeInfo = checkDeviceList[index]
+            FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
+                index++
+                nextSubscribe(isSubscribe)
+            }
+        }
+    }
+
 }
