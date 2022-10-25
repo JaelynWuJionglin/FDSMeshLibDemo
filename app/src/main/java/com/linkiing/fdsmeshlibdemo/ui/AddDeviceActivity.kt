@@ -153,6 +153,10 @@ class AddDeviceActivity : BaseActivity() {
     override fun finish() {
         super.finish()
         searchDevices.stopScan()
+
+        /**
+         * 此方法会停止自动连接mesh网络，所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接mesh网络。
+         */
         fdsAddOrRemoveDeviceApi.destroy()
     }
 }

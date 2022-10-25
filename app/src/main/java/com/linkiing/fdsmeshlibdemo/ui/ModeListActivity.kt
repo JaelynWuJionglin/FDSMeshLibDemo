@@ -176,7 +176,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      * 固件版本回调
      * @param version 固件版本
      */
-    override fun onSuccess(version: String) {
+    override fun onSuccess(version: Int) {
         loadingDialog.dismissDialog()
         val msg = "固件版本:$version"
         LOGUtils.d(msg)

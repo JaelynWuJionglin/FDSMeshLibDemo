@@ -26,11 +26,11 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
 
         initView()
         initListener()
-        LOGUtils.e("================> FDSNodes().size:${FDSMeshApi.instance.getFDSNodes().size}")
     }
 
     override fun onResume() {
         super.onResume()
+        LOGUtils.v("StudioActivity onResume()")
         MeshLogin.instance.autoConnect()
     }
 
