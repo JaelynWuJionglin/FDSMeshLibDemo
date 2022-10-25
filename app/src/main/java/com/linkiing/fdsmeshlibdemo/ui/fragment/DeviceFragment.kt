@@ -1,8 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
@@ -13,7 +11,6 @@ import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
-import com.linkiing.fdsmeshlibdemo.app.App
 import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
@@ -51,6 +48,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
+        LOGUtils.v("DeviceFragment onHiddenChanged() hidden:$hidden")
         if (!hidden) {
             studioDeviceAdapter?.update()
         }

@@ -155,7 +155,8 @@ class AddDeviceActivity : BaseActivity() {
         searchDevices.stopScan()
 
         /**
-         * 此方法会停止自动连接mesh网络，所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接mesh网络。
+         * 此方法会停止自动连接mesh网络。
+         * 所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接。
          */
         fdsAddOrRemoveDeviceApi.destroy()
     }

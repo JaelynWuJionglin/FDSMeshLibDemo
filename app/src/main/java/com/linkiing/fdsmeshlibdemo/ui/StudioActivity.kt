@@ -94,10 +94,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
         fragmentTransaction.commit()
     }
 
-
-    override fun finish() {
-        super.finish()
-
+    private fun saveJson() {
         if (index != 0){
             //保存当前MeshJson数据
             val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
@@ -109,6 +106,11 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
             }
             MMKVSp.instance.setStudioList(studioList)
         }
+    }
+
+    override fun finish() {
+        super.finish()
+        saveJson()
     }
 
     override fun onDestroy() {

@@ -40,7 +40,7 @@ class FirmwareUpdateDialog(private val activity: Activity) :
         progressBar.progress = 0
 
         if (mFirmware.isNotEmpty() && fdsNodeInfo != null) {
-            //FDSMeshApi.instance.startOTAWithOtaData(mFirmware,fdsNodeInfo!!,this)
+            FDSMeshApi.instance.startOTAWithOtaData(mFirmware,fdsNodeInfo!!,this)
         } else {
             ConstantUtils.toast(activity, "Error！未识别到固件或设备。")
         }
@@ -48,6 +48,11 @@ class FirmwareUpdateDialog(private val activity: Activity) :
 
     override fun onStop() {
         super.onStop()
+
+        /**
+         * 此方法会断开设备连接并停止自动连接。
+         * 所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接mesh网络。
+         */
         FDSMeshApi.instance.stopOTA()
         MeshLogin.instance.autoConnect()
     }
@@ -80,15 +85,6 @@ class FirmwareUpdateDialog(private val activity: Activity) :
             mFirmware = ByteArray(length)
             inputStream.read(mFirmware)
             inputStream.close()
-
-            //固件版本
-            val version = ByteArray(4)
-            System.arraycopy(mFirmware, 2, version, 0, 4)
-            val firmVersion = String(version).replace(" ", "")
-
-            activity.runOnUiThread {
-                tv_frm_version?.text = "固件版本:v$firmVersion"
-            }
         } catch (e: IOException) {
             e.printStackTrace()
             mFirmware = ByteArray(0)
