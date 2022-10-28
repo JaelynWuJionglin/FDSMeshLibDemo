@@ -151,6 +151,11 @@ class GroupActivity : BaseActivity() {
             )
         } else {
             val fdsNodeInfo = checkDeviceList[index]
+
+            /**
+             * 同一个节点订阅组的上限是8个，超过8个便无法再订阅其他组。
+             * 删除组的时候，务必要取消不必要的订阅关系。
+             */
             FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
                 index++
                 nextSubscribe(isSubscribe)

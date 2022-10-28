@@ -1,7 +1,12 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.main.SendQueueUtils
 import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.callbacks.FDSBatteryPowerCallBack
 import com.godox.sdk.callbacks.FDSFirmwareCallBack
@@ -14,6 +19,7 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.mode_list_activity.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * 功能列表页
@@ -25,9 +31,11 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     private var modelList: MutableList<ModelInfo> = mutableListOf()
     private var modelListV3: MutableList<ModelInfo> = mutableListOf()
     private var address = -1//传入的地址
-    private var typeName=""//传入的设备名称与组名称
+    private var typeName = ""//传入的设备名称与组名称
     private lateinit var loadingDialog: LoadingDialog
     private val fdsCommandApi: FDSCommandApi = FDSCommandApi.instance
+    private val sendQueueUtils = SendQueueUtils<Int>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.mode_list_activity)
@@ -35,11 +43,38 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
         initData()
         initView()
         initRecyclerView()
+        initSeekBar()
     }
 
     private fun initView() {
         loadingDialog = LoadingDialog(this)
-        mode_titleBar.initTitleBar(typeName,0)
+        mode_titleBar.initTitleBar(typeName, 0)
+    }
+
+    private fun initData() {
+        val bundle = intent.extras
+        address = bundle!!.getInt("address")
+        typeName = bundle.getString("typeName")!!
+        //v2添加
+        modelList.add(modelData("修改灯光开关", address))
+        modelList.add(modelData("修改灯光RGBW", address))
+        modelList.add(modelData("修改灯光CCT", address))
+        modelList.add(modelData("修改灯光HSI", address))
+        modelList.add(modelData("修改灯光色卡", address))
+        modelList.add(modelData("修改灯光特效", address))
+        modelList.add(modelData("修改设备风扇", address))
+        modelList.add(modelData("获取蓝牙固件版本", address))
+        modelList.add(modelData("获取电池电量信息", address))
+
+        //v3添加
+        modelListV3.add(modelData("修改灯光特效", address))
+        modelListV3.add(modelData("修改灯光色卡", address))
+        modelListV3.add(modelData("修改灯光XY", address))
+        modelListV3.add(modelData("修改灯光RGBW", address))
+        modelListV3.add(modelData("修改灯光RGBWW", address))
+        modelListV3.add(modelData("修改灯光RGBACL", address))
+        modelListV3.add(modelData("修改亮度偏移", address))
+        modelListV3.add(modelData("获取mucu固件版本", address))
     }
 
     private fun initRecyclerView() {
@@ -82,8 +117,8 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                     fdsCommandApi.getBatteryPower(address, this)
                 }
             }
-            if(it in 0..6){
-                ConstantUtils.toast(this,getString(R.string.sending_completed_text))
+            if (it in 0..6) {
+                ConstantUtils.toast(this, getString(R.string.sending_completed_text))
             }
         }
 
@@ -95,10 +130,10 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
         modelAdapterV3.setOnItemClickListener { it, address ->
             when (it) {
                 0 -> {//修改灯光特效，跳转
-                    val bundle=Bundle()
-                    bundle.putInt("address",address)
-                    bundle.putString("typeName",typeName);
-                    goActivityBundle(LightFXListActivity::class.java,false,bundle)
+                    val bundle = Bundle()
+                    bundle.putInt("address", address)
+                    bundle.putString("typeName", typeName);
+                    goActivityBundle(LightFXListActivity::class.java, false, bundle)
                 }
                 1 -> {//修改灯光色卡
                     fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 10, 1, 0, 0);
@@ -124,36 +159,32 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                 }
             }
             if (it in 1..6) {
-                ConstantUtils.toast(this,getString(R.string.sending_completed_text))
+                ConstantUtils.toast(this, getString(R.string.sending_completed_text))
             }
         }
     }
 
-    private fun initData() {
-        val bundle=intent.extras
-        address= bundle!!.getInt("address")
-        typeName= bundle.getString("typeName")!!
-        //v2添加
-        modelList.add(modelData("修改灯光开关", address))
-        modelList.add(modelData("修改灯光RGBW", address))
-        modelList.add(modelData("修改灯光CCT", address))
-        modelList.add(modelData("修改灯光HSI", address))
-        modelList.add(modelData("修改灯光色卡", address))
-        modelList.add(modelData("修改灯光特效", address))
-        modelList.add(modelData("修改设备风扇", address))
-        modelList.add(modelData("获取蓝牙固件版本", address))
-        modelList.add(modelData("获取电池电量信息", address))
+    private fun initSeekBar() {
+        sendQueueUtils.setSamplingTime(320)
+            .start {
+                fdsCommandApi.changeLightXY(address, it, 6, 1100, 2200)
+            }
 
-        //v3添加
-        modelListV3.add(modelData("修改灯光特效", address))
-        modelListV3.add(modelData("修改灯光色卡", address))
-        modelListV3.add(modelData("修改灯光XY", address))
-        modelListV3.add(modelData("修改灯光RGBW", address))
-        modelListV3.add(modelData("修改灯光RGBWW", address))
-        modelListV3.add(modelData("修改灯光RGBACL", address))
-        modelListV3.add(modelData("修改亮度偏移", address))
-        modelListV3.add(modelData("获取mucu固件版本", address))
+        seekbarBrightness?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                sendQueueUtils.addDataSampling(progress)
+            }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val progress = seekBar?.progress ?: 0
+                sendQueueUtils.clearQueueData()
+                sendQueueUtils.addData(progress)
+            }
+        })
     }
 
     /**
@@ -167,9 +198,10 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
      */
     override fun onSuccess(state: Int, hour: Int, minute: Int, option: Int, power: Int) {
         loadingDialog.dismissDialog()
-        val msg = "充电状态：${state}，使用时间小时部分：${hour}，" + "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
+        val msg =
+            "充电状态：${state}，使用时间小时部分：${hour}，" + "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
         LOGUtils.d(msg)
-        ConstantUtils.toast(this,msg)
+        ConstantUtils.toast(this, msg)
     }
 
     /**
@@ -180,7 +212,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
         loadingDialog.dismissDialog()
         val msg = "固件版本:$version"
         LOGUtils.d(msg)
-        ConstantUtils.toast(this,msg)
+        ConstantUtils.toast(this, msg)
     }
 
     /**
@@ -193,7 +225,11 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
         loadingDialog.dismissDialog()
         val msg = "产品版本:$productVersion  MCU方案版本:$mcuVersion"
         LOGUtils.d(msg)
-        ConstantUtils.toast(this,msg)
+        ConstantUtils.toast(this, msg)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        sendQueueUtils.destroy()
+    }
 }

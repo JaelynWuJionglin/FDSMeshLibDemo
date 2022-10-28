@@ -11,6 +11,7 @@ import com.linkiing.fdsmeshlibdemo.adapter.StudioGroupAdapter
 import com.linkiing.fdsmeshlibdemo.ui.GroupActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
@@ -92,8 +93,17 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
             when (it) {
                 StuGpBottomMenuDialog.MENU_DELETE -> {
                     if (fdsGroupInfo != null) {
-                        FDSMeshApi.instance.removeGroup(fdsGroupInfo!!)
-                        studioGroupAdapter?.update()
+
+                        /**
+                         * 同一个节点订阅组的上限是8个，超过8个便无法再订阅其他组。
+                         * 删除组的时候，务必要取消不必要的订阅关系。
+                         */
+                        if (FDSMeshApi.instance.getGroupFDSNodes(fdsGroupInfo!!.address).isEmpty()){
+                            FDSMeshApi.instance.removeGroup(fdsGroupInfo!!)
+                            studioGroupAdapter?.update()
+                        } else {
+                            ConstantUtils.toast(mActivity,"组内还有未取消订阅的设备！")
+                        }
                     }
                 }
                 StuGpBottomMenuDialog.MENU_RENAME -> {
