@@ -1,8 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +17,6 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.mode_list_activity.*
-import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * 功能列表页
@@ -138,7 +135,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                 1 -> {//修改灯光色卡
                     fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 10, 1, 0, 0);
                 }
-                2 -> {//修改灯光XYZ
+                2 -> {//修改灯光XY
                     fdsCommandApi.changeLightXY(address, 56, 6, 1100, 2200)
                 }
                 3 -> {//修改灯光RGBW

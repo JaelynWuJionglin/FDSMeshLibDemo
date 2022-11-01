@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.app
 
+import com.base.mesh.api.main.MeshConfigure
 import com.godox.sdk.MeshApp
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
@@ -33,7 +34,29 @@ class App: MeshApp() {
         //appId认证
         FDSMeshApi.instance.setWithAppId(appId)
 
+        //设置mesh配置信息
+        setMeshConfigure()
+
         //BleUtils 初始化
         BleUtils.instance.init(this)
+    }
+
+    private fun setMeshConfigure(){
+        val meshConfigure = MeshConfigure()
+
+        /*
+         * 配网过程中连接失败重试次数（建议>=3）
+         * 注意：太小的重试次数会影响配网稳定性
+         */
+        meshConfigure.provisionMaxConnectRetry = 4
+
+        /*
+         * 配网连接设备失败，等待重试下一次的等待时间（建议500ms - 3000ms）
+         * 此参数只在配网过程中，连接设备失败的时候生效。
+         * 注意：会影响配网成功率
+         */
+        meshConfigure.provisionDisconnectDelayed = 3000
+
+        FDSMeshApi.instance.setMeshConfigure(meshConfigure)
     }
 }

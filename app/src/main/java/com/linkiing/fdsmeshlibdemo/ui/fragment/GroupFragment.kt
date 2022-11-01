@@ -95,15 +95,15 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
                     if (fdsGroupInfo != null) {
 
                         /**
-                         * 同一个节点订阅组的上限是8个，超过8个便无法再订阅其他组。
+                         * 同一个节点订阅组的上限是32个，超过32个便无法再订阅其他组。
                          * 删除组的时候，务必要取消不必要的订阅关系。
                          */
-                        if (FDSMeshApi.instance.getGroupFDSNodes(fdsGroupInfo!!.address).isEmpty()){
+//                        if (FDSMeshApi.instance.getGroupFDSNodes(fdsGroupInfo!!.address).isEmpty()){
                             FDSMeshApi.instance.removeGroup(fdsGroupInfo!!)
                             studioGroupAdapter?.update()
-                        } else {
-                            ConstantUtils.toast(mActivity,"组内还有未取消订阅的设备！")
-                        }
+//                        } else {
+//                            ConstantUtils.toast(mActivity,"组内还有未取消订阅的设备！")
+//                        }
                     }
                 }
                 StuGpBottomMenuDialog.MENU_RENAME -> {

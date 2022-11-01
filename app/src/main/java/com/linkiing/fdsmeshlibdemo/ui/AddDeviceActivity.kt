@@ -15,6 +15,8 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
+import kotlinx.android.synthetic.main.activity_add_device.titleBar
+import kotlinx.android.synthetic.main.activity_main.*
 
 class AddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
@@ -23,6 +25,7 @@ class AddDeviceActivity : BaseActivity() {
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var isAllCheck = false
     private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
+    private var isScanning = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +38,15 @@ class AddDeviceActivity : BaseActivity() {
     }
 
     private fun initView() {
+        titleBar?.initTitleBar(true, R.drawable.refresh)
+        titleBar?.setOnEndImageListener {
+            addDevicesAdapter.clearList()
+            if (isScanning) {
+                stopScan()
+            }
+            scanDevices()
+        }
+
         loadingDialog = LoadingDialog(this)
     }
 
@@ -51,21 +63,27 @@ class AddDeviceActivity : BaseActivity() {
     }
 
     private fun scanDevices() {
+        isScanning = true
         searchDevices.startScanDevice(this, "GD_LED", 20 * 1000, object : FDSBleDevCallBack {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 addDevicesAdapter.addDevices(advertisingDevice, type)
             }
 
             override fun onScanTimeOut() {
-
+                isScanning = false
             }
         })
+    }
+
+    private fun stopScan() {
+        searchDevices.stopScan()
+        isScanning = false
     }
 
     private fun addDevice() {
         loadingDialog.showDialog()
 
-        searchDevices.stopScan()
+        stopScan()
 
         //添加设备到mesh
         val deviceList = addDevicesAdapter.getCheckDevices()
@@ -152,7 +170,7 @@ class AddDeviceActivity : BaseActivity() {
 
     override fun finish() {
         super.finish()
-        searchDevices.stopScan()
+        stopScan()
 
         /**
          * 此方法会停止自动连接mesh网络。
