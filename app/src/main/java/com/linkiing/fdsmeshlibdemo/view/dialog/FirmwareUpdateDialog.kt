@@ -80,8 +80,7 @@ class FirmwareUpdateDialog(private val activity: Activity) :
 
     private fun readFirmware() {
         try {
-            //val path = "LK8620_mesh_GD_v000037_20221024.bin"
-            val path = "LK8620_mesh_GD_v00000A_20221031.bin"
+            val path = "LK8620_mesh_GD_v000039_20221102.bin"
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()
             mFirmware = ByteArray(length)

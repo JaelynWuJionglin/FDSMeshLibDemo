@@ -40,6 +40,18 @@
                     android:background="@drawable/white_round_bg"
                     android:nestedScrollingEnabled="false"
                     android:paddingTop="5dp" />
+
+                <SeekBar
+                    android:id="@+id/seekbarBrightness_v2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/recyclerView_v2"/>
             </RelativeLayout>
 
             <TextView
@@ -61,22 +73,21 @@
                     android:background="@drawable/white_round_bg"
                     android:nestedScrollingEnabled="false"
                     android:paddingTop="5dp" />
+
+                <SeekBar
+                    android:id="@+id/seekbarBrightness_v3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/recyclerView_v3"/>
             </RelativeLayout>
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <SeekBar
-        android:id="@+id/seekbarBrightness"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:thumbOffset="15dp"
-        android:paddingStart="40dp"
-        android:paddingEnd="40dp"
-        android:max="100"
-        android:progress="0"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="20dp"/>
-
 </LinearLayout>

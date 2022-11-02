@@ -12,6 +12,7 @@ import com.godox.sdk.callbacks.FDSMCUCallBack
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
+import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
@@ -31,7 +32,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     private var typeName = ""//传入的设备名称与组名称
     private lateinit var loadingDialog: LoadingDialog
     private val fdsCommandApi: FDSCommandApi = FDSCommandApi.instance
-    private val sendQueueUtils = SendQueueUtils<Int>()
+    private val sendQueueUtils = SendQueueUtils<SeekBarBean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,14 +163,24 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     }
 
     private fun initSeekBar() {
-        sendQueueUtils.setSamplingTime(320)
+        sendQueueUtils
+            //.setSamplingTime(320)//数据采样间隔
+            //.setMineInterval(320)//如果是小包，使用此发送间隔时间发送
             .start {
-                fdsCommandApi.changeLightXY(address, it, 6, 1100, 2200)
+                when(it.model) {
+                    0 -> {
+                        fdsCommandApi.changeLightRGBW(address, it.value, 0, 150, 100, 200, 0)
+                    }
+                    1 -> {
+                        fdsCommandApi.changeLightXY(address, it.value, 6, 1100, 2200)
+                    }
+                }
             }
 
-        seekbarBrightness?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        seekbarBrightness_v2?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                sendQueueUtils.addDataSampling(progress)
+                //isSmall 是否是小包数据
+                sendQueueUtils.addDataSampling(true,SeekBarBean(0,progress))
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -179,7 +190,23 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 val progress = seekBar?.progress ?: 0
                 sendQueueUtils.clearQueueData()
-                sendQueueUtils.addData(progress)
+                sendQueueUtils.addData(true,SeekBarBean(0,progress))
+            }
+        })
+
+        seekbarBrightness_v3?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                sendQueueUtils.addDataSampling(false,SeekBarBean(1,progress))
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val progress = seekBar?.progress ?: 0
+                sendQueueUtils.clearQueueData()
+                sendQueueUtils.addData(false,SeekBarBean(1,progress))
             }
         })
     }

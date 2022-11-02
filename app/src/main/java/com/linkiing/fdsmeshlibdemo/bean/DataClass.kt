@@ -46,3 +46,8 @@ data class ModelInfo(
 data class FDSNodeBean(var fdsNodeInfo: FDSNodeInfo){
     var isChecked = false
 }
+
+/**
+ * SeekBar
+ */
+data class SeekBarBean(var model: Int, var value: Int)

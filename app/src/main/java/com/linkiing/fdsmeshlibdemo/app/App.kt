@@ -42,7 +42,7 @@ class App: MeshApp() {
     }
 
     private fun setMeshConfigure(){
-        val meshConfigure = MeshConfigure()
+        val meshConfigure = MeshConfigure().apply {  }
 
         /*
          * 配网过程中连接失败重试次数（建议>=3）
@@ -56,6 +56,12 @@ class App: MeshApp() {
          * 注意：会影响配网成功率
          */
         meshConfigure.provisionDisconnectDelayed = 3000
+
+        /*
+         * 是否使用默认绑定的组网方式，可加快配网速度
+         * 需要固件支持。
+         */
+        meshConfigure.isPrivateMode = true
 
         FDSMeshApi.instance.setMeshConfigure(meshConfigure)
     }
