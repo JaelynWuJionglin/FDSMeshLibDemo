@@ -72,6 +72,13 @@ class AddDeviceActivity : BaseActivity() {
             override fun onScanTimeOut() {
                 isScanning = false
             }
+
+            /*
+             * 开启搜索设备失败。
+             */
+            override fun onScanFail() {
+                isScanning = false
+            }
         })
     }
 
@@ -177,7 +184,9 @@ class AddDeviceActivity : BaseActivity() {
 
     override fun finish() {
         super.finish()
-        stopScan()
+
+        //停止搜索，释放资源
+        searchDevices.destroy()
 
         /**
          * 此方法会停止自动连接mesh网络。
