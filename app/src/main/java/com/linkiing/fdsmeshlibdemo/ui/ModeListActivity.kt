@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.main.SendQueueUtils
+import com.base.mesh.api.utils.SendQueueUtils
 import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.callbacks.FDSBatteryPowerCallBack
 import com.godox.sdk.callbacks.FDSFirmwareCallBack
@@ -163,9 +163,12 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     }
 
     private fun initSeekBar() {
+        /*
+         * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
+         */
         sendQueueUtils
-            //.setSamplingTime(320)//数据采样间隔
-            //.setMineInterval(320)//如果是小包，使用此发送间隔时间发送
+            .setSamplingTime(300)//数据采样间隔
+            .setMineInterval(300)//如果是小包，使用此发送间隔时间发送。
             .start {
                 when(it.model) {
                     0 -> {

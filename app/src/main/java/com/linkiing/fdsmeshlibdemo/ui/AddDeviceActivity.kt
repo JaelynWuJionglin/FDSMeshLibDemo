@@ -132,6 +132,13 @@ class AddDeviceActivity : BaseActivity() {
                 }
                 LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
             }
+
+            /*
+             * 单个设备入网失败返回
+             */
+            override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
+                super.onFDSNodeFail(fdsNodeInfo)
+            }
         })
     }
 
