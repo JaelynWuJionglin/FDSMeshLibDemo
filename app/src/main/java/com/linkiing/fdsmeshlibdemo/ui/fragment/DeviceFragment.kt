@@ -16,9 +16,9 @@ import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.FirmwareUpdateDialog
-import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.device_fragment.*
 

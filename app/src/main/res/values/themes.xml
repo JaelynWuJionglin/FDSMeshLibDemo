@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="Theme.FDSMeshLibDemo" parent="Theme.AppCompat.Light.NoActionBar">
         <!--控制各个控件被选中时的颜色-->

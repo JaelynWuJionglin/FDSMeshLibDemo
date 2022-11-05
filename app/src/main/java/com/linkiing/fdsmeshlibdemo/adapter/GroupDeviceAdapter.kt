@@ -11,7 +11,6 @@ import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
-import com.telink.ble.mesh.entity.AdvertisingDevice
 
 class GroupDeviceAdapter(private val groupAddress: Int) : RecyclerView.Adapter<GroupDeviceAdapter.MyHolder>() {
     private var devList = getFDSNodeList()

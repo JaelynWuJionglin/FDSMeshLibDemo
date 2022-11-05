@@ -15,8 +15,6 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
-import kotlinx.android.synthetic.main.activity_add_device.titleBar
-import kotlinx.android.synthetic.main.activity_main.*
 
 class AddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter

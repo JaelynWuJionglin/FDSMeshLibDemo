@@ -1,7 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.bean.FDSColorBlockBean
@@ -10,9 +9,7 @@ import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import kotlinx.android.synthetic.main.light_fx_list_activity.*
-import kotlinx.android.synthetic.main.mode_list_activity.*
 import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
 
 /**
