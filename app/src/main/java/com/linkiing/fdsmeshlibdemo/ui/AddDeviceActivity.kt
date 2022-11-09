@@ -189,6 +189,7 @@ class AddDeviceActivity : BaseActivity() {
         /**
          * 此方法会停止自动连接mesh网络。
          * 所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接。
+         * 注意：onStop() onDestroy()可能存在延时调用的可能。
          */
         fdsAddOrRemoveDeviceApi.destroy()
     }

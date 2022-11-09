@@ -42,7 +42,7 @@ class App: MeshApp() {
     }
 
     private fun setMeshConfigure(){
-        val meshConfigure = MeshConfigure().apply {  }
+        val meshConfigure = MeshConfigure()
 
         /*
          * 配网过程中连接失败重试次数（建议>=3）
@@ -55,7 +55,7 @@ class App: MeshApp() {
          * 此参数只在配网过程中，连接设备失败的时候生效。
          * 注意：会影响配网成功率
          */
-        meshConfigure.provisionDisconnectDelayed = 3000
+        meshConfigure.provisionDisconnectDelayed = 500L
 
         /*
          * 是否使用默认绑定的组网方式，可加快配网速度

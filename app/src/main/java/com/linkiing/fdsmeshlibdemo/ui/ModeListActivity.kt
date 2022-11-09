@@ -9,6 +9,7 @@ import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.callbacks.FDSBatteryPowerCallBack
 import com.godox.sdk.callbacks.FDSFirmwareCallBack
 import com.godox.sdk.callbacks.FDSMCUCallBack
+import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
@@ -217,25 +218,26 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     /**
      * 电量回调
      *
+     * @param fdsNodeInfo 节点信息
      * @param state 1-未充电 2-充电中 其它-未知
      * @param hour 使用时间小时部分
      * @param minute 使用时间分钟部分
      * @param option 0-电量百分比，1-电量格子
      * @param power 如果option为0则范围0-100，如果option为1则范围0-3
      */
-    override fun onSuccess(state: Int, hour: Int, minute: Int, option: Int, power: Int) {
+    override fun onSuccess(fdsNodeInfo: FDSNodeInfo,state: Int, hour: Int, minute: Int, option: Int, power: Int) {
         loadingDialog.dismissDialog()
-        val msg =
-            "充电状态：${state}，使用时间小时部分：${hour}，" + "使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
+        val msg = "设备地址：${fdsNodeInfo.macAddress} 充电状态：${state} 使用时间小时部分：${hour} 使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
         LOGUtils.d(msg)
         ConstantUtils.toast(this, msg)
     }
 
     /**
      * 固件版本回调
+     * @param fdsNodeInfo 节点信息
      * @param version 固件版本
      */
-    override fun onSuccess(version: Int) {
+    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, version: Int) {
         loadingDialog.dismissDialog()
         val msg = "固件版本:$version"
         LOGUtils.d(msg)
@@ -244,11 +246,11 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
 
     /**
      * MCU固件版本回调
-     *
+     * @param fdsNodeInfo 节点信息
      * @param productVersion 产品版本
      * @param mcuVersion MCU方案版本
      */
-    override fun onSuccess(productVersion: String, mcuVersion: String) {
+    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, productVersion: String, mcuVersion: String) {
         loadingDialog.dismissDialog()
         val msg = "产品版本:$productVersion  MCU方案版本:$mcuVersion"
         LOGUtils.d(msg)
