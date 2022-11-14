@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import com.base.mesh.api.listener.MeshOtaListener
+import com.base.mesh.api.main.MeshGattMcuUpgrade
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
@@ -14,7 +15,7 @@ import java.io.IOException
 import java.io.InputStream
 
 @SuppressLint("SetTextI18n")
-class FirmwareUpdateDialog(private val activity: Activity) :
+class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Boolean) :
     BaseFullDialog(activity, R.layout.layout_dialog_fm), MeshOtaListener {
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
@@ -40,7 +41,29 @@ class FirmwareUpdateDialog(private val activity: Activity) :
         progressBar.progress = 0
 
         if (mFirmware.isNotEmpty() && fdsNodeInfo != null) {
-            FDSMeshApi.instance.startOTAWithOtaData(mFirmware,fdsNodeInfo!!,this)
+            if (isMcuUpgrade) {
+
+                /**
+                 * 开启MCU OTA升级
+                 * @param otaData 固件数据
+                 * @param version 固件版本
+                 * @param fdsNodeInfo 节点
+                 * @param listener MCU OTA升级回调
+                 * @return  true表示开启成功，false表示开启失败
+                 */
+                FDSMeshApi.instance.startMcuOTAWithOtaData(mFirmware,0,fdsNodeInfo!!,this)
+
+            } else {
+
+                /**
+                 * 开启OTA升级
+                 * @param otaData 固件数据
+                 * @param fdsNodeInfo 节点
+                 * @param listener OTA升级回调
+                 * @return true表示开启成功，false表示开启失败
+                 */
+                FDSMeshApi.instance.startOTAWithOtaData(mFirmware,fdsNodeInfo!!,this)
+            }
         } else {
             ConstantUtils.toast(activity, "Error！未识别到固件或设备。")
         }
@@ -49,11 +72,16 @@ class FirmwareUpdateDialog(private val activity: Activity) :
     override fun onStop() {
         super.onStop()
 
+        if (isMcuUpgrade) {
+            FDSMeshApi.instance.stopMcuOTA()
+        } else {
+            FDSMeshApi.instance.stopOTA()
+        }
+
         /**
-         * 此方法会断开设备连接并停止自动连接。
-         * 所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接mesh网络。
+         * 升级过程会停止mesh网络。
+         * 如果需要升级完成自动重连mesh,需要调用MeshLogin.instance.autoConnect()。
          */
-        FDSMeshApi.instance.stopOTA()
         MeshLogin.instance.autoConnect()
     }
 
@@ -71,16 +99,19 @@ class FirmwareUpdateDialog(private val activity: Activity) :
         }
     }
 
-    override fun onFailed() {
+    override fun onFailed(errorCode: Int) {
         activity.runOnUiThread {
             dismiss()
-            ConstantUtils.toast(activity, "升级失败！")
+            ConstantUtils.toast(activity, "升级失败！errorCode：$errorCode")
         }
     }
 
     private fun readFirmware() {
         try {
-            val path = "LK8620_mesh_GD_v000039_20221102.bin"
+            var path = "LK8620_mesh_GD_v000039_20221102.bin"
+            if (isMcuUpgrade) {
+                path = "TP2R_V040_T2.bin"
+            }
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()
             mFirmware = ByteArray(length)

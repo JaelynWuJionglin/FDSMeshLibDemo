@@ -15,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.linkiing.fdsmeshlibdemo.view.dialog.FirmwareUpdateDialog
+import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
@@ -26,7 +26,8 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var renameTextDialog: InputTextDialog
-    private lateinit var firmwareUpdateDialog: FirmwareUpdateDialog
+    private lateinit var meshOtaDialog: MeshOtaDialog
+    private lateinit var meshMcuUpgradeDialog: MeshOtaDialog
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi:FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
@@ -63,7 +64,8 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
         fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(mActivity)
 
-        firmwareUpdateDialog = FirmwareUpdateDialog(mActivity)
+        meshOtaDialog = MeshOtaDialog(mActivity,false)
+        meshMcuUpgradeDialog = MeshOtaDialog(mActivity,true)
     }
 
     private fun initRecyclerView() {
@@ -149,11 +151,13 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                 }
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     if (fdsNodeInfo != null) {
-                        firmwareUpdateDialog.showDialog(fdsNodeInfo!!)
+                        meshOtaDialog.showDialog(fdsNodeInfo!!)
                     }
                 }
                 StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {
-                    ConstantUtils.toast(mContext,"功能开发中，敬请期待！")
+                    if (fdsNodeInfo != null) {
+                        meshMcuUpgradeDialog.showDialog(fdsNodeInfo!!)
+                    }
                 }
             }
         }
@@ -173,7 +177,8 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
     override fun onDestroy() {
         super.onDestroy()
-        firmwareUpdateDialog.dismiss()
+        meshOtaDialog.dismiss()
+        meshMcuUpgradeDialog.dismiss()
         fdsAddOrRemoveDeviceApi?.destroy()
         FDSMeshApi.instance.removeFDSNodeStatusChangeCallBack(this)
     }
