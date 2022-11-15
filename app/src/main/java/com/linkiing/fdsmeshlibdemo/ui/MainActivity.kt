@@ -71,13 +71,12 @@ class MainActivity : BaseActivity() {
             PermissionsUtils.blePermissions(this, object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
                     //权限申请成功
-
                     if (!it.choose && !TextUtils.isEmpty(it.meshJsonStr)) {
                         //需要切换Mesh网络
                         LOGUtils.e("切换网络 =============> ${it.name}")
                         FDSMeshApi.instance.importMeshJson(it.meshJsonStr)
                     }
-
+                    studioAdapter.changeChoose(it)
                     goActivity(StudioActivity::class.java, "index",it.index,false)
                 }
 

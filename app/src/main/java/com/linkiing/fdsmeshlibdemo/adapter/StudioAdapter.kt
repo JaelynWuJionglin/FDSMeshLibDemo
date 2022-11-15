@@ -55,6 +55,16 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
         }
     }
 
+    /**
+     * 选择改变
+     */
+    fun changeChoose(bean: StudioListBean){
+        for (studio in studioList) {
+            studio.choose = studio.name == bean.name
+        }
+        MMKVSp.instance.setStudioList(studioList)
+    }
+
     private fun deleteStudio(studioListBean: StudioListBean) {
         val iterator = studioList.iterator()
         while (iterator.hasNext()) {
@@ -97,10 +107,6 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
         //点击事件
         holder.itemView.setOnClickListener {
             onItemClickListener(bean)
-            for (studio in studioList) {
-                studio.choose = studio.name == bean.name
-            }
-            MMKVSp.instance.setStudioList(studioList)
         }
 
         //删除
