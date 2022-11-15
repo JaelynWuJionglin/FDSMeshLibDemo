@@ -55,6 +55,18 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
         }
     }
 
+    private fun deleteStudio(studioListBean: StudioListBean) {
+        val iterator = studioList.iterator()
+        while (iterator.hasNext()) {
+            val studio = iterator.next()
+            if (studio.index == studioListBean.index) {
+                iterator.remove()
+            }
+        }
+        MMKVSp.instance.setStudioList(studioList)
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_studio_item, parent, false)
@@ -68,6 +80,12 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             "Studio-${bean.index}"
         } else {
             bean.name
+        }
+
+        if (position == 0){
+            holder.tv_delete.visibility = View.GONE
+        } else {
+            holder.tv_delete.visibility = View.VISIBLE
         }
 
         if (position == studioList.size - 1) {
@@ -84,8 +102,10 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             }
             MMKVSp.instance.setStudioList(studioList)
         }
-        holder.itemView.setOnClickListener{
-            onItemClickListener(bean)
+
+        //删除
+        holder.tv_delete.setOnClickListener {
+            deleteStudio(bean)
         }
     }
 
@@ -95,6 +115,7 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
 
     class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
+        val tv_delete = itemView.findViewById<TextView>(R.id.tv_delete)
         val view_line = itemView.findViewById<View>(R.id.view_line)
     }
 }

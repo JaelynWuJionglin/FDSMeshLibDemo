@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
+import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
@@ -94,6 +95,14 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
     private fun initListener() {
         FDSMeshApi.instance.addFDSNodeStatusChangeCallBack(this)
+
+        dev_switch.setOnCheckedChangeListener { compoundButton, isSwitch ->
+            //设备全开全关
+            if (!compoundButton.isPressed) {
+                return@setOnCheckedChangeListener
+            }
+            FDSCommandApi.instance.changeLightSwitch(0xFFFF, isSwitch)
+        }
 
         tv_refresh.setOnClickListener {
             //刷新设备在线状态

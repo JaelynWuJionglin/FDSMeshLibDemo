@@ -21,6 +21,14 @@
             android:textColor="@color/black"
             android:text="设备列表"/>
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/dev_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"/>
+
         <TextView
             android:id="@+id/tv_refresh"
             android:layout_width="wrap_content"
@@ -30,7 +38,7 @@
             android:paddingBottom="5dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="15dp"
             android:textSize="12sp"
             android:textColor="@color/white"
             android:text="刷新"/>

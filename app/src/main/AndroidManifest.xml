@@ -4,9 +4,13 @@
     package="com.linkiing.fdsmeshlibdemo">
 
     <!-- 网络 -->
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- 定位 蓝牙需要 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 定位 蓝牙需要 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 蓝牙 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- 蓝牙 -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
@@ -16,6 +20,15 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
+    <!--存储-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
     <application
         android:name=".app.App"
         android:allowBackup="true"
@@ -23,11 +36,17 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.FDSMeshLibDemo"
         tools:targetApi="31">
 
+        <!--存储 -->
+        <meta-data
+            android:name="ScopedStorage"
+            android:value="true" />
+
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name=".utils.MyFileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">

@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,6 +10,9 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioAdapter
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
+import com.linkiing.fdsmeshlibdemo.utils.FileSelectorUtils
+import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.telink.ble.mesh.util.LOGUtils
@@ -17,6 +21,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : BaseActivity() {
     private lateinit var studioAdapter: StudioAdapter
     private lateinit var inputTextDialog: InputTextDialog
+    private var jsonStr = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +50,11 @@ class MainActivity : BaseActivity() {
             //新增Studio
             val studioListBean = StudioListBean(studioAdapter.getStudioNextIndex())
             studioListBean.name = it
-            studioListBean.meshJsonStr = FDSMeshApi.instance.getInitMeshJson()
+            if (TextUtils.isEmpty(jsonStr)) {
+                studioListBean.meshJsonStr = FDSMeshApi.instance.getInitMeshJson()
+            } else {
+                studioListBean.meshJsonStr = jsonStr
+            }
             studioAdapter.addStudio(studioListBean)
         }
     }
@@ -80,11 +89,36 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initListener() {
+
         //新增Studio
         bt_add_studio.setOnClickListener {
+            jsonStr = ""
             inputTextDialog.setDefText("Studio-${studioAdapter.getStudioNextIndex()}")
             inputTextDialog.showDialog()
         }
+
+        //导入json数据
+        bt_import_json?.setOnClickListener {
+            FileSelectorUtils.instance.goSelectJson(this) { path ->
+                if (!TextUtils.isEmpty(path)) {
+                    jsonStr = FileUtils.getJsonSelect(path)
+                    if (!TextUtils.isEmpty(jsonStr)) {
+                        inputTextDialog.setDefText("Studio-${studioAdapter.getStudioNextIndex()}")
+                        inputTextDialog.showDialog()
+                    } else {
+                        ConstantUtils.toast(this,"选择错误！")
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data != null && requestCode == FileSelectorUtils.SELECT_REQUEST_CODE) {
+            //文件选择
+            FileSelectorUtils.instance.onSelectActivityResult(requestCode, resultCode, data)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onDestroy() {

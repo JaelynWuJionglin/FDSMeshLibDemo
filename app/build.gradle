@@ -62,4 +62,7 @@ dependencies {
 
     //mmkv
     implementation 'com.tencent:mmkv:1.2.14'
+
+    //文件选择器
+    implementation 'com.leon:lfilepickerlibrary:1.8.0'
 }

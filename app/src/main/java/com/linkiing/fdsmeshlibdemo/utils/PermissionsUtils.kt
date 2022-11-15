@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.utils
 
+import android.Manifest
 import android.app.Activity
 import android.os.Build
 import com.hjq.permissions.OnPermissionCallback
@@ -54,5 +55,37 @@ object PermissionsUtils {
                 .permission(Permission.ACCESS_COARSE_LOCATION)
                 .request(permCallback)
         }
+    }
+
+    /**
+     * 文件访问权限
+     */
+    fun filePermissions(activity: Activity, callback: OnPermissionCallback) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            XXPermissions
+                .with(activity)
+                .permission(Permission.MANAGE_EXTERNAL_STORAGE)
+                .request(callback)
+        } else {
+            XXPermissions
+                .with(activity)
+                .permission(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                .request(callback)
+        }
+    }
+
+    /**
+     * 文件访问权限,相机权限
+     */
+    fun cameraPermissions(activity: Activity, callback: OnPermissionCallback){
+        XXPermissions
+            .with(activity)
+            .permission(
+                Manifest.permission.CAMERA
+            )
+            .request(callback)
     }
 }
