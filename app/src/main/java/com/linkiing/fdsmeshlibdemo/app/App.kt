@@ -63,6 +63,14 @@ class App: MeshApp() {
          */
         meshConfigure.isPrivateMode = true
 
+        /*
+         * Mesh发送数据包承载模式
+         * 0:默认都不使用长包
+         * 1:直连节点长包
+         * 2:全部长包
+         */
+        meshConfigure.extendBearerMode = 2
+
         FDSMeshApi.instance.setMeshConfigure(meshConfigure)
     }
 }

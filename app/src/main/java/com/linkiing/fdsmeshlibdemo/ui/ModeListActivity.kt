@@ -33,7 +33,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     private var typeName = ""//传入的设备名称与组名称
     private lateinit var loadingDialog: LoadingDialog
     private val fdsCommandApi: FDSCommandApi = FDSCommandApi.instance
-    private val sendQueueUtils = SendQueueUtils<SeekBarBean>()
+    private val sendQueueUtils = SendQueueUtils.instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,7 +135,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
                     goActivityBundle(LightFXListActivity::class.java, false, bundle)
                 }
                 1 -> {//修改灯光色卡
-                    fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 10, 1, 0, 0);
+                    fdsCommandApi.changeLightCardEx(address, 55, 5, 1, 10, 1, 0, 0)
                 }
                 2 -> {//修改灯光XY
                     fdsCommandApi.changeLightXY(address, 56, 6, 1100, 2200)
@@ -168,30 +168,31 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
          * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
          */
         sendQueueUtils
-            .setSamplingTime(290)//数据采样间隔
-            .setMineInterval(300)//如果是小包，使用此发送间隔时间发送。
+            .setSamplingTime(300)//数据采样间隔
             .start {
-                when (it.model) {
-                    0 -> {
-                        val color = (0xFFFFFF * (it.value / 100.0f)).toInt()
-                        fdsCommandApi.changeLightRGBW(
-                            address,
-                            10,
-                            0,
-                            (color shr 16) and 0xFF,
-                            (color shr 8) and 0xFF,
-                            color and 0xFF,
-                            0
-                        )
-                    }
-                    1 -> {
-                        fdsCommandApi.changeLightXY(
-                            address,
-                            it.value,
-                            0,
-                            (9999 * (it.value / 100.0f)).toInt(),
-                            (9999 * ((100 - it.value) / 100.0f)).toInt(),
-                        )
+                if (it is SeekBarBean){
+                    when (it.model) {
+                        0 -> {
+                            val color = (0xFFFFFF * (it.value / 100.0f)).toInt()
+                            fdsCommandApi.changeLightRGBW(
+                                address,
+                                10,
+                                0,
+                                (color shr 16) and 0xFF,
+                                (color shr 8) and 0xFF,
+                                color and 0xFF,
+                                0
+                            )
+                        }
+                        1 -> {
+                            fdsCommandApi.changeLightXY(
+                                address,
+                                it.value,
+                                0,
+                                (9999 * (it.value / 100.0f)).toInt(),
+                                (9999 * ((100 - it.value) / 100.0f)).toInt(),
+                            )
+                        }
                     }
                 }
             }
@@ -199,7 +200,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
         seekbarBrightness_v2?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //isSmall 是否是小包数据
-                sendQueueUtils.addDataSampling(true, SeekBarBean(0, progress))
+                sendQueueUtils.addDataSampling(SeekBarBean(0, progress))
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -209,13 +210,13 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 val progress = seekBar?.progress ?: 0
                 sendQueueUtils.clearQueueData()
-                sendQueueUtils.addData(true, SeekBarBean(0, progress))
+                sendQueueUtils.addData(SeekBarBean(0, progress))
             }
         })
 
         seekbarBrightness_v3?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                sendQueueUtils.addDataSampling(false, SeekBarBean(1, progress))
+                sendQueueUtils.addDataSampling(SeekBarBean(1, progress))
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -225,7 +226,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 val progress = seekBar?.progress ?: 0
                 sendQueueUtils.clearQueueData()
-                sendQueueUtils.addData(false, SeekBarBean(1, progress))
+                sendQueueUtils.addData(SeekBarBean(1, progress))
             }
         })
     }
