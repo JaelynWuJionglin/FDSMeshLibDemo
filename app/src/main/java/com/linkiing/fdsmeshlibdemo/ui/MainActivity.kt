@@ -5,9 +5,13 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSMeshApi
+import com.godox.sdk.tool.HttpUtils
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.hjq.permissions.OnPermissionCallback
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioAdapter
+import com.linkiing.fdsmeshlibdemo.bean.HttpProvisionBean
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
@@ -74,10 +78,11 @@ class MainActivity : BaseActivity() {
                     if (!it.choose && !TextUtils.isEmpty(it.meshJsonStr)) {
                         //需要切换Mesh网络
                         LOGUtils.e("切换网络 =============> ${it.name}")
-                        FDSMeshApi.instance.importMeshJson(it.meshJsonStr)
+                        importMeshJson(it)
+                    } else {
+                        goActivity(StudioActivity::class.java, "index",it.index,false)
                     }
                     studioAdapter.changeChoose(it)
-                    goActivity(StudioActivity::class.java, "index",it.index,false)
                 }
 
                 override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
@@ -108,6 +113,43 @@ class MainActivity : BaseActivity() {
                         ConstantUtils.toast(this,"选择错误！")
                     }
                 }
+            }
+        }
+    }
+
+    private fun importMeshJson(studioListBean: StudioListBean) {
+
+        //从json中获取信息
+        val meshJsonInfo = FDSMeshApi.instance.getMeshJsonInfoByJson(studioListBean.meshJsonStr)
+        LOGUtils.i("HTTP importMeshJson ==> netWorkKey:${meshJsonInfo.netWorkKey}  provisionAddress:${meshJsonInfo.provisionAddress}")
+
+        //获取服务器上的provisionAddress
+        val getProvisionAddressUrlStr = "http://godox.light.belvie-iot.com/api/provision/getByUuidAndSync?" +
+                "mesh_uuid=${meshJsonInfo.netWorkKey}&address=${meshJsonInfo.provisionAddress}"
+        HttpUtils().httpRequest(this,HttpUtils.GET,getProvisionAddressUrlStr){
+            LOGUtils.i("HTTP getProvisionAddressUrlStr ==> it:$it")
+
+            if (!TextUtils.isEmpty(it)) {
+                try {
+                    //请求到服务器的provisionAddress，根据provisionAddress导入json
+                    val httpProvisionBean = Gson().fromJson(it,HttpProvisionBean::class.java)
+                    LOGUtils.i("HTTP ==> address:${httpProvisionBean.data.address}")
+                    var serverProvisionAddress = 0
+                    if (httpProvisionBean.code == 0) {
+                        //服务器有当前mesh的地址分配记录
+                        serverProvisionAddress = httpProvisionBean.data.address
+                    }
+
+                    if (FDSMeshApi.instance.importMeshJson(studioListBean.meshJsonStr,serverProvisionAddress)) {
+                        goActivity(StudioActivity::class.java, "index",studioListBean.index,false)
+                    } else {
+                        LOGUtils.e("Error! 导入json失败！serverProvisionAddress:$serverProvisionAddress")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                LOGUtils.e("Error! 请求服务器上的provisionAddress出错！")
             }
         }
     }
