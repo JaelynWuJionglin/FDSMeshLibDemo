@@ -143,7 +143,7 @@ class MainActivity : BaseActivity() {
      *
      * 注：只需要在第一次导入其他app分享的json数据时，才同需要同步服务端的provisionerAddress修改到json中。
      *    之后保存修改后的json可直接使用。
-     *    同一台手机相同的json信息，每次从后台请求的provisionerAddress相同，避免多次调用给后台制造压力。
+     *    同一台手机相同的json信息，每次从后台请求的provisionerAddress相同，应尽量避免多次调用给后台制造压力。
      */
     private fun updateProvisionerAddress(jsonStr: String, updateProvisionerAddressListener: (String) -> Unit) {
         //从json中获取信息
@@ -151,7 +151,7 @@ class MainActivity : BaseActivity() {
         LOGUtils.i("HTTP importMeshJson ==> netWorkKey:${meshJsonInfo.netWorkKey}  provisionAddress:${meshJsonInfo.provisionerAddress}")
 
         //从服务器获取分配的provisionerAddress
-        val getProvisionAddressUrlStr = "http://192.168.2.102:8118/api/provision/queryAndSync?" +
+        val getProvisionAddressUrlStr = "http://godox.light.belvie-iot.com/api/provision/queryAndSync?" +
                 "app_uuid=${FDSMeshApi.instance.getAppLocalUUID()}" +
                 "&network_key=${meshJsonInfo.netWorkKey}" +
                 "&address=${meshJsonInfo.provisionerAddress}"
