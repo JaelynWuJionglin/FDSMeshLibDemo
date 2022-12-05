@@ -95,7 +95,7 @@ class AddDeviceActivity : BaseActivity() {
         if (deviceList.isEmpty()) {
             return
         }
-        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack() {
+        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack {
             /*
              * 入网完成回调
              * isAllSuccess 是否全部入网成功

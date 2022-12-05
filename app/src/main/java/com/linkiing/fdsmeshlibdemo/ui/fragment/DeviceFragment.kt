@@ -134,7 +134,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
                             fdsNodeInfo!!,
                             true,
-                            object : FDSRemoveNodeCallBack() {
+                            object : FDSRemoveNodeCallBack {
 
                                 /*
                                  * 删除设备完成回调

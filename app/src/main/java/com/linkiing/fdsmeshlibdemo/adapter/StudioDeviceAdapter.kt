@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
+import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
 import com.telink.ble.mesh.util.LOGUtils
 
@@ -23,6 +24,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     fun update(){
         fdsNodeList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
         LOGUtils.d("StudioDeviceAdapter fdsNodeList.size:${fdsNodeList.size}")
+        LOGUtils.i("fdsNodeList:${Gson().toJson(fdsNodeList)}")
         notifyDataSetChanged()
     }
 
