@@ -5,6 +5,7 @@ import com.godox.sdk.MeshApp
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.utils.BleUtils
+import com.telink.ble.mesh.core.networking.ExtendBearerMode
 import com.telink.ble.mesh.util.CrashLogUtil
 import com.telink.ble.mesh.util.LOGUtils
 
@@ -63,14 +64,15 @@ class App: MeshApp() {
          */
         meshConfigure.isPrivateMode = true
 
-        /*
-         * Mesh发送数据包承载模式（需固件支持）
-         * 0:默认都不使用长包
-         * 1:直连节点长包
-         * 2:全部长包
-         */
-        meshConfigure.extendBearerMode = 2
-
         FDSMeshApi.instance.setMeshConfigure(meshConfigure)
+
+
+        /*
+         * 设置Mesh发送数据包承载模式（需固件支持）
+         * NONE:默认都不使用长包
+         * GATT:直连节点长包
+         * GATT_ADV:全部长包
+         */
+        FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.GATT_ADV)
     }
 }
