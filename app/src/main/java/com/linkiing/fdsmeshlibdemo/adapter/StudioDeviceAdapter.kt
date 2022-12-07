@@ -62,7 +62,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val fdsNodeInfo = fdsNodeList[position]
         holder.tv_name.text = fdsNodeInfo.name
-        holder.tv_mac.text = "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.type}"
+        holder.tv_mac.text = "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.type} - ${fdsNodeInfo.firmwareVersion}"
 
         //在线状态
         if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
