@@ -108,7 +108,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
 
     private fun readFirmware() {
         try {
-            var path = "8258_mesh_con_20_40ms_10p46_20221215.bin"
+            var path = "8258_mesh_con_7p5_40ms_9p81_20221215.bin"
             if (isMcuUpgrade) {
                 path = "TP2R_V040_T2.bin"
             }
