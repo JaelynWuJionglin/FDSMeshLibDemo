@@ -49,7 +49,7 @@ class App: MeshApp() {
          * 配网过程中连接失败重试次数（建议>=3）
          * 注意：太小的重试次数会影响配网稳定性
          */
-        meshConfigure.provisionMaxConnectRetry = 4
+        meshConfigure.provisionMaxConnectRetry = 8
 
         /*
          * 配网连接设备失败，等待重试下一次的等待时间（建议500ms - 3000ms）

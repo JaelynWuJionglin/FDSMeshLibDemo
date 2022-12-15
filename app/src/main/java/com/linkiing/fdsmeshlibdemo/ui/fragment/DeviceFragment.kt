@@ -24,15 +24,16 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.device_fragment.*
+import java.util.*
 
-class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
+class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var renameTextDialog: InputTextDialog
     private lateinit var meshOtaDialog: MeshOtaDialog
     private lateinit var meshMcuUpgradeDialog: MeshOtaDialog
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
-    private var fdsAddOrRemoveDeviceApi:FDSAddOrRemoveDeviceApi? = null
+    private var fdsAddOrRemoveDeviceApi: FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var connectedFDSNodeInfo: FDSNodeInfo? = null
     private val mHandler = Handler(Looper.getMainLooper())
@@ -70,8 +71,8 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
         fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(mActivity)
 
-        meshOtaDialog = MeshOtaDialog(mActivity,false)
-        meshMcuUpgradeDialog = MeshOtaDialog(mActivity,true)
+        meshOtaDialog = MeshOtaDialog(mActivity, false)
+        meshMcuUpgradeDialog = MeshOtaDialog(mActivity, true)
     }
 
     private fun initRecyclerView() {
@@ -88,12 +89,12 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
 
         studioDeviceAdapter?.setItemClickListener {
             if (it.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-                ConstantUtils.toast(mContext,getString(R.string.equipment_not_online_text))
+                ConstantUtils.toast(mContext, getString(R.string.equipment_not_online_text))
             } else {
-                val bundle= Bundle()
-                bundle.putInt("address",it.meshAddress)
-                bundle.putString("typeName",it.name)
-                goActivityBundle(ModeListActivity::class.java,false,bundle)
+                val bundle = Bundle()
+                bundle.putInt("address", it.meshAddress)
+                bundle.putString("typeName", it.name)
+                goActivityBundle(ModeListActivity::class.java, false, bundle)
             }
         }
     }
@@ -139,22 +140,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
                             fdsNodeInfo!!,
                             true,
-                            object : FDSRemoveNodeCallBack {
-
-                                /*
-                                 * 删除设备完成回调
-                                 * isAllSuccess 是否全部退网成功
-                                 * fdsNodes 退网成功的节点列表
-                                 */
-                                override fun onComplete(
-                                    isAllSuccess: Boolean,
-                                    fdsNodes: MutableList<FDSNodeInfo>,
-                                ) {
-                                    LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
-                                    studioDeviceAdapter?.update()
-                                    loadingDialog.dismissDialog()
-                                }
-                            })
+                            fdsRemoveNodeCallBack)
                     }
                 }
                 StuDevBottomMenuDialog.MENU_RENAME -> {
@@ -173,7 +159,32 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         meshMcuUpgradeDialog.showDialog(fdsNodeInfo!!)
                     }
                 }
+                StuDevBottomMenuDialog.MENU_DELETE_ALL -> {
+                    if (studioDeviceAdapter != null && studioDeviceAdapter!!.itemCount > 0) {
+                        loadingDialog.showDialog()
+                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
+                            studioDeviceAdapter!!.getAllFdsNodeList(),
+                            true,
+                            fdsRemoveNodeCallBack)
+                    }
+                }
             }
+        }
+    }
+
+    private val fdsRemoveNodeCallBack = object : FDSRemoveNodeCallBack {
+        /*
+         * 删除设备完成回调
+         * isAllSuccess 是否全部退网成功
+         * fdsNodes 退网成功的节点列表
+         */
+        override fun onComplete(
+            isAllSuccess: Boolean,
+            fdsNodes: MutableList<FDSNodeInfo>,
+        ) {
+            LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+            studioDeviceAdapter?.update()
+            loadingDialog.dismissDialog()
         }
     }
 
@@ -194,7 +205,7 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                             isResetConnectDevice = false
 
                             //尝试等待连接高版本设备10s，10s连接不上则自动随机连接一个设备。
-                            mHandler.postDelayed(stateOffLineRunnable,10*1000)
+                            mHandler.postDelayed(stateOffLineRunnable, 10 * 1000)
                         }
                     }
                 } else {
@@ -204,9 +215,11 @@ class DeviceFragment: BaseFragment(R.layout.device_fragment), NodeStatusChangeLi
                         connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
                     }
                     if (connectedFDSNodeInfo != null) {
-                        LOGUtils.v("==============> " +
-                                "  connectedFDSNodeInfo!!.firmwareVersion:${connectedFDSNodeInfo!!.firmwareVersion}" +
-                                "  fdsNodeInfo.firmwareVersion:${fdsNodeInfo.firmwareVersion}")
+                        LOGUtils.v(
+                            "==============> " +
+                                    "  connectedFDSNodeInfo!!.firmwareVersion:${connectedFDSNodeInfo!!.firmwareVersion}" +
+                                    "  fdsNodeInfo.firmwareVersion:${fdsNodeInfo.firmwareVersion}"
+                        )
                         if (connectedFDSNodeInfo!!.firmwareVersion < fdsNodeInfo.firmwareVersion) {
                             //直连节点版本小，切换直接节点
                             resetConnectDevice(fdsNodeInfo)

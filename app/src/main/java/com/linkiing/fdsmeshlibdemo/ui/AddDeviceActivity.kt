@@ -24,6 +24,9 @@ class AddDeviceActivity : BaseActivity() {
     private var isAllCheck = false
     private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
     private var isScanning = true
+    private var addDeviceSize = 0
+    private var addDeviceSusSize = 0
+    private var addDeviceFailSize = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +98,11 @@ class AddDeviceActivity : BaseActivity() {
         if (deviceList.isEmpty()) {
             return
         }
+        addDeviceSize = deviceList.size
+        addDeviceSusSize = 0
+        addDeviceFailSize = 0
+        loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+
         fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack {
             /*
              * 入网完成回调
@@ -107,9 +115,13 @@ class AddDeviceActivity : BaseActivity() {
             ) {
                 LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
 
+                addDeviceSusSize = fdsNodes.size
+                addDeviceFailSize = addDeviceSize - addDeviceSusSize
+                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+
                 //节点设置默认名称
                 for (fdsNode in fdsNodes) {
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${ fdsNode.type}", "")
+                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
                 }
 
                 addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
@@ -121,6 +133,9 @@ class AddDeviceActivity : BaseActivity() {
              */
             override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
                 super.onFDSNodeSuccess(fdsNodeInfo)
+                addDeviceSusSize++
+                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+
                 //设备成功入网，配置打开设备主动上报在线状态
                 val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
                 LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
@@ -143,6 +158,8 @@ class AddDeviceActivity : BaseActivity() {
              */
             override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
                 super.onFDSNodeFail(fdsNodeInfo)
+                addDeviceFailSize++
+                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
             }
         })
     }

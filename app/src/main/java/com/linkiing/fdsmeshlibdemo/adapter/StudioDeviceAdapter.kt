@@ -21,30 +21,35 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     private var itemLongClickListener: (FDSNodeInfo) -> Unit = {}
     private var itemClickListener: (FDSNodeInfo) -> Unit = {}
 
-    fun update(){
+    fun update() {
         fdsNodeList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
         LOGUtils.d("StudioDeviceAdapter fdsNodeList.size:${fdsNodeList.size}")
         LOGUtils.i("fdsNodeList:${Gson().toJson(fdsNodeList)}")
         notifyDataSetChanged()
     }
 
-    fun update(meshAddressList: MutableList<Int>){
+    fun update(meshAddressList: MutableList<Int>) {
         for ((index, dev) in fdsNodeList.withIndex()) {
-            if (listHaveMeshAddress(dev.meshAddress,meshAddressList)) {
+            if (listHaveMeshAddress(dev.meshAddress, meshAddressList)) {
                 notifyItemChanged(index)
             }
         }
     }
 
+    fun getAllFdsNodeList(): MutableList<FDSNodeInfo> {
+        return fdsNodeList
+    }
+
     fun setItemLongClickListener(itemLongClickListener: (FDSNodeInfo) -> Unit) {
         this.itemLongClickListener = itemLongClickListener
     }
+
     fun setItemClickListener(itemClickListener: (FDSNodeInfo) -> Unit) {
         this.itemClickListener = itemClickListener
     }
 
     private fun listHaveMeshAddress(meshAddress: Int, meshAddressList: MutableList<Int>): Boolean {
-        for (address in meshAddressList){
+        for (address in meshAddressList) {
             if (address == meshAddress) {
                 return true
             }
@@ -62,7 +67,8 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val fdsNodeInfo = fdsNodeList[position]
         holder.tv_name.text = fdsNodeInfo.name
-        holder.tv_mac.text = "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.type} - ${fdsNodeInfo.firmwareVersion}"
+        holder.tv_mac.text =
+            "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.type} - ${fdsNodeInfo.firmwareVersion}"
 
         //在线状态
         if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
@@ -75,14 +81,34 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         holder.iv_switch.isChecked = fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_ON
 
         val connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
-        if (connectedFDSNodeInfo != null){
-            if (connectedFDSNodeInfo.macAddress == fdsNodeInfo.macAddress){
+        if (connectedFDSNodeInfo != null) {
+            if (connectedFDSNodeInfo.macAddress == fdsNodeInfo.macAddress) {
                 //直连设备
-                holder.tv_name.setTextColor(ContextCompat.getColor(holder.itemView.context,R.color.red))
-                holder.tv_mac.setTextColor(ContextCompat.getColor(holder.itemView.context,R.color.red))
+                holder.tv_name.setTextColor(
+                    ContextCompat.getColor(
+                        holder.itemView.context,
+                        R.color.red
+                    )
+                )
+                holder.tv_mac.setTextColor(
+                    ContextCompat.getColor(
+                        holder.itemView.context,
+                        R.color.red
+                    )
+                )
             } else {
-                holder.tv_name.setTextColor(ContextCompat.getColor(holder.itemView.context,R.color.black))
-                holder.tv_mac.setTextColor(ContextCompat.getColor(holder.itemView.context,R.color.black))
+                holder.tv_name.setTextColor(
+                    ContextCompat.getColor(
+                        holder.itemView.context,
+                        R.color.black
+                    )
+                )
+                holder.tv_mac.setTextColor(
+                    ContextCompat.getColor(
+                        holder.itemView.context,
+                        R.color.black
+                    )
+                )
             }
         } else {
             LOGUtils.e("StudioDeviceAdapter connectedFDSNodeInfo == null")
@@ -94,7 +120,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
             if (!compoundButton.isPressed) {
                 return@setOnCheckedChangeListener
             }
-            FDSCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress,b)
+            FDSCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress, b)
         }
 
         //长按事件

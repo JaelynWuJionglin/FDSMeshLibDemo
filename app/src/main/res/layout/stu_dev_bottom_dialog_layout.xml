@@ -71,6 +71,20 @@
         android:background="@color/grey" />
 
     <TextView
+        android:id="@+id/tv_delete_all"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="删除所有未入组的设备"
+        android:textColor="@color/red"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey" />
+
+    <TextView
         android:id="@+id/tv_cancel"
         android:layout_width="match_parent"
         android:layout_height="50dp"

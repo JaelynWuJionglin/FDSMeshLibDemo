@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.model.FDSNodeInfo
+import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.DeviceLisBean
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -97,7 +98,8 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
         holder.tv_name.text = "GD_LED_${deviceBean.deviceType}"
-        holder.tv_mac.text = deviceBean.advertisingDevice.device.address
+        holder.tv_mac.text =
+            "${deviceBean.advertisingDevice.device.address} - ${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}"
 
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)

@@ -18,6 +18,7 @@ class StuDevBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layou
         const val MENU_RENAME = 1
         const val MENU_BLE_UPGRADE = 2
         const val MENU_MCU_UPGRADE = 3
+        const val MENU_DELETE_ALL = 4
     }
 
     init {
@@ -63,6 +64,7 @@ class StuDevBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layou
         tv_delete.setOnClickListener(this)
         tv_ble_upgrade.setOnClickListener(this)
         tv_mcu_upgrade.setOnClickListener(this)
+        tv_delete_all.setOnClickListener(this)
         tv_cancel.setOnClickListener(this)
     }
 
@@ -80,8 +82,8 @@ class StuDevBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layou
             R.id.tv_mcu_upgrade->{
                 listener(MENU_MCU_UPGRADE)
             }
-            R.id.tv_cancel -> {
-
+            R.id.tv_delete_all -> {
+                listener(MENU_DELETE_ALL)
             }
         }
         dismissDialog()

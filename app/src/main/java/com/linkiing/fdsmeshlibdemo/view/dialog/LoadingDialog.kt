@@ -7,12 +7,14 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.TextView
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 
 class LoadingDialog(private val context: Context) {
     private var mDialog: Dialog? = null
     private var contentView: View? = null
+    private var tvLoadingMsg: TextView? = null
     private val handler: Handler = Handler(Looper.myLooper()!!)
     private var toastMsgStr: String = ""
 
@@ -22,7 +24,7 @@ class LoadingDialog(private val context: Context) {
     private var runnable: Runnable = Runnable {
         dismissDialog()
         if (toastMsgStr != "") {
-            ConstantUtils.toast(context,toastMsgStr)
+            ConstantUtils.toast(context, toastMsgStr)
         }
         if (isCallback) {
             timeOutCallbacks(true)
@@ -40,13 +42,14 @@ class LoadingDialog(private val context: Context) {
     }
 
     private fun showRoundProcessDialog(isCanceled: Boolean) {
-        if ((context as Activity).isFinishing){
+        if ((context as Activity).isFinishing) {
             return
         }
-        if (contentView == null){
+        if (contentView == null) {
             contentView = View.inflate(context, R.layout.loading_dialog_layout, null)
+            tvLoadingMsg = contentView!!.findViewById(R.id.tv_loading_msg)
         }
-        if (mDialog == null){
+        if (mDialog == null) {
             mDialog = AlertDialog.Builder(context, R.style.Dialog_bocop).create()
         }
         if (isCanceled) {
@@ -102,6 +105,7 @@ class LoadingDialog(private val context: Context) {
         isCallback = true
         showRoundProcessDialog(outTime, false)
     }
+
     fun showDialog(outTime: Long, msgStr: String, timeOutCallbacks: (Boolean) -> Unit) {
         this.toastMsgStr = msgStr
         this.timeOutCallbacks = timeOutCallbacks
@@ -109,6 +113,9 @@ class LoadingDialog(private val context: Context) {
         showRoundProcessDialog(outTime, false)
     }
 
+    fun updateLoadingMsg(msg: String){
+        tvLoadingMsg?.text = msg
+    }
 
     fun dismissDialog() {
         handler.removeCallbacks(runnable)
