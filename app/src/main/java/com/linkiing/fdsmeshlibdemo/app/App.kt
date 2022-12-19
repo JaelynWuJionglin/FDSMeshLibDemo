@@ -46,10 +46,10 @@ class App: MeshApp() {
         val meshConfigure = MeshConfigure()
 
         /*
-         * 配网过程中连接失败重试次数（建议>=3）
-         * 注意：太小的重试次数会影响配网稳定性
+         * 设备配网连接设备超时时长。(秒)
+         * 注意：太短的时长会影响配网成功率，建议 >= 45s
          */
-        meshConfigure.provisionMaxConnectRetry = 8
+        meshConfigure.provisionMaxConnectOutTime = 45
 
         /*
          * 配网连接设备失败，等待重试下一次的等待时间（建议500ms - 3000ms）
