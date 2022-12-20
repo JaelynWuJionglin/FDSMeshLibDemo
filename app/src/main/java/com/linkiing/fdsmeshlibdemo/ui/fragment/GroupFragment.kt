@@ -6,6 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
+import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioGroupAdapter
 import com.linkiing.fdsmeshlibdemo.ui.GroupActivity
@@ -14,6 +15,7 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
+import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.group_fragment.*
 
 class GroupFragment : BaseFragment(R.layout.group_fragment) {
@@ -76,6 +78,7 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
 
         createGroupTextDialog.setOnDialogListener {
             val fdsGroupInfo = FDSMeshApi.instance.createGroup(it)
+            LOGUtils.e("fdsGroupInfo =============> ${Gson().toJson(fdsGroupInfo)}")
             if (fdsGroupInfo != null) {
                 studioGroupAdapter?.update()
             }
