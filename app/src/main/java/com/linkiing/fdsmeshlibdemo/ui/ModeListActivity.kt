@@ -257,7 +257,7 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     }
 
     /**
-     * 固件版本回调
+     * 蓝牙固件版本回调
      * @param fdsNodeInfo 节点信息
      * @param version 固件版本
      */
@@ -271,8 +271,8 @@ class ModeListActivity : BaseActivity(), FDSFirmwareCallBack, FDSBatteryPowerCal
     /**
      * MCU固件版本回调
      * @param fdsNodeInfo 节点信息
-     * @param productVersion 产品版本
-     * @param mcuVersion MCU方案版本
+     * @param productVersion 产品版本 （表示产品的版本信息）
+     * @param mcuVersion MCU方案版本 （用于区分同一个型号产品使用的不同的MCU平台）
      */
     override fun onSuccess(fdsNodeInfo: FDSNodeInfo, productVersion: String, mcuVersion: String) {
         loadingDialog.dismissDialog()
