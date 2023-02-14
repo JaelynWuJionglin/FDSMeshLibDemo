@@ -10,6 +10,7 @@ import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -65,7 +66,13 @@ class AddDeviceActivity : BaseActivity() {
 
     private fun scanDevices() {
         isScanning = true
-        searchDevices.startScanDevice(this, "GD_LED", 20 * 1000, object : FDSBleDevCallBack {
+
+        val filterName = if (MMKVSp.instance.isTestModel()) {
+            ""
+        } else {
+            "GD_LED"
+        }
+        searchDevices.startScanDevice(this, filterName, 20 * 1000, object : FDSBleDevCallBack {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 addDevicesAdapter.addDevices(advertisingDevice, type)
             }

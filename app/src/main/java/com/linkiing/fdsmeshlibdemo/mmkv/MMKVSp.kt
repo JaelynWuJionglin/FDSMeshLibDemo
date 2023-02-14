@@ -15,6 +15,7 @@ class MMKVSp {
     private lateinit var kv: MMKV
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val KV_StudioList = "KV_StudioList"
+    private val KV_IsTestModel = "KV_IsTestModel"
 
     companion object {
         val instance: MMKVSp by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -31,7 +32,7 @@ class MMKVSp {
 
     fun setStudioList(studioList: MutableList<StudioListBean>) {
         val str = gson.toJson(studioList)
-        kv.encode(KV_StudioList,str)
+        kv.encode(KV_StudioList, str)
     }
 
     fun getStudioList(): MutableList<StudioListBean> {
@@ -42,5 +43,13 @@ class MMKVSp {
             val type = object : TypeToken<List<StudioListBean>>() {}.type
             gson.fromJson(str, type)
         }
+    }
+
+    fun setTestModel(isTestModel: Boolean) {
+        kv.encode(KV_IsTestModel, isTestModel)
+    }
+
+    fun isTestModel(): Boolean {
+        return kv.decodeBool(KV_IsTestModel,false)
     }
 }

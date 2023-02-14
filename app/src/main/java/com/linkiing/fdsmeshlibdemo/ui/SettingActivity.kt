@@ -3,6 +3,8 @@ package com.linkiing.fdsmeshlibdemo.ui
 import android.os.Bundle
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.app.App
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileUtils
@@ -25,6 +27,16 @@ class SettingActivity: BaseActivity() {
 
         my_shear?.setOnClickListener {
             shareJson()
+        }
+
+        switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
+        switch_test_model?.setOnCheckedChangeListener { buttonView, isChecked ->
+            MMKVSp.instance.setTestModel(isChecked)
+            if (isChecked){
+                App.getInstance().defMeshConfigure()
+            } else {
+                App.getInstance().setMeshConfigure()
+            }
         }
     }
 
