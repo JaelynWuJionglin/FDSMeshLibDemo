@@ -32,8 +32,11 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         LOGUtils.v("StudioActivity onResume()")
-        //MeshLogin.instance.autoConnect()
-        connectHighVersionDevice()
+        if (MMKVSp.instance.isTestModel()) {
+            MeshLogin.instance.autoConnect()
+        } else {
+            connectHighVersionDevice()
+        }
     }
 
     private fun initView() {

@@ -210,11 +210,6 @@ class AddDeviceActivity : BaseActivity() {
         //停止搜索，释放资源
         searchDevices.destroy()
 
-        /**
-         * 此方法会停止自动连接mesh网络。
-         * 所以需要保证之后有调用MeshLogin.instance.autoConnect()启动自动连接。
-         * 注意：onStop() onDestroy()可能存在延时调用的可能。
-         */
         fdsAddOrRemoveDeviceApi.destroy()
     }
 }

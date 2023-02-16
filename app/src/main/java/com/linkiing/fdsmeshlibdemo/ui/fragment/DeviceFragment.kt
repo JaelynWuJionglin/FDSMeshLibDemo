@@ -50,7 +50,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     override fun onResume() {
         super.onResume()
         LOGUtils.v("DeviceFragment onResume()")
-        MeshLogin.instance.autoConnect()
         studioDeviceAdapter?.update()
     }
 
