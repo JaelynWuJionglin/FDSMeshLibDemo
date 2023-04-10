@@ -51,8 +51,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.core:core-ktx:${project.kotlin_version}"
+    implementation "androidx.appcompat:appcompat:${project.appcompat_version}"
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     testImplementation 'junit:junit:4.13.2'
@@ -68,7 +68,7 @@ dependencies {
     implementation 'com.madgag.spongycastle:prov:1.58.0.0'
 
     //gson（SDK需要）
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation "com.google.code.gson:gson:${project.gson_version}"
     //END###########################################################################################
 
 //    implementation project(path: ':GodoxMeshLib')

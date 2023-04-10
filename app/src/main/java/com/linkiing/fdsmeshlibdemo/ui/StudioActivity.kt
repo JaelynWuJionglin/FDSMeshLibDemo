@@ -5,7 +5,6 @@ import android.view.View
 import androidx.fragment.app.FragmentActivity
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
-import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
