@@ -1,10 +1,10 @@
 buildscript {
     ext{
-        kotlin_version = "1.9.0"
+        kotlin_version = "1.7.10"
         appcompat_version = "1.5.0"
         gson_version = "2.10"
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 9
         versionName = "1.0.9"
     }
