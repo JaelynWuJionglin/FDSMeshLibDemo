@@ -72,6 +72,7 @@ dependencies {
     //END###########################################################################################
 
 //    implementation project(path: ':GodoxMeshLib')
+//    implementation project(path: ':LsTiBleMeshLib')
 
     //权限
     implementation 'com.github.getActivity:XXPermissions:13.2'

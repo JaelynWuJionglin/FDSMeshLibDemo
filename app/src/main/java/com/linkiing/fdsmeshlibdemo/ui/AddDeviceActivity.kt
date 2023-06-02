@@ -132,7 +132,13 @@ class AddDeviceActivity : BaseActivity() {
                 }
 
                 addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
+
+                //主动查询在线状态
+                val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
+                LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
+
                 loadingDialog.dismissDialog()
+
             }
 
             /*
