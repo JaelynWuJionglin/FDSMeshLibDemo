@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider
 import java.io.File
 
 object ConstantUtils {
+    var scanTime = 0L
     private var toast: Toast? = null
 
     fun toast(context: Context, msg: String) {

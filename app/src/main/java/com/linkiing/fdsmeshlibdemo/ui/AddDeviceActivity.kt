@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -96,7 +97,7 @@ class AddDeviceActivity : BaseActivity() {
     }
 
     private fun addDevice() {
-        loadingDialog.showDialog()
+        loadingDialog.showDialog(100 * 1000L)
 
         stopScan()
 
@@ -208,6 +209,10 @@ class AddDeviceActivity : BaseActivity() {
             }
         }
         return false
+    }
+
+    override fun onPause() {
+        super.onPause()
     }
 
     override fun finish() {

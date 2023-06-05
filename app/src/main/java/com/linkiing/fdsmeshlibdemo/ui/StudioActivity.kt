@@ -10,6 +10,7 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_studio.*
 
@@ -31,11 +32,12 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         LOGUtils.v("StudioActivity onResume()")
-        if (MMKVSp.instance.isTestModel()) {
+//        if (MMKVSp.instance.isTestModel()) {
             MeshLogin.instance.autoConnect()
-        } else {
-            connectHighVersionDevice()
-        }
+//        } else {
+//            connectHighVersionDevice()
+//        }
+        ConstantUtils.scanTime = System.currentTimeMillis()
     }
 
     private fun initView() {

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.tool.HttpUtils
 import com.google.gson.Gson
@@ -193,5 +192,6 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         LOGUtils.d("MainActivity onDestroy()")
+        FDSMeshApi.instance.destroy()
     }
 }
