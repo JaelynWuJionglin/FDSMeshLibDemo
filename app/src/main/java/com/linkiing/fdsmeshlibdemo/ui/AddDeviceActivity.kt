@@ -97,8 +97,6 @@ class AddDeviceActivity : BaseActivity() {
     }
 
     private fun addDevice() {
-        loadingDialog.showDialog(100 * 1000L)
-
         stopScan()
 
         //添加设备到mesh
@@ -106,6 +104,9 @@ class AddDeviceActivity : BaseActivity() {
         if (deviceList.isEmpty()) {
             return
         }
+
+        loadingDialog.showDialog()
+
         addDeviceSize = deviceList.size
         addDeviceSusSize = 0
         addDeviceFailSize = 0
@@ -209,10 +210,6 @@ class AddDeviceActivity : BaseActivity() {
             }
         }
         return false
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun finish() {

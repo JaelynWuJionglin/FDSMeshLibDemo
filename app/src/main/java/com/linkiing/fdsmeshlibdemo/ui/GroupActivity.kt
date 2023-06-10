@@ -2,8 +2,6 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +13,6 @@ import com.linkiing.fdsmeshlibdemo.adapter.GroupDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_add_device_in_group.*
 import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
 import kotlinx.android.synthetic.main.activity_group.*
 import kotlinx.android.synthetic.main.activity_group.iv_check
@@ -29,7 +26,6 @@ class GroupActivity : BaseActivity() {
     private var isAllCheck = false
     private var checkDeviceList = mutableListOf<FDSNodeInfo>()
     private var index = 0
-    private var mHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

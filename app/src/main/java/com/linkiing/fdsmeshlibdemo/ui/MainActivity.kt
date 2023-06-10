@@ -31,6 +31,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        LOGUtils.d("MainActivity onCreate()")
 
         initView()
         initRecyclerView()
@@ -192,6 +193,5 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         LOGUtils.d("MainActivity onDestroy()")
-        FDSMeshApi.instance.destroy()
     }
 }
