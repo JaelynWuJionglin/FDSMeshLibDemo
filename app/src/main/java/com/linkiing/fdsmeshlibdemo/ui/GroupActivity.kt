@@ -13,6 +13,7 @@ import com.linkiing.fdsmeshlibdemo.adapter.GroupDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
 import kotlinx.android.synthetic.main.activity_group.*
 import kotlinx.android.synthetic.main.activity_group.iv_check
@@ -143,14 +144,21 @@ class GroupActivity : BaseActivity() {
             )
         } else {
             val fdsNodeInfo = checkDeviceList[index]
-
-            /**
-             * 同一个节点订阅组的上限是32个，超过32个便无法再订阅其他组。
-             * 删除组的时候，务必要取消不必要的订阅关系。
-             */
-            FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
+            if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE){
+                //离线设备不可进行订阅操作
+                LOGUtils.e("Error! nextSubscribe 设备离线 ==> MAC:${fdsNodeInfo.macAddress}")
                 index++
                 nextSubscribe(isSubscribe)
+            } else {
+                /**
+                 * 同一个节点订阅组的上限是32个，超过32个便无法再订阅其他组。
+                 * 删除组的时候，务必要取消不必要的订阅关系。
+                 */
+                FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
+                    LOGUtils.d("nextSubscribe 订阅结果 ==>Mac:${fdsNodeInfo.macAddress} GroupAddress${fdsGroupInfo?.address}  it:$it")
+                    index++
+                    nextSubscribe(isSubscribe)
+                }
             }
         }
     }
