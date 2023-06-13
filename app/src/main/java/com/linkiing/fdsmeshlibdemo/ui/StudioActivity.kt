@@ -3,6 +3,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
+import com.base.mesh.api.listener.MeshLoginListener
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
@@ -14,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.activity_studio.*
 
-class StudioActivity : FragmentActivity(), View.OnClickListener {
+class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {
     private val deviceFragment = DeviceFragment()
     private val groupFragment = GroupFragment()
     private var nowFragment:BaseFragment? = null
@@ -27,6 +28,8 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
 
         initView()
         initListener()
+
+        MeshLogin.instance.addLoginListener(this)
     }
 
     override fun onResume() {
@@ -38,6 +41,17 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
 //            connectHighVersionDevice()
 //        }
         ConstantUtils.scanTime = System.currentTimeMillis()
+    }
+
+    override fun onMeshDisconnect() {
+        super.onMeshDisconnect()
+        //Mesh网络断开，重新连接
+        MeshLogin.instance.autoConnect()
+    }
+
+    override fun onMeshConnected() {
+        super.onMeshConnected()
+        //Mesh连接成功
     }
 
     private fun initView() {
@@ -166,6 +180,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        MeshLogin.instance.removeLoginListener(this)
         MeshLogin.instance.disconnect()
     }
 }
