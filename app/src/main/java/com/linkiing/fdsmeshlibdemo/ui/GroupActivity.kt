@@ -131,6 +131,7 @@ class GroupActivity : BaseActivity() {
     private fun nextSubscribe(isSubscribe: Boolean) {
         if (index >= checkDeviceList.size) {
             loadingDialog.dismissDialog()
+            setCheck(false)
             groupAdapter?.update()
 
             //一次执行完成
