@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.godox.sdk.api.FDSCommandApi
+import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.linkiing.fdsmeshlibdemo.R
@@ -55,7 +55,7 @@ class StudioGroupAdapter : RecyclerView.Adapter<StudioGroupAdapter.MyHolder>() {
         //Switch
         holder.iv_switch.setOnCheckedChangeListener { _, b ->
             //设备开关灯
-            FDSCommandApi.instance.changeLightSwitch(fdsGroupInfo.address,b)
+            GodoxCommandApi.instance.changeLightSwitch(fdsGroupInfo.address,b)
         }
 
         //长按事件

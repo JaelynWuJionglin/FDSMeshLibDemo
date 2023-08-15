@@ -86,6 +86,14 @@
                     android:layout_below="@+id/recyclerView_v3"/>
             </RelativeLayout>
 
+            <Button
+                android:id="@+id/bt_test1"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="OnOff连续测试"
+                android:textSize="14sp"
+                android:textColor="@color/black"/>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

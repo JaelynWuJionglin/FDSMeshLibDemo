@@ -7,8 +7,8 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.main.MeshLogin
+import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
-import com.godox.sdk.api.FDSCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
@@ -24,7 +24,6 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.telink.ble.mesh.util.LOGUtils
 import kotlinx.android.synthetic.main.device_fragment.*
-import java.util.*
 
 class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
@@ -106,7 +105,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             if (!compoundButton.isPressed) {
                 return@setOnCheckedChangeListener
             }
-            FDSCommandApi.instance.changeLightSwitch(0xFFFF, isSwitch)
+            GodoxCommandApi.instance.changeLightSwitch(0xFFFF, isSwitch)
         }
 
         tv_refresh.setOnClickListener {

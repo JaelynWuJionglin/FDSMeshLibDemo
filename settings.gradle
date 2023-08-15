@@ -45,3 +45,4 @@ rootProject.name = "FDSMeshLibDemo"
 include ':app'
 include ':LsTiBleMeshLib'
 include ':GodoxMeshLib'
+include ':GodoxAgmLib'

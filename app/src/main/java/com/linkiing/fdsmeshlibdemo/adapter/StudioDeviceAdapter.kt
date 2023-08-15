@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.godox.sdk.api.FDSCommandApi
+import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.google.gson.Gson
@@ -120,7 +120,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
             if (!compoundButton.isPressed) {
                 return@setOnCheckedChangeListener
             }
-            FDSCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress, b)
+            GodoxCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress, b)
         }
 
         //长按事件

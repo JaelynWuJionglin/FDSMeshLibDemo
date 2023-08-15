@@ -71,6 +71,7 @@ dependencies {
     implementation "com.google.code.gson:gson:${project.gson_version}"
     //END###########################################################################################
 
+//    implementation project(path: ':GodoxAgmLib')
 //    implementation project(path: ':GodoxMeshLib')
 //    implementation project(path: ':LsTiBleMeshLib')
 
