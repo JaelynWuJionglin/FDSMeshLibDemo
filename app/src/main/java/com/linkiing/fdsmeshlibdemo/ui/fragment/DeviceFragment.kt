@@ -188,7 +188,9 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
 
     override fun onNodeStatusChange(meshAddressList: MutableList<Int>) {
         //节点在线状态改变
-        studioDeviceAdapter?.update(meshAddressList)
+        mActivity.runOnUiThread {
+            studioDeviceAdapter?.update(meshAddressList)
+        }
 
         for (meshAddress in meshAddressList) {
             val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(meshAddress)

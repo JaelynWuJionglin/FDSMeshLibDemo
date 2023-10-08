@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import com.base.mesh.api.listener.MeshOtaListener
-import com.base.mesh.api.main.MeshGattMcuUpgrade
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
@@ -110,7 +109,8 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         try {
             var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
             if (isMcuUpgrade) {
-                path = "TP2R_V040_T2.bin"
+                path = "TP2R_V139.bin" //新
+//                path = "TP2R_TP4R_TP8R_V137.bin" //旧
             }
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()

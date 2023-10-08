@@ -45,8 +45,11 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
 
     override fun onMeshDisconnect() {
         super.onMeshDisconnect()
-        //Mesh网络断开，重新连接
-        MeshLogin.instance.autoConnect()
+
+        if (!FDSMeshApi.instance.isMcuOtaIng()) {
+            //Mesh网络断开，重新连接
+            MeshLogin.instance.autoConnect()
+        }
     }
 
     override fun onMeshConnected() {
