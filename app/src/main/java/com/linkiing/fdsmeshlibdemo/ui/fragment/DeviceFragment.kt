@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
+import com.godox.agm.callback.FirmwareCallBack
+import com.godox.agm.callback.OpenPaCallback
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
@@ -149,7 +151,34 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                 }
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     if (fdsNodeInfo != null) {
-                        meshOtaDialog.showDialog(fdsNodeInfo!!)
+                        //获取固件版本
+                        GodoxCommandApi.instance.getFirmwareVersion(fdsNodeInfo!!.meshAddress, object : FirmwareCallBack{
+                            override fun onSuccess(
+                                fdsNodeInfo: FDSNodeInfo,
+                                version: Int,
+                                isPa: Boolean
+                            ) {
+                                /*
+                                 * 1,比对固件版本
+                                 * 2,判断是否是PA固件
+                                 */
+                                if (isPa) {
+                                    //PA固件打开PA升级功能
+                                    GodoxCommandApi.instance.openPaUpgrade(fdsNodeInfo.meshAddress, object : OpenPaCallback{
+                                        override fun openPaComplete() {
+                                            //打开PA升级成功，开始升级
+                                            meshOtaDialog.setIsPa(true)
+                                            meshOtaDialog.showDialog(fdsNodeInfo)
+                                        }
+                                    })
+
+                                } else {
+                                    //非PA固件，直接升级
+                                    meshOtaDialog.setIsPa(false)
+                                    meshOtaDialog.showDialog(fdsNodeInfo)
+                                }
+                            }
+                        })
                     }
                 }
                 StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {

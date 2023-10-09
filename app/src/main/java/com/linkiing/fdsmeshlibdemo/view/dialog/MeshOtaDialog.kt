@@ -18,6 +18,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     BaseFullDialog(activity, R.layout.layout_dialog_fm), MeshOtaListener {
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
+    private var isPa = false
 
     fun showDialog(fdsNodeInfo: FDSNodeInfo) {
         this.fdsNodeInfo = fdsNodeInfo
@@ -25,6 +26,10 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
             dismiss()
         }
         show()
+    }
+
+    fun setIsPa(isPa: Boolean){
+        this.isPa = isPa
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +113,9 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     private fun readFirmware() {
         try {
             var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
+            if (isPa) {
+                path = "LK8620_mesh_GD_PA_v000045_20231009.bin"
+            }
             if (isMcuUpgrade) {
                 path = "TP2R_V139.bin" //新
 //                path = "TP2R_TP4R_TP8R_V137.bin" //旧

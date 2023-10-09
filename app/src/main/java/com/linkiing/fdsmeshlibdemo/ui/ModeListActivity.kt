@@ -315,7 +315,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
      * @param fdsNodeInfo 节点信息
      * @param version 固件版本
      */
-    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, version: Int) {
+    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, version: Int, isPa: Boolean) {
         loadingDialog.dismissDialog()
         val msg = "固件版本:$version"
         LOGUtils.d(msg)
