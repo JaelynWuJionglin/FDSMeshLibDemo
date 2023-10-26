@@ -36,13 +36,21 @@ class App : MeshApp() {
         //appId认证
         FDSMeshApi.instance.setWithAppId(appId)
 
-        //设置mesh配置信息
+        //BleUtils 初始化
+        BleUtils.instance.init(this)
+
+        /*
+        * 配置mesh参数
+        */
         if (!MMKVSp.instance.isTestModel()) {
             setMeshConfigure()
         }
 
-        //BleUtils 初始化
-        BleUtils.instance.init(this)
+        /**
+         * 初始化mesh数据
+         *（会获取Android_ID等设备信息，生成唯一ID，故首次启动app，需要在用户同意隐私政策后调用）
+         */
+        initMeshData()
     }
 
     fun setMeshConfigure() {
