@@ -1,20 +1,19 @@
 # Android Mesh SDK说明⽂档
 ## ⼀.SDK说明
 ### 1，mesh核心库
-GodoxMeshLib_v1.2.1  
-LsTiBleMeshLib_v1.2.1   
+GodoxMeshLib_v1.2.3  
+LsTiBleMeshLib_v1.2.3   
 
 ### 2，mesh数据协议库
-GodoxAgmLib_v1.1.1  
+GodoxAgmLib_v1.1.2  
 
 ### 3，⽀持的Android版本：
-Android5.0-最新
+Android5.0以上（包含）
 
 ### 4，开发语⾔：
 kotlin Java
 
 ### 5，编译环境：
-Android studio Flamingo 2022.2.1 Patch2 
 gradle-7.3.3
 
 ## ⼆.⼯程介绍
