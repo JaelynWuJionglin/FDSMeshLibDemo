@@ -12,7 +12,7 @@ import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.linkiing.fdsmeshlibdemo.R
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 
 class StudioGroupAdapter : RecyclerView.Adapter<StudioGroupAdapter.MyHolder>() {
     private var fdsGroupList = FDSMeshApi.instance.getGroups()

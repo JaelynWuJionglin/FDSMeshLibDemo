@@ -15,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
 
 class AddDeviceActivity : BaseActivity() {

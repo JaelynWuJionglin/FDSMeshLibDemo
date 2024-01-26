@@ -15,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**

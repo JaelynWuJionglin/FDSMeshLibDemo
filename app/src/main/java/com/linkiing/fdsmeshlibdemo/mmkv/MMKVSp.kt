@@ -5,7 +5,7 @@ import android.text.TextUtils
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import com.tencent.mmkv.MMKV
 
 /**

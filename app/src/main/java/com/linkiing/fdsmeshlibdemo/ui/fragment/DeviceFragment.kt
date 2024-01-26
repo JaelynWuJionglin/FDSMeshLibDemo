@@ -24,7 +24,7 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.device_fragment.*
 
 class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {

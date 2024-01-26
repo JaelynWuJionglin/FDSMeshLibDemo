@@ -15,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.group_fragment.*
 
 class GroupFragment : BaseFragment(R.layout.group_fragment) {

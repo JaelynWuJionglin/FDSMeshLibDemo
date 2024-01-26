@@ -19,7 +19,7 @@ import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {

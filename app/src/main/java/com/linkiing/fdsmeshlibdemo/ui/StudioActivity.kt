@@ -12,7 +12,7 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.activity_studio.*
 
 class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {

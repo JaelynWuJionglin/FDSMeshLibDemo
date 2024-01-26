@@ -14,7 +14,7 @@ import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 
 class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>() {
     private var fdsNodeList = FDSMeshApi.instance.getFDSNodes()

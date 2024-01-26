@@ -10,7 +10,7 @@ import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.telink.ble.mesh.util.LOGUtils
+import com.base.mesh.api.log.LOGUtils
 
 class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
     private var studioList = MMKVSp.instance.getStudioList()
