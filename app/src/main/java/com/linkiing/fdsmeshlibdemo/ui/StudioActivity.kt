@@ -13,12 +13,13 @@ import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.base.mesh.api.log.LOGUtils
+import com.telink.ble.mesh.core.networking.ExtendBearerMode
 import kotlinx.android.synthetic.main.activity_studio.*
 
 class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {
     private val deviceFragment = DeviceFragment()
     private val groupFragment = GroupFragment()
-    private var nowFragment:BaseFragment? = null
+    private var nowFragment: BaseFragment? = null
     private var tabId: Int = -1
     private var index = 0
 
@@ -36,10 +37,13 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         super.onResume()
         LOGUtils.v("StudioActivity onResume()")
 //        if (MMKVSp.instance.isTestModel()) {
-            MeshLogin.instance.autoConnect()
+        MeshLogin.instance.autoConnect()
 //        } else {
 //            connectHighVersionDevice()
 //        }
+
+        resetExtendBearerMode()
+
         ConstantUtils.scanTime = System.currentTimeMillis()
     }
 
@@ -55,6 +59,8 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     override fun onMeshConnected() {
         super.onMeshConnected()
         //Mesh连接成功
+
+        resetExtendBearerMode()
     }
 
     private fun initView() {
@@ -92,25 +98,26 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             R.id.tab_devices -> {
                 setTab(0)
             }
+
             R.id.tab_group -> {
                 setTab(1)
             }
         }
     }
 
-    private fun showFragment(fragment:BaseFragment){
+    private fun showFragment(fragment: BaseFragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         //先hide之前的fragment
         if (nowFragment != null) {
-            if (nowFragment!!.isAdded && nowFragment!!.isVisible){
+            if (nowFragment!!.isAdded && nowFragment!!.isVisible) {
                 fragmentTransaction.hide(nowFragment!!)
             }
         }
 
         //添加新的fragment
-        if (!fragment.isAdded){
-            fragmentTransaction.add(R.id.frameLayout,fragment)
-        }else{
+        if (!fragment.isAdded) {
+            fragmentTransaction.add(R.id.frameLayout, fragment)
+        } else {
             fragmentTransaction.show(fragment)
         }
         nowFragment = fragment
@@ -118,7 +125,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun saveJson() {
-        if (index != 0){
+        if (index != 0) {
             //保存当前MeshJson数据
             val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
             val studioList = MMKVSp.instance.getStudioList()
@@ -131,6 +138,17 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         }
     }
 
+    private fun resetExtendBearerMode() {
+        val node = FDSMeshApi.instance.getConnectedFDSNodeInfo()
+        if (node != null) {
+            if (node.firmwareVersion >= 41) {
+                FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.GATT_ADV)
+            } else {
+                FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.NONE)
+            }
+        }
+    }
+
     /**
      * 连接高版本设备节点，如果超时连接不成功，则自动连接一个随机节点。
      */
@@ -139,7 +157,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         if (MeshLogin.instance.isLogin()) {
             val connectedDevice = FDSMeshApi.instance.getConnectedFDSNodeInfo()
             if (connectedDevice != null) {
-                if (connectedDevice.firmwareVersion >= deviceHighVersion){
+                if (connectedDevice.firmwareVersion >= deviceHighVersion) {
                     //已经连接高版本设备
                     return
                 }
@@ -153,7 +171,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         }
         MeshLogin.instance.setAutoConnectFilterDevicesList(list)
         MeshLogin.instance.disconnect()
-        MeshLogin.instance.autoConnect(10 * 1000){
+        MeshLogin.instance.autoConnect(10 * 1000) {
             LOGUtils.d("autoConnect =============================> $it")
             //尝试连接高版本设备10s，10s连接不上则自动随机连接一个设备。
             if (!it) {
