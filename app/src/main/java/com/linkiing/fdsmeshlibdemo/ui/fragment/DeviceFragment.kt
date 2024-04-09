@@ -233,8 +233,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                             connectedFDSNodeInfo = null
                             isResetConnectDevice = false
 
-                            //尝试等待连接高版本设备10s，10s连接不上则自动随机连接一个设备。
-                            mHandler.postDelayed(stateOffLineRunnable, 10 * 1000)
+                            //尝试等待连接15s，15s连接不上重新调用autoConnect
+                            mHandler.postDelayed(stateOffLineRunnable, 15 * 1000)
                         }
                     }
                 } else {
@@ -249,11 +249,11 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                                     "  connectedFDSNodeInfo!!.firmwareVersion:${connectedFDSNodeInfo!!.firmwareVersion}" +
                                     "  fdsNodeInfo.firmwareVersion:${fdsNodeInfo.firmwareVersion}"
                         )
-                        if (connectedFDSNodeInfo!!.firmwareVersion < fdsNodeInfo.firmwareVersion) {
-                            //直连节点版本小，切换直接节点
-                            resetConnectDevice(fdsNodeInfo)
-                            return
-                        }
+//                        if (connectedFDSNodeInfo!!.firmwareVersion < fdsNodeInfo.firmwareVersion) {
+//                            //直连节点版本小，切换直接节点
+//                            resetConnectDevice(fdsNodeInfo)
+//                            return
+//                        }
                     }
                 }
             }
@@ -261,8 +261,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     }
 
     private val stateOffLineRunnable = Runnable {
-        //清除连接过滤，所有设备都可能成为直连节点
-        MeshLogin.instance.clearAutoConnectFilterDevicesList()
+        MeshLogin.instance.autoConnect()
     }
 
     /**

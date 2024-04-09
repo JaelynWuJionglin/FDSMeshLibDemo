@@ -21,6 +21,9 @@ class LoadingDialog(private val context: Context) {
     private var timeOutCallbacks: (Boolean) -> Unit = {}
     private var isCallback: Boolean = false
 
+    //点击监听
+    var msgClickListener: () -> Unit = {}
+
     private var runnable: Runnable = Runnable {
         dismissDialog()
         if (toastMsgStr != "") {
@@ -64,6 +67,10 @@ class LoadingDialog(private val context: Context) {
         }
         mDialog?.show()
         mDialog?.setContentView(contentView!!)
+
+        tvLoadingMsg?.setOnClickListener {
+            msgClickListener()
+        }
     }
 
     /**

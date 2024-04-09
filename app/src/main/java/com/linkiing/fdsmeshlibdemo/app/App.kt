@@ -72,15 +72,6 @@ class App : MeshApp() {
 
 
         FDSMeshApi.instance.setMeshConfigure(meshConfigure)
-
-
-        /*
-         * 设置Mesh发送数据包承载模式（需固件支持）
-         * NONE:默认都不使用长包
-         * GATT:直连节点长包
-         * GATT_ADV:全部长包
-         */
-        FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.GATT_ADV)
     }
 
     fun defMeshConfigure() {

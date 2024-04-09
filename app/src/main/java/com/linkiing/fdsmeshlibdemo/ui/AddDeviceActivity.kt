@@ -2,7 +2,6 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -51,6 +50,14 @@ class AddDeviceActivity : BaseActivity() {
         }
 
         loadingDialog = LoadingDialog(this)
+        loadingDialog.msgClickListener = {
+            /**
+             * 注意:调用方法后不会立即停止配网，会等待当前正在配网的设备配网完成；
+             * 且需要回调onComplete()之后，才可以重新使用deviceAddNetWork()方法。
+             */
+            fdsAddOrRemoveDeviceApi.stopDeviceAddNetWork(fdeAddNetWorkCallBack)
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 结束中...")
+        }
     }
 
     private fun initRecyclerView() {
@@ -112,71 +119,76 @@ class AddDeviceActivity : BaseActivity() {
         addDeviceFailSize = 0
         loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, object : FDSAddNetWorkCallBack {
-            /*
-             * 入网完成回调
-             * isAllSuccess 是否全部入网成功
-             * fdsNodes 入网成功的节点
-             */
-            override fun onComplete(
-                isAllSuccess: Boolean,
-                fdsNodes: MutableList<FDSNodeInfo>
-            ) {
-                LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, fdeAddNetWorkCallBack)
+    }
 
-                addDeviceSusSize = fdsNodes.size
-                addDeviceFailSize = addDeviceSize - addDeviceSusSize
-                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+    /**
+     * FDSAddNetWorkCallBack
+     */
+    private val fdeAddNetWorkCallBack = object : FDSAddNetWorkCallBack {
+        /*
+         * 入网完成回调
+         * isAllSuccess 是否全部入网成功
+         * fdsNodes 入网成功的节点
+         */
+        override fun onComplete(
+            isAllSuccess: Boolean,
+            fdsNodes: MutableList<FDSNodeInfo>
+        ) {
+            LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
 
-                //节点设置默认名称
-                for (fdsNode in fdsNodes) {
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
-                }
+            addDeviceSusSize = fdsNodes.size
+            addDeviceFailSize = addDeviceSize - addDeviceSusSize
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-                addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
-
-                //主动查询在线状态
-                val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
-                LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
-
-                loadingDialog.dismissDialog()
-
+            //节点设置默认名称
+            for (fdsNode in fdsNodes) {
+                FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
             }
 
-            /*
-             * 单个设备入网成功返回
-             */
-            override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
-                super.onFDSNodeSuccess(fdsNodeInfo)
-                addDeviceSusSize++
-                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-                //设备成功入网，配置打开设备主动上报在线状态
-                val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
-                LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
-                if (isFDSNodeConfigPublish) {
-                    return
-                }
+            //主动查询在线状态
+            val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
+            LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
 
-                /**
-                 * 配置节点主动上报在线状态
-                 */
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo)
-                if (isOk) {
-                    publishFdsNodeInfoList.add(fdsNodeInfo)
-                }
-                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+            loadingDialog.dismissDialog()
+
+        }
+
+        /*
+         * 单个设备入网成功返回
+         */
+        override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
+            super.onFDSNodeSuccess(fdsNodeInfo)
+            addDeviceSusSize++
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+
+            //设备成功入网，配置打开设备主动上报在线状态
+            val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
+            LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
+            if (isFDSNodeConfigPublish) {
+                return
             }
 
-            /*
-             * 单个设备入网失败返回
+            /**
+             * 配置节点主动上报在线状态
              */
-            override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
-                super.onFDSNodeFail(fdsNodeInfo)
-                addDeviceFailSize++
-                loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo)
+            if (isOk) {
+                publishFdsNodeInfoList.add(fdsNodeInfo)
             }
-        })
+            LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+        }
+
+        /*
+         * 单个设备入网失败返回
+         */
+        override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
+            super.onFDSNodeFail(fdsNodeInfo)
+            addDeviceFailSize++
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        }
     }
 
     private fun initListener() {
