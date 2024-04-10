@@ -37,7 +37,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private var fdsAddOrRemoveDeviceApi: FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var connectedFDSNodeInfo: FDSNodeInfo? = null
-    private val mHandler = Handler(Looper.getMainLooper())
     private var isResetConnectDevice = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -233,8 +232,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                             connectedFDSNodeInfo = null
                             isResetConnectDevice = false
 
-                            //尝试等待连接15s，15s连接不上重新调用autoConnect
-                            mHandler.postDelayed(stateOffLineRunnable, 15 * 1000)
+//                            MeshLogin.instance.autoConnect()
                         }
                     }
                 } else {
@@ -260,10 +258,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
     }
 
-    private val stateOffLineRunnable = Runnable {
-        MeshLogin.instance.autoConnect()
-    }
-
     /**
      * 切换直连节点
      */
@@ -285,7 +279,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
 
     override fun onDestroy() {
         super.onDestroy()
-        mHandler.removeCallbacks(stateOffLineRunnable)
         meshOtaDialog.dismiss()
         meshMcuUpgradeDialog.dismiss()
         fdsAddOrRemoveDeviceApi?.destroy()
