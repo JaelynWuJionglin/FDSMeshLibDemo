@@ -11,7 +11,9 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.DeviceLisBean
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.telink.ble.mesh.entity.AdvertisingDevice
+import com.telink.ble.mesh.util.PermissionUtils
 
 class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<DeviceLisBean>()
@@ -94,12 +96,24 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         return MyHolder(view)
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "MissingPermission")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
-        holder.tv_name.text = "GD_LED_${deviceBean.deviceType}"
-        holder.tv_mac.text =
-            "${deviceBean.advertisingDevice.device.address} - ${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}"
+        val devName = if (PermissionUtils.checkPermissionBle()) {
+            deviceBean.advertisingDevice.device?.name ?: "null"
+        } else {
+            "null"
+        }
+
+        if (MMKVSp.instance.isTestModel()) {
+            holder.tv_name.text = "name:$devName"
+            holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address} - rssi:${deviceBean.advertisingDevice.rssi}"
+        } else {
+            holder.tv_name.text = "${devName}_${deviceBean.deviceType}"
+            holder.tv_mac.text =
+                "${deviceBean.advertisingDevice.device.address} - ${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}"
+        }
+
 
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
