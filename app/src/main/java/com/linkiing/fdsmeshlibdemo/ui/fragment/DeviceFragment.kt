@@ -31,8 +31,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var renameTextDialog: InputTextDialog
-    private lateinit var meshOtaDialog: MeshOtaDialog
-    private lateinit var meshMcuUpgradeDialog: MeshOtaDialog
+    private var meshOtaDialog: MeshOtaDialog? = null
+    private var meshMcuUpgradeDialog: MeshOtaDialog? = null
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi: FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
@@ -166,15 +166,15 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                                     GodoxCommandApi.instance.openPaUpgrade(fdsNodeInfo.meshAddress, object : OpenPaCallback{
                                         override fun openPaComplete() {
                                             //打开PA升级成功，开始升级
-                                            meshOtaDialog.setIsPa(true)
-                                            meshOtaDialog.showDialog(fdsNodeInfo)
+                                            meshOtaDialog?.setIsPa(true)
+                                            meshOtaDialog?.showDialog(fdsNodeInfo)
                                         }
                                     })
 
                                 } else {
                                     //非PA固件，直接升级
-                                    meshOtaDialog.setIsPa(false)
-                                    meshOtaDialog.showDialog(fdsNodeInfo)
+                                    meshOtaDialog?.setIsPa(false)
+                                    meshOtaDialog?.showDialog(fdsNodeInfo)
                                 }
                             }
                         })
@@ -182,7 +182,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                 }
                 StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {
                     if (fdsNodeInfo != null) {
-                        meshMcuUpgradeDialog.showDialog(fdsNodeInfo!!)
+                        meshMcuUpgradeDialog?.showDialog(fdsNodeInfo!!)
                     }
                 }
                 StuDevBottomMenuDialog.MENU_DELETE_ALL -> {
@@ -279,8 +279,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
 
     override fun onDestroy() {
         super.onDestroy()
-        meshOtaDialog.dismiss()
-        meshMcuUpgradeDialog.dismiss()
+        meshOtaDialog?.dismiss()
+        meshMcuUpgradeDialog?.dismiss()
         fdsAddOrRemoveDeviceApi?.destroy()
         FDSMeshApi.instance.removeFDSNodeStatusChangeCallBack(this)
     }

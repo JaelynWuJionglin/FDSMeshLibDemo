@@ -107,11 +107,13 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
 
         if (MMKVSp.instance.isTestModel()) {
             holder.tv_name.text = "name:$devName"
-            holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address} - rssi:${deviceBean.advertisingDevice.rssi}"
+            holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
+                    " - rssi:${deviceBean.advertisingDevice.rssi}"
         } else {
             holder.tv_name.text = "${devName}_${deviceBean.deviceType}"
-            holder.tv_mac.text =
-                "${deviceBean.advertisingDevice.device.address} - ${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}"
+            holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
+                    " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}" +
+                    " - rssi:${deviceBean.advertisingDevice.rssi}"
         }
 
 

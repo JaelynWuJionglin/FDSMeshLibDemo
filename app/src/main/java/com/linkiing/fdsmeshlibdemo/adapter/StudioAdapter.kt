@@ -13,10 +13,20 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.base.mesh.api.log.LOGUtils
 
 class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
-    private var studioList = MMKVSp.instance.getStudioList()
+    private var studioList = mutableListOf<StudioListBean>()
     private var onItemClickListener: (StudioListBean) -> Unit = {}
 
-    init {
+    fun updateData(){
+        studioList = MMKVSp.instance.getStudioList()
+
+        val iterator = studioList.iterator()
+        while (iterator.hasNext()) {
+            val bean = iterator.next()
+            if (bean.index <= 0) {
+                iterator.remove()
+            }
+        }
+
         if (studioList.isEmpty()) {
             val studioListBean = StudioListBean(getStudioNextIndex())
             studioListBean.name = "Studio-1"
@@ -24,10 +34,7 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             addStudio(studioListBean)
         }
         LOGUtils.d("StudioDeviceAdapter studioList.size:${studioList.size}")
-    }
 
-    fun updateData(){
-        studioList = MMKVSp.instance.getStudioList()
         notifyDataSetChanged()
     }
 

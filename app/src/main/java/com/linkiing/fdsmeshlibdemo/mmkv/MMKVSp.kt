@@ -40,7 +40,7 @@ class MMKVSp {
         return if (TextUtils.isEmpty(str)) {
             mutableListOf()
         } else {
-            val type = object : TypeToken<List<StudioListBean>>() {}.type
+            val type = object : TypeToken<MutableList<StudioListBean>>() {}.type
             gson.fromJson(str, type)
         }
     }

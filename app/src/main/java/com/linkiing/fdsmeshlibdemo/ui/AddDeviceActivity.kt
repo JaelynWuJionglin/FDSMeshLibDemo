@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
@@ -81,8 +82,10 @@ class AddDeviceActivity : BaseActivity() {
             "GD_LED"
         }
         searchDevices.startScanDevice(this, filterName, 20 * 1000, object : FDSBleDevCallBack {
+            @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 addDevicesAdapter.addDevices(advertisingDevice, type)
+                tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
             }
 
             override fun onScanTimeOut() {

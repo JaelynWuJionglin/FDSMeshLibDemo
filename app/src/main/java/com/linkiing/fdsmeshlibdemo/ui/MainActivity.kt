@@ -103,6 +103,7 @@ class MainActivity : BaseActivity() {
 
                 override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
                     super.onDenied(permissions, never)
+                    LOGUtils.e(" =============> blePermissions onDenied")
                 }
             })
         }

@@ -114,11 +114,11 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         try {
             var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
             if (isPa) {
-                path = "LK8620_mesh_GD_PA_v000045_20231009.bin"
+                //path = "8258_mesh_PA.bin"
+                path = "8258_mesh_PA_V47_ADV_ENABLE.bin"
             }
             if (isMcuUpgrade) {
                 path = "TP2R_V139.bin" //新
-//                path = "TP2R_TP4R_TP8R_V137.bin" //旧
             }
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()

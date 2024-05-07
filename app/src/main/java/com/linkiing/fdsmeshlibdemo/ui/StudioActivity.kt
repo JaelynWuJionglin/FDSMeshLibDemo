@@ -66,6 +66,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     private fun initView() {
         index = intent.getIntExtra("index", 0)
         if (index == 0) {
+            LOGUtils.e(" =============> index == 0")
             finish()
         }
 

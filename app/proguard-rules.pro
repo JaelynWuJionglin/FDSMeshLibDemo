@@ -126,3 +126,6 @@
 -keep class com.godox.sdk** {*;}
 -keep class com.base.mesh.api** {*;}
 -keep class com.telink.ble.mesh** {*;}
+
+# app
+-keep class com.linkiing.fdsmeshlibdemo.bean** {*;}

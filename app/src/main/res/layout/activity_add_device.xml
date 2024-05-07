@@ -20,12 +20,13 @@
         android:gravity="center_vertical">
 
         <TextView
+            android:id="@+id/tv_dev_network_equipment"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/black"
-            android:text="可连接设备"/>
+            android:text="@string/text_dev_network_equipment"/>
 
         <ImageView
             android:id="@+id/iv_check"
