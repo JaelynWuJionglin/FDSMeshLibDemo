@@ -51,12 +51,27 @@
             android:layout_marginStart="10dp"/>
 
         <com.linkiing.fdsmeshlibdemo.view.MenuItem
-            android:id="@+id/my_shear"
+            android:id="@+id/my_shear_json"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:menu_text="@string/shear_json"
             app:menu_image_end="@drawable/arrow_right"
             app:menu_text_end=""/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/grey_line"
+            android:layout_marginStart="10dp"/>
+
+        <com.linkiing.fdsmeshlibdemo.view.MenuItem
+            android:id="@+id/my_shear_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu_text="@string/shear_log"
+            app:menu_image_end="@drawable/arrow_right"
+            app:menu_text_end=""/>
+
     </LinearLayout>
 
     <androidx.appcompat.widget.SwitchCompat

@@ -10,5 +10,6 @@
     <string name="mesh_lib_ver">MESH库版本</string>
     <string name="my_about">关于软件</string>
     <string name="shear_json">分享当前JSON</string>
+    <string name="shear_log">分享日志</string>
     <string name="text_dev_network_equipment">可配网设备</string>
 </resources>

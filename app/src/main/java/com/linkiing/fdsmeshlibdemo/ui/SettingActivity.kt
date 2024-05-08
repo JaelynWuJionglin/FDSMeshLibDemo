@@ -1,6 +1,8 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import com.base.mesh.api.log.FileJaUtils
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.app.App
@@ -25,8 +27,14 @@ class SettingActivity: BaseActivity() {
         mesh_lib_ver?.setTextHint("V${FDSMeshApi.instance.getVersion()}")
         my_about?.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
 
-        my_shear?.setOnClickListener {
+        my_shear_json?.setOnClickListener {
             shareJson()
+        }
+
+        my_shear_log?.setOnClickListener {
+            LOGUtils.shareAppLogFile { file ->
+                FileJaUtils.shareFile(this,file,getString(R.string.app_name))
+            }
         }
 
         switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
