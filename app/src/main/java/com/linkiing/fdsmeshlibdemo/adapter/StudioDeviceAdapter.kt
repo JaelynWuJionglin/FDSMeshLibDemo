@@ -1,6 +1,7 @@
 package com.linkiing.fdsmeshlibdemo.adapter
 
 import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
 import com.base.mesh.api.log.LOGUtils
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 
 class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>() {
     private var fdsNodeList = FDSMeshApi.instance.getFDSNodes()
@@ -66,15 +68,37 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val fdsNodeInfo = fdsNodeList[position]
-        holder.tv_name.text = fdsNodeInfo.name
-        holder.tv_mac.text =
-            "${fdsNodeInfo.macAddress} - ${fdsNodeInfo.type} - ${fdsNodeInfo.firmwareVersion}"
+        holder.tv_name.text = "name:${
+            if (TextUtils.isEmpty(fdsNodeInfo.name)) {
+                "null"
+            } else {
+                fdsNodeInfo.name
+            }
+        }"
+
+        if (MMKVSp.instance.isTestModel()) {
+            holder.tv_mac.text =
+                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
+        } else {
+            holder.tv_mac.text =
+                "mac:${fdsNodeInfo.macAddress} - type:${fdsNodeInfo.type} - ver:${fdsNodeInfo.firmwareVersion}"
+        }
 
         //在线状态
-        if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-            holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
+        if (MMKVSp.instance.isTestModel()) {
+            //TestModel 连接上mesh，则全部上线
+            if (FDSMeshApi.instance.getConnectedFDSNodeInfo() == null) {
+                holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
+            } else {
+                holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
+            }
         } else {
-            holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
+            //Godox
+            if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
+                holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
+            } else {
+                holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
+            }
         }
 
         //开关状态

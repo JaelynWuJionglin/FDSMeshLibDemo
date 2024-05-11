@@ -1,8 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
@@ -274,6 +272,12 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             MeshLogin.instance.setAutoConnectFilterDevicesList(list)
             MeshLogin.instance.disconnect()
             MeshLogin.instance.autoConnect()
+        }
+    }
+
+    fun updateList() {
+        mActivity.runOnUiThread {
+            studioDeviceAdapter?.update()
         }
     }
 

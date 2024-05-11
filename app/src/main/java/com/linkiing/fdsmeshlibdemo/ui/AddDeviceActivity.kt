@@ -145,8 +145,10 @@ class AddDeviceActivity : BaseActivity() {
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             //节点设置默认名称
-            for (fdsNode in fdsNodes) {
-                FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
+            if (!MMKVSp.instance.isTestModel()) {
+                for (fdsNode in fdsNodes) {
+                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
+                }
             }
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
@@ -174,14 +176,16 @@ class AddDeviceActivity : BaseActivity() {
                 return
             }
 
-            /**
-             * 配置节点主动上报在线状态
-             */
-            val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo)
-            if (isOk) {
-                publishFdsNodeInfoList.add(fdsNodeInfo)
+            if (!MMKVSp.instance.isTestModel()) {
+                /**
+                 * 配置节点主动上报在线状态
+                 */
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo)
+                if (isOk) {
+                    publishFdsNodeInfoList.add(fdsNodeInfo)
+                }
+                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
             }
-            LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
         }
 
         /*
