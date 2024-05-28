@@ -51,3 +51,5 @@ data class FDSNodeBean(var fdsNodeInfo: FDSNodeInfo){
  * SeekBar
  */
 data class SeekBarBean(var model: Int, var value: Int)
+
+data class RetryFDSNodeInfo(val fdsNodeInfo: FDSNodeInfo, var retryIndex: Int)

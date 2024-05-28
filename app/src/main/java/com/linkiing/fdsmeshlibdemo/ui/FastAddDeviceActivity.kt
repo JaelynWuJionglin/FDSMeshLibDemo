@@ -2,33 +2,38 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
-import com.godox.sdk.callbacks.FDSAddNetWorkCallBack
 import com.godox.sdk.callbacks.FDSBleDevCallBack
+import com.godox.sdk.callbacks.FDSFastAddNetWorkCallBack
 import com.godox.sdk.model.FDSNodeInfo
+import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
 
-class AddDeviceActivity : BaseActivity() {
+class FastAddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
+    private val handler = Handler(Looper.myLooper()!!)
     private val searchDevices = FDSSearchDevicesApi()
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var isAllCheck = false
-    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
     private var isScanning = true
+    private var fastFoundDeviceSize = 0
     private var addDeviceSize = 0
-    private var addDeviceSusSize = 0
-    private var addDeviceFailSize = 0
+    private val configPublishUtils = ConfigPublishUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +47,7 @@ class AddDeviceActivity : BaseActivity() {
 
     private fun initView() {
         titleBar?.initTitleBar(true, R.drawable.refresh)
-        titleBar?.setTitle("搜索设备")
+        titleBar?.setTitle("搜索设备(Fast)")
         titleBar?.setOnEndImageListener {
             addDevicesAdapter.clearList()
             if (isScanning) {
@@ -52,14 +57,6 @@ class AddDeviceActivity : BaseActivity() {
         }
 
         loadingDialog = LoadingDialog(this)
-        loadingDialog.msgClickListener = {
-            /**
-             * 注意:调用方法后不会立即停止配网，会等待当前正在配网的设备配网完成；
-             * 且需要回调onComplete()之后，才可以重新使用deviceAddNetWork()方法。
-             */
-            fdsAddOrRemoveDeviceApi.stopDeviceAddNetWork(fdeAddNetWorkCallBack)
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 结束中...")
-        }
     }
 
     private fun initRecyclerView() {
@@ -85,9 +82,14 @@ class AddDeviceActivity : BaseActivity() {
         searchDevices.startScanDevice(this, filterName, 30 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                addDevicesAdapter.addDevices(advertisingDevice, type)
-                tv_dev_network_equipment?.text =
-                    "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+
+                //固件版本 >= 39 才支持Fast模式
+                val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
+                if (fv >= 39) {
+                    addDevicesAdapter.addDevices(advertisingDevice, type)
+                    tv_dev_network_equipment?.text =
+                        "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                }
             }
 
             override fun onScanTimeOut() {
@@ -117,34 +119,29 @@ class AddDeviceActivity : BaseActivity() {
             return
         }
 
-        loadingDialog.showDialog()
-
+        fastFoundDeviceSize = 0
         addDeviceSize = deviceList.size
-        addDeviceSusSize = 0
-        addDeviceFailSize = 0
-        loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-        fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, fdeAddNetWorkCallBack)
+        loadingDialog.showDialog()
+        loadingDialog.updateLoadingMsg("设备配网中...")
+
+        /**
+         * Fast配网模式。
+         *（注意：固件版本 >= 39 支持）
+         */
+        fdsAddOrRemoveDeviceApi.deviceFastAddNetWork(deviceList, fdeFastAddNetWorkCallBack)
     }
 
     /**
      * FDSAddNetWorkCallBack
      */
-    private val fdeAddNetWorkCallBack = object : FDSAddNetWorkCallBack {
-        /*
-         * 入网完成回调
-         * isAllSuccess 是否全部入网成功
-         * fdsNodes 入网成功的节点
-         */
-        override fun onComplete(
-            isAllSuccess: Boolean,
-            fdsNodes: MutableList<FDSNodeInfo>
-        ) {
-            LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+    private val fdeFastAddNetWorkCallBack = object : FDSFastAddNetWorkCallBack {
 
-            addDeviceSusSize = fdsNodes.size
-            addDeviceFailSize = addDeviceSize - addDeviceSusSize
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        //配网成功
+        override fun onInNetworkSuccess(isAllSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
+            LOGUtils.d("FastAddDeviceActivity onSuccess() size:${fdsNodes.size}")
+
+            loadingDialog.updateLoadingMsg("配网成功!")
 
             //节点设置默认名称
             if (!MMKVSp.instance.isTestModel()) {
@@ -155,48 +152,28 @@ class AddDeviceActivity : BaseActivity() {
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-            //主动查询在线状态
-            val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
-            LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
-
-            loadingDialog.dismissDialog()
-
-        }
-
-        /*
-         * 单个设备入网成功返回
-         */
-        override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
-            super.onFDSNodeSuccess(fdsNodeInfo)
-            addDeviceSusSize++
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
-
-            //设备成功入网，配置打开设备主动上报在线状态
-            val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
-            LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
-            if (isFDSNodeConfigPublish) {
-                return
-            }
-
-            if (!MMKVSp.instance.isTestModel()) {
-                /**
-                 * 配置节点主动上报在线状态
-                 */
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo, null)
-                if (isOk) {
-                    publishFdsNodeInfoList.add(fdsNodeInfo)
+            //连接mesh
+            MeshLogin.instance.autoConnect(10 * 1000L) {
+                if (it) {
+                    //配置节点在线状态
+                    configPublishUtils.startConfigPublish(fdsNodes, handler) {
+                        loadingDialog.dismissDialog()
+                    }
+                } else {
+                    loadingDialog.dismissDialog()
                 }
-                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
             }
         }
 
-        /*
-         * 单个设备入网失败返回
-         */
-        override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
-            super.onFDSNodeFail(fdsNodeInfo)
-            addDeviceFailSize++
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        override fun onDeviceFound(macAddress: String) {
+            super.onDeviceFound(macAddress)
+            fastFoundDeviceSize++
+            loadingDialog.updateLoadingMsg("找到设备:$fastFoundDeviceSize/$addDeviceSize")
+        }
+
+        override fun onInNetworkAllFail() {
+            loadingDialog.updateLoadingMsg("配网失败!")
+            loadingDialog.dismissDialog()
         }
     }
 
@@ -221,20 +198,10 @@ class AddDeviceActivity : BaseActivity() {
         }
     }
 
-    private fun isFDSNodeConfigPublish(fdsNodeInfo: FDSNodeInfo): Boolean {
-        if (publishFdsNodeInfoList.isEmpty()) {
-            return false
-        }
-        for (fdsNode in publishFdsNodeInfoList) {
-            if (fdsNode.meshAddress == fdsNodeInfo.meshAddress) {
-                return true
-            }
-        }
-        return false
-    }
 
     override fun onDestroy() {
         super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
 
         //停止搜索，释放资源
         searchDevices.destroy()

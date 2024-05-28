@@ -53,7 +53,7 @@ class App : MeshApp() {
 
         /*
          * 设备配网连接设备超时时长。(秒)
-         * 注意：太短的时长会影响配网成功率，建议 >= 45s
+         * 注意：太短的时长会影响配网成功率，建议 >= 15s
          */
         meshConfigure.provisionMaxConnectOutTime = 45
 

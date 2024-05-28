@@ -12,4 +12,8 @@
     <string name="shear_json">分享当前JSON</string>
     <string name="shear_log">分享日志</string>
     <string name="text_dev_network_equipment">可配网设备</string>
+    <string name="text_reset_dev_network">重置设备配网</string>
+    <string name="text_reset_dev_list">可重置设备列表</string>
+    <string name="text_reset_start">开始重置</string>
+    <string name="text_fast_provision">使用FastProvision</string>
 </resources>

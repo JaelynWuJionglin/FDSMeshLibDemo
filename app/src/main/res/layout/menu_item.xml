@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="5dp"
     android:paddingBottom="5dp">
 
@@ -24,22 +25,46 @@
         android:textColor="@color/black"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/tv_end"
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchCompat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp"
-        android:layout_toStartOf="@+id/iv_end"
-        android:text="XXXXX"
-        android:textColor="@color/grey"
-        android:textSize="14sp" />
-
-    <ImageView
-        android:id="@+id/iv_end"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_gravity="center_vertical"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/arrow_right" />
+        android:visibility="gone"
+        android:checked="false"/>
+
+    <LinearLayout
+        android:id="@+id/lr_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="XXXXX"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/iv_end"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/arrow_right" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/bt_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey_line"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

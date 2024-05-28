@@ -15,7 +15,7 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.telink.ble.mesh.util.PermissionUtils
 
-class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
+class ResetDeviceAdapter : RecyclerView.Adapter<ResetDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<DeviceLisBean>()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 
@@ -38,20 +38,13 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         val iterator = devList.iterator()
         while (iterator.hasNext()) {
             val dev = iterator.next()
-            if (isInFdsNodes(fdsNodes,dev)){
-                iterator.remove()
+            for (fdsNode in fdsNodes) {
+                if (fdsNode.macAddress == dev.advertisingDevice.device.address) {
+                    iterator.remove()
+                }
             }
         }
         notifyDataSetChanged()
-    }
-
-    private fun isInFdsNodes(fdsNodes: MutableList<FDSNodeInfo>, dev: DeviceLisBean): Boolean{
-        for (fdsNode in fdsNodes) {
-            if (fdsNode.macAddress == dev.advertisingDevice.device.address) {
-               return true
-            }
-        }
-        return false
     }
 
     fun clearList() {
@@ -99,7 +92,7 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.layout_select_device_item, parent, false)
+            .inflate(R.layout.layout_reset_device_item, parent, false)
         return MyHolder(view)
     }
 
@@ -112,17 +105,9 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
             "null"
         }
 
-        if (MMKVSp.instance.isTestModel()) {
-            holder.tv_name.text = "name:$devName"
-            holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
-                    " - rssi:${deviceBean.advertisingDevice.rssi}"
-        } else {
-            holder.tv_name.text = "${devName}_${deviceBean.deviceType}"
-            holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
-                    " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}" +
-                    " - rssi:${deviceBean.advertisingDevice.rssi}"
-        }
-
+        holder.tv_name.text = "name:$devName"
+        holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
+                " - rssi:${deviceBean.advertisingDevice.rssi}"
 
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)

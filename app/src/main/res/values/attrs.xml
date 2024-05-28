@@ -16,5 +16,7 @@
         <attr name="menu_text_end" format="string" />
         <attr name="menu_image" format="reference" />
         <attr name="menu_image_end" format="reference" />
+        <attr name="menu_switch" format="boolean" />
+        <attr name="menu_bt_line" format="boolean" />
     </declare-styleable>
 </resources>

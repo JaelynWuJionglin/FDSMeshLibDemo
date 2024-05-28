@@ -23,6 +23,8 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.base.mesh.api.log.LOGUtils
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
+import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
 import kotlinx.android.synthetic.main.device_fragment.*
 
 class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
@@ -114,7 +116,11 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
 
         tv_add_dev.setOnClickListener {
-            goActivity(AddDeviceActivity::class.java, false)
+            if(!MMKVSp.instance.isTestModel() && MMKVSp.instance.isFastProvision()){
+                goActivity(FastAddDeviceActivity::class.java,false)
+            } else {
+                goActivity(AddDeviceActivity::class.java, false)
+            }
         }
 
         renameTextDialog.setOnDialogListener {

@@ -94,6 +94,14 @@
                 android:textSize="14sp"
                 android:textColor="@color/black"/>
 
+            <Button
+                android:id="@+id/bt_test2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="TEST"
+                android:textSize="14sp"
+                android:textColor="@color/black"/>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

@@ -114,7 +114,6 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         try {
             var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
             if (isPa) {
-                //path = "8258_mesh_PA.bin"
                 path = "8258_mesh_PA_V47_ADV_ENABLE.bin"
             }
             if (isMcuUpgrade) {

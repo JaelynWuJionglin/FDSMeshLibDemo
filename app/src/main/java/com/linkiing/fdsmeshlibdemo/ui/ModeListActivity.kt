@@ -16,6 +16,7 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.base.mesh.api.log.LOGUtils
+import com.godox.sdk.api.FDSMeshApi
 import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**
@@ -197,7 +198,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     private fun initSeekBar() {/*
          * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
          */
-        sendQueueUtils.setSamplingTime(200)//数据采样间隔
+        sendQueueUtils.setSamplingTime(300)//数据采样间隔
             .start {
                 if (it is SeekBarBean) {
                     when (it.model) {
@@ -219,8 +220,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
                                 address,
                                 it.value,
                                 0,
-                                (9999 * (it.value / 100.0f)).toInt(),
-                                (9999 * ((100 - it.value) / 100.0f)).toInt(),
+                                0,
+                                0,
                             )
                         }
 
@@ -269,6 +270,10 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         bt_test1?.setOnClickListener {
             testOnOff()
         }
+
+        bt_test2.setOnClickListener {
+
+        }
     }
 
     private fun testOnOff() {
@@ -279,10 +284,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
 
         Thread {
             var c = 0
-            var p = 0
             while (c < 200) {
-                if (sendQueueUtils.addDataSampling(SeekBarBean(3, p))) {
-                    p++
+                if (sendQueueUtils.addDataSampling(SeekBarBean(3, c))) {
                     c++
                 }
             }
@@ -317,6 +320,10 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
      */
     override fun onSuccess(fdsNodeInfo: FDSNodeInfo, version: Int, isPa: Boolean) {
         loadingDialog.dismissDialog()
+
+        //更新蓝牙固件版本
+        FDSMeshApi.instance.updateFirmwareVersion(fdsNodeInfo, version)
+
         val msg = "固件版本:$version"
         LOGUtils.d(msg)
         ConstantUtils.toast(this, msg)

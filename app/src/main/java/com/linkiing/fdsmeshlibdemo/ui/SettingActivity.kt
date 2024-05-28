@@ -1,6 +1,8 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import android.view.View
+import android.widget.CompoundButton
 import com.base.mesh.api.log.FileJaUtils
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
@@ -14,7 +16,7 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import kotlinx.android.synthetic.main.activity_setting.*
 import java.io.File
 
-class SettingActivity: BaseActivity() {
+class SettingActivity : BaseActivity() {
     private lateinit var loadingDialog: LoadingDialog
     private val jsonName = "JSON_NAME_SHEAR.json"
 
@@ -27,20 +29,49 @@ class SettingActivity: BaseActivity() {
         mesh_lib_ver?.setTextHint("V${FDSMeshApi.instance.getVersion()}")
         my_about?.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
 
+        menu_fast_provision?.switchCompatChecked(MMKVSp.instance.isFastProvision())
+        switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
+
+        if(MMKVSp.instance.isTestModel()) {
+            menu_fast_provision?.visibility = View.GONE
+            reset_dev_network?.visibility = View.GONE
+        } else {
+            menu_fast_provision?.visibility = View.VISIBLE
+            reset_dev_network?.visibility = View.VISIBLE
+        }
+
+        initListener()
+    }
+
+    private fun initListener() {
+        reset_dev_network?.setOnClickListener {
+            goActivity(ResetActivity::class.java, false)
+        }
+
+        menu_fast_provision?.setSwitchChangeListener { buttonView, isChecked ->
+            MMKVSp.instance.setFastProvision(isChecked)
+        }
+
         my_shear_json?.setOnClickListener {
             shareJson()
         }
 
         my_shear_log?.setOnClickListener {
             LOGUtils.shareAppLogFile { file ->
-                FileJaUtils.shareFile(this,file,getString(R.string.app_name))
+                FileJaUtils.shareFile(this, file, getString(R.string.app_name))
             }
         }
 
-        switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
-        switch_test_model?.setOnCheckedChangeListener { buttonView, isChecked ->
+        switch_test_model?.setOnCheckedChangeListener { _, isChecked ->
             MMKVSp.instance.setTestModel(isChecked)
-            if (isChecked){
+            if(isChecked) {
+                menu_fast_provision?.visibility = View.GONE
+                reset_dev_network?.visibility = View.GONE
+            } else {
+                menu_fast_provision?.visibility = View.VISIBLE
+                reset_dev_network?.visibility = View.VISIBLE
+            }
+            if (isChecked) {
                 App.getInstance().defMeshConfigure()
             } else {
                 App.getInstance().setMeshConfigure()

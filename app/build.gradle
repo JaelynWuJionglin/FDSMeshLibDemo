@@ -40,6 +40,14 @@ android {
         }
     }
 
+    android.applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            def curTime = new Date()
+            def timeStr = curTime.format('yyyyMMddHHmmss')
+            outputFileName = "FDSMeshDemo-v${variant.versionName}-${timeStr}.apk"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

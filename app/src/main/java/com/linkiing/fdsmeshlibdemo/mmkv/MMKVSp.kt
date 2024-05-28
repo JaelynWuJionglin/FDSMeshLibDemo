@@ -16,6 +16,7 @@ class MMKVSp {
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val KV_StudioList = "KV_StudioList"
     private val KV_IsTestModel = "KV_IsTestModel"
+    private val KV_IsFastProvision = "KV_IsFastProvision"
 
     companion object {
         val instance: MMKVSp by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -51,5 +52,13 @@ class MMKVSp {
 
     fun isTestModel(): Boolean {
         return kv.decodeBool(KV_IsTestModel,false)
+    }
+
+    fun setFastProvision(isFastProvision: Boolean) {
+        kv.encode(KV_IsFastProvision, isFastProvision)
+    }
+
+    fun isFastProvision(): Boolean {
+        return kv.decodeBool(KV_IsFastProvision,false)
     }
 }
