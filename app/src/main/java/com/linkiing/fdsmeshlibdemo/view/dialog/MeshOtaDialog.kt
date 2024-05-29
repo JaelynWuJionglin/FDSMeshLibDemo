@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import com.base.mesh.api.listener.MeshOtaListener
+import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
@@ -19,23 +20,26 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var isPa = false
+    private var version = 0
 
     fun showDialog(fdsNodeInfo: FDSNodeInfo) {
         this.fdsNodeInfo = fdsNodeInfo
         if (isShowing) {
             dismiss()
         }
+        readFirmware()
         show()
     }
 
-    fun setIsPa(isPa: Boolean){
+    fun setOldFirmwareInfo(isPa: Boolean, version: Int) {
         this.isPa = isPa
+        this.version = version
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setCanceledOnTouchOutside(false)
-        readFirmware()
+        //readFirmware()
     }
 
     override fun onStart() {
@@ -55,7 +59,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
                  * @param listener MCU OTA升级回调
                  * @return  true表示开启成功，false表示开启失败
                  */
-                FDSMeshApi.instance.startMcuOTAWithOtaData(mFirmware,0,fdsNodeInfo!!,this)
+                FDSMeshApi.instance.startMcuOTAWithOtaData(mFirmware, 0, fdsNodeInfo!!, this)
 
             } else {
 
@@ -66,7 +70,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
                  * @param listener OTA升级回调
                  * @return true表示开启成功，false表示开启失败
                  */
-                FDSMeshApi.instance.startOTAWithOtaData(mFirmware,fdsNodeInfo!!,this)
+                FDSMeshApi.instance.startOTAWithOtaData(mFirmware, fdsNodeInfo!!, this)
             }
         } else {
             ConstantUtils.toast(activity, "Error！未识别到固件或设备。")
@@ -112,9 +116,16 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
 
     private fun readFirmware() {
         try {
+            LOGUtils.e("MeshOtaDialog ================ isPa:$isPa 升级前:$version ================")
             var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
             if (isPa) {
-                path = "8258_mesh_PA_V47_ADV_ENABLE.bin"
+                path = if (version == 0x49) {
+                    LOGUtils.e("MeshOtaDialog ================ 升级后:${0x48} ================")
+                    "8258_mesh_otaTest_v48.bin"
+                } else {
+                    LOGUtils.e("MeshOtaDialog ================ 升级后:${0x49} ================")
+                    "8258_mesh_otaTest_v49.bin"
+                }
             }
             if (isMcuUpgrade) {
                 path = "TP2R_V139.bin" //新

@@ -170,14 +170,14 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                                     GodoxCommandApi.instance.openPaUpgrade(fdsNodeInfo.meshAddress, object : OpenPaCallback{
                                         override fun openPaComplete() {
                                             //打开PA升级成功，开始升级
-                                            meshOtaDialog?.setIsPa(true)
+                                            meshOtaDialog?.setOldFirmwareInfo(true,version)
                                             meshOtaDialog?.showDialog(fdsNodeInfo)
                                         }
                                     })
 
                                 } else {
                                     //非PA固件，直接升级
-                                    meshOtaDialog?.setIsPa(false)
+                                    meshOtaDialog?.setOldFirmwareInfo(false,version)
                                     meshOtaDialog?.showDialog(fdsNodeInfo)
                                 }
                             }
