@@ -198,7 +198,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     private fun initSeekBar() {/*
          * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
          */
-        sendQueueUtils.setSamplingTime(300)//数据采样间隔
+        sendQueueUtils.setSamplingTime(200)//数据采样间隔
             .start {
                 if (it is SeekBarBean) {
                     when (it.model) {
