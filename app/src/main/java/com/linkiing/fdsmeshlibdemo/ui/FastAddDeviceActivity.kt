@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
+import com.base.mesh.api.utils.ByteUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -18,6 +20,7 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.BleUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -41,6 +44,7 @@ class FastAddDeviceActivity : BaseActivity() {
 
         initView()
         initRecyclerView()
+//        initTestDev()
         scanDevices()
         initListener()
     }
@@ -79,16 +83,18 @@ class FastAddDeviceActivity : BaseActivity() {
         } else {
             "GD_LED"
         }
-        searchDevices.startScanDevice(this, filterName, 30 * 1000, object : FDSBleDevCallBack {
+        searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
 
-                //固件版本 >= 39 才支持Fast模式
-                val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                if (fv >= 39) {
-                    addDevicesAdapter.addDevices(advertisingDevice, type)
-                    tv_dev_network_equipment?.text =
-                        "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                if (isFilterDev(advertisingDevice)) {
+                    //固件版本 >= 39 才支持Fast模式
+                    val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
+                    if (fv >= 39) {
+                        addDevicesAdapter.addDevices(advertisingDevice, type)
+                        tv_dev_network_equipment?.text =
+                            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                    }
                 }
             }
 
@@ -156,8 +162,14 @@ class FastAddDeviceActivity : BaseActivity() {
             MeshLogin.instance.autoConnect(10 * 1000L) {
                 if (it) {
                     //配置节点在线状态
-                    configPublishUtils.startConfigPublish(fdsNodes, handler) {
-                        loadingDialog.dismissDialog()
+                    configPublishUtils.startConfigPublish(fdsNodes, handler) {isAllSuccess, susNumber ->
+                        runOnUiThread {
+                            loadingDialog.updateLoadingMsg("配置在线:$susNumber")
+
+                            if (isAllSuccess) {
+                                loadingDialog.dismissDialog()
+                            }
+                        }
                     }
                 } else {
                     loadingDialog.dismissDialog()
@@ -207,5 +219,143 @@ class FastAddDeviceActivity : BaseActivity() {
         searchDevices.destroy()
 
         fdsAddOrRemoveDeviceApi.destroy()
+    }
+
+
+    //=============================================================================================
+
+    private val macList = mutableListOf(
+        "A4:C1:38:E4:14:13",
+        "A4:C1:38:88:55:96",
+        "A4:C1:38:58:3C:FE",
+        "A4:C1:38:60:32:75",
+        "A4:C1:38:25:D8:36",
+        "A4:C1:38:9A:AE:F6",
+        "A4:C1:38:75:52:1E",
+        "A4:C1:38:36:BD:C2",
+        "A4:C1:38:16:5C:FF",
+        "A4:C1:38:D6:0C:FB",
+        "A4:C1:38:FF:85:DF",
+        "A4:C1:38:CD:C1:8F",
+        "A4:C1:38:66:50:46",
+        "A4:C1:38:13:E8:A8",
+        "A4:C1:38:0C:DB:10",
+        "A4:C1:38:1C:31:C1",
+        "A4:C1:38:3D:4E:CC",
+        "A4:C1:38:DB:0A:52",
+        "A4:C1:38:FF:DC:D6",
+        "A4:C1:38:44:FA:7F",
+        "A4:C1:38:F3:F5:F7",
+        "A4:C1:38:C7:CA:4F",
+        "A4:C1:38:75:8C:E7",
+        "A4:C1:38:D0:61:B0",
+        "A4:C1:38:BC:43:4A",
+        "A4:C1:38:17:A3:DE",
+        "A4:C1:38:80:A6:A3",
+        "A4:C1:38:65:88:9B",
+        "A4:C1:38:93:7D:A8",
+        "A4:C1:38:B4:A8:25",
+        "A4:C1:38:D3:CB:4B",
+        "A4:C1:38:E0:EE:51",
+        "A4:C1:38:E9:EB:03",
+        "A4:C1:38:E8:17:9B",
+        "A4:C1:38:66:2F:64",
+        "A4:C1:38:70:F5:84",
+        "A4:C1:38:96:DA:24",
+        "A4:C1:38:97:E8:F2",
+        "A4:C1:38:17:FD:AE",
+        "A4:C1:38:D0:DD:EA",
+        "A4:C1:38:D2:88:CD",
+        "A4:C1:38:74:F5:14",
+        "A4:C1:38:10:40:F2",
+        "A4:C1:38:BA:53:F5",
+        "A4:C1:38:E7:0E:6C",
+        "A4:C1:38:B3:3A:08",
+        "A4:C1:38:E5:89:30",
+        "A4:C1:38:46:D8:B0",
+        "A4:C1:38:54:AF:73",
+        "A4:C1:38:CB:1C:18",
+        "A4:C1:38:8D:C3:75",
+        "A4:C1:38:24:50:CE",
+        "A4:C1:38:E0:57:D6",
+        "A4:C1:38:68:0C:3E",
+        "A4:C1:38:B2:B8:96",
+        "A4:C1:38:4C:33:E2",
+        "A4:C1:38:3B:AC:00",
+        "A4:C1:38:76:C7:94",
+        "A4:C1:38:B1:B9:1A",
+        "A4:C1:38:59:DE:FE",
+        "A4:C1:38:F3:E6:FE",
+        "A4:C1:38:D6:F3:C0",
+        "A4:C1:38:45:90:03",
+        "A4:C1:38:DD:C7:3A",
+        "A4:C1:38:01:B5:15",
+        "A4:C1:38:17:79:7A",
+        "A4:C1:38:11:35:7D",
+        "A4:C1:38:B3:8F:F4",
+        "A4:C1:38:6C:2B:54",
+        "A4:C1:38:4B:1B:83",
+        "A4:C1:38:80:9A:EF",
+        "A4:C1:38:F2:7A:9C",
+        "A4:C1:38:CE:7F:79",
+        "A4:C1:38:2B:7A:72",
+        "A4:C1:38:ED:50:E1",
+        "A4:C1:38:2B:14:4E",
+        "A4:C1:38:1A:45:13",
+        "A4:C1:38:EF:0B:9E",
+        "A4:C1:38:95:70:4B",
+        "A4:C1:38:8E:A2:32",
+        "A4:C1:38:CD:EE:D0",
+        "A4:C1:38:FD:CD:4E",
+        "A4:C1:38:E6:A8:85",
+        "A4:C1:38:3A:1D:AC",
+        "A4:C1:38:65:32:5D",
+        "A4:C1:38:B1:DF:C0",
+        "A4:C1:38:27:8B:B7",
+        "A4:C1:38:07:C3:75",
+        "A4:C1:38:CD:8C:65",
+        "A4:C1:38:01:6E:35",
+        "A4:C1:38:B8:F0:03",
+        "A4:C1:38:E5:1F:1D",
+        "A4:C1:38:75:75:A1",
+        "A4:C1:38:17:A2:75",
+        "A4:C1:38:15:B9:01",
+        "A4:C1:38:EB:57:36"
+    )
+
+    @SuppressLint("SetTextI18n")
+    private fun initTestDev() {
+        val list = mutableListOf<AdvertisingDevice>()
+        val mBluetoothAdapter = BleUtils.instance.getBluetoothAdapter()
+        if (mBluetoothAdapter != null) {
+            for (mac in macList) {
+                if (!TextUtils.isEmpty(mac)) {
+                    val dev = mBluetoothAdapter.getRemoteDevice(mac)
+                    if (dev != null) {
+                        list.add(
+                            AdvertisingDevice(
+                                dev,
+                                -50,
+                                ByteUtils.hexStringToBytes("0201060303271815162718110201003335690007004ECDFD38C1A40000070947445F4C454416FF4ECDFD38C1A401004E4D0000FFFF420000000000000000")
+                            )
+                        )
+                    }
+                }
+            }
+
+        }
+
+        addDevicesAdapter.addDevicesTest(list)
+        tv_dev_network_equipment?.text =
+            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+    }
+
+    private fun isFilterDev(advertisingDevice: AdvertisingDevice): Boolean {
+        for (mac in macList) {
+            if (advertisingDevice.device?.address == mac) {
+                return true
+            }
+        }
+        return false
     }
 }

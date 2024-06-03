@@ -116,14 +116,20 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
 
     private fun readFirmware() {
         try {
-            LOGUtils.e("MeshOtaDialog ================ isPa:$isPa 升级前:$version ================")
-            var path = "LK8620_mesh_GD_9p81_v000042_20221215.bin"
+            LOGUtils.e("GATT_OTA ================ isPa:$isPa 升级前:$version ================")
+            var path = if (version == 0x42) {
+                LOGUtils.e("GATT_OTA ================ 升级后:${0x48} ================")
+                "LK8620_mesh_GD_v000048_20240527_beta.bin"
+            } else {
+                LOGUtils.e("GATT_OTA ================ 升级后:${0x42} ================")
+                "LK8620_mesh_GD_9p81_v000042_20221215.bin"
+            }
             if (isPa) {
                 path = if (version == 0x49) {
-                    LOGUtils.e("MeshOtaDialog ================ 升级后:${0x48} ================")
+                    LOGUtils.e("GATT_OTA ================ 升级后:${0x48} ================")
                     "8258_mesh_otaTest_v48.bin"
                 } else {
-                    LOGUtils.e("MeshOtaDialog ================ 升级后:${0x49} ================")
+                    LOGUtils.e("GATT_OTA ================ 升级后:${0x49} ================")
                     "8258_mesh_otaTest_v49.bin"
                 }
             }

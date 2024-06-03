@@ -51,6 +51,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         super.onResume()
         LOGUtils.v("DeviceFragment onResume()")
         studioDeviceAdapter?.update()
+        tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -58,6 +59,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         LOGUtils.v("DeviceFragment onHiddenChanged() hidden:$hidden")
         if (!hidden) {
             studioDeviceAdapter?.update()
+            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }
 
@@ -131,6 +133,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                  */
                 FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
                 studioDeviceAdapter?.update()
+                tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
             }
         }
 
@@ -214,6 +217,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         ) {
             LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
             studioDeviceAdapter?.update()
+            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
             loadingDialog.dismissDialog()
         }
     }
@@ -284,6 +288,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     fun updateList() {
         mActivity.runOnUiThread {
             studioDeviceAdapter?.update()
+            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }
 

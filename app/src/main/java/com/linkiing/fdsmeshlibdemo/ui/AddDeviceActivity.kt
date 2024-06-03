@@ -82,7 +82,7 @@ class AddDeviceActivity : BaseActivity() {
         } else {
             "GD_LED"
         }
-        searchDevices.startScanDevice(this, filterName, 30 * 1000, object : FDSBleDevCallBack {
+        searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 addDevicesAdapter.addDevices(advertisingDevice, type)

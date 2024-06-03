@@ -16,4 +16,5 @@
     <string name="text_reset_dev_list">可重置设备列表</string>
     <string name="text_reset_start">开始重置</string>
     <string name="text_fast_provision">使用FastProvision</string>
+    <string name="text_device_list">设备列表</string>
 </resources>

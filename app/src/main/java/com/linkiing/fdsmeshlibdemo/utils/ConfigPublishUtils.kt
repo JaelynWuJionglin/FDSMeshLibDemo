@@ -6,14 +6,13 @@ import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
-import com.linkiing.fdsmeshlibdemo.bean.RetryFDSNodeInfo
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigPublishUtils : ConfigNodePublishStateListener {
-    private var retryFDSNodeInfo: RetryFDSNodeInfo? = null
-    private val publishNodeList = CopyOnWriteArrayList<RetryFDSNodeInfo>()
+    private val publishNodeList = CopyOnWriteArrayList<FDSNodeInfo>()
     private var handler: Handler? = null
-    private var listenerComplete: (Boolean) -> Unit = {}
+    private var listenerComplete: (Boolean, Int) -> Unit = { _, _ -> }
+    private var successNumber = 0
 
     /**
      * 批量配置设备在线状态
@@ -21,48 +20,50 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
     fun startConfigPublish(
         fdsNodes: MutableList<FDSNodeInfo>,
         handler: Handler?,
-        listenerComplete: (Boolean) -> Unit
+        listenerComplete: (Boolean, Int) -> Unit
     ) {
         this.handler = handler
         this.listenerComplete = listenerComplete
+        this.successNumber = 0
 
         publishNodeList.clear()
         for (fdsNode in fdsNodes) {
-            publishNodeList.add(RetryFDSNodeInfo(fdsNode, 2))
+            publishNodeList.add(fdsNode)
         }
-        retryFDSNodeInfo = null
         nextConfigPublish()
     }
 
     private fun nextConfigPublish() {
         if (!MeshLogin.instance.isLogin()) {
             LOGUtils.e("nextConfigPublish() Error! isLogin false.")
-            listenerComplete(false)
+            listenerComplete(false, successNumber)
             return
         }
         if (publishNodeList.isEmpty()) {
-            listenerComplete(true)
+            listenerComplete(true, successNumber)
         } else {
-            retryFDSNodeInfo = publishNodeList[0]
-            if (retryFDSNodeInfo != null) {
+            if (publishNodeList[0] != null) {
                 val isOk = FDSMeshApi.instance.configFDSNodePublishState(
                     true,
-                    retryFDSNodeInfo!!.fdsNodeInfo,
+                    publishNodeList[0],
                     this
                 )
                 LOGUtils.d(
                     "nextConfigPublish() =====> " +
-                            "macAddress:${retryFDSNodeInfo!!.fdsNodeInfo.macAddress} " +
-                            "meshAddress:${retryFDSNodeInfo!!.fdsNodeInfo.meshAddress} " +
-                            "retryIndex:${retryFDSNodeInfo!!.retryIndex} " +
+                            "macAddress:${publishNodeList[0]!!.macAddress} " +
+                            "meshAddress:${publishNodeList[0]!!.meshAddress} " +
                             "isOk:$isOk"
                 )
 
                 publishNodeList.removeAt(0)
 
                 if (!isOk) {
-                    retryConfigPublish()
+                    handler?.postDelayed({
+                        nextConfigPublish()
+                    }, 500)
                 }
+                successNumber ++
+                listenerComplete(false, successNumber)
             } else {
                 publishNodeList.removeAt(0)
                 nextConfigPublish()
@@ -70,24 +71,8 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         }
     }
 
-    private fun retryConfigPublish() {
-        if (retryFDSNodeInfo != null) {
-            retryFDSNodeInfo!!.retryIndex--
-            //重试总共两次
-            if (retryFDSNodeInfo!!.retryIndex > 0) {
-                publishNodeList.add(retryFDSNodeInfo)
-            }
-        }
-        handler?.postDelayed({
-            nextConfigPublish()
-        }, 500)
-    }
-
     override fun onComplete(success: Boolean) {
-        if (!success) {
-            retryConfigPublish()
-        } else {
-            nextConfigPublish()
-        }
+        LOGUtils.d("onComplete() =====> success:$success")
+        nextConfigPublish()
     }
 }

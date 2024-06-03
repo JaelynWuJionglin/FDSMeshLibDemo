@@ -27,6 +27,15 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         notifyItemChanged(devList.size - 1)
     }
 
+    fun addDevicesTest(mutableList: MutableList<AdvertisingDevice>) {
+        for (advertisingDevice in mutableList) {
+            if (!haveDevice(advertisingDevice)) {
+                devList.add(DeviceLisBean(advertisingDevice, "0000"))
+            }
+        }
+        notifyDataSetChanged()
+    }
+
     fun allCheck(isAllCheck: Boolean) {
         for (bean in devList) {
             bean.isChecked = isAllCheck

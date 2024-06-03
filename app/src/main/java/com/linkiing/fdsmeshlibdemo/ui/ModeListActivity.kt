@@ -325,7 +325,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         FDSMeshApi.instance.updateFirmwareVersion(fdsNodeInfo, version)
 
         val msg = "固件版本:$version"
-        LOGUtils.d(msg)
+        LOGUtils.i("GATT_OTA ==> $msg")
         ConstantUtils.toast(this, msg)
     }
 

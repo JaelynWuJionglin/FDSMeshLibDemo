@@ -14,12 +14,13 @@
         android:background="@color/white1">
 
         <TextView
+            android:id="@+id/tv_dev_list_msg"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/black"
-            android:text="设备列表"/>
+            android:text="@string/text_device_list"/>
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/dev_switch"
