@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
@@ -25,6 +26,7 @@ import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import kotlinx.android.synthetic.main.activity_add_device.*
+import java.util.Locale
 
 class FastAddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
@@ -78,6 +80,8 @@ class FastAddDeviceActivity : BaseActivity() {
     private fun scanDevices() {
         isScanning = true
 
+        progressBar?.visibility = View.VISIBLE
+
         val filterName = if (MMKVSp.instance.isTestModel()) {
             ""
         } else {
@@ -87,19 +91,20 @@ class FastAddDeviceActivity : BaseActivity() {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
 
-                if (isFilterDev(advertisingDevice)) {
-                    //固件版本 >= 39 才支持Fast模式
+                //if (isFilterDev(advertisingDevice)) {
+                    //固件版本 >= 0x39 才支持Fast模式
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 39) {
+                    if (fv >= 0x39) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
                     }
-                }
+                //}
             }
 
             override fun onScanTimeOut() {
                 isScanning = false
+                progressBar?.visibility = View.GONE
             }
 
             /*
@@ -107,6 +112,7 @@ class FastAddDeviceActivity : BaseActivity() {
              */
             override fun onScanFail() {
                 isScanning = false
+                progressBar?.visibility = View.GONE
             }
         })
     }
@@ -114,6 +120,7 @@ class FastAddDeviceActivity : BaseActivity() {
     private fun stopScan() {
         searchDevices.stopScan()
         isScanning = false
+        progressBar?.visibility = View.GONE
     }
 
     private fun addDevice() {
@@ -320,7 +327,8 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:75:75:A1",
         "A4:C1:38:17:A2:75",
         "A4:C1:38:15:B9:01",
-        "A4:C1:38:EB:57:36"
+        "A4:C1:38:EB:57:36",
+        "A4:C1:38:F5:45:02"
     )
 
     @SuppressLint("SetTextI18n")
@@ -352,9 +360,13 @@ class FastAddDeviceActivity : BaseActivity() {
 
     private fun isFilterDev(advertisingDevice: AdvertisingDevice): Boolean {
         for (mac in macList) {
-            if (advertisingDevice.device?.address == mac) {
-                return true
+            val devMac = advertisingDevice.device?.address?.uppercase(Locale.ENGLISH)?.trim() ?: ""
+            if (devMac != "") {
+                if (devMac == mac.uppercase(Locale.ENGLISH).trim()) {
+                    return true
+                }
             }
+
         }
         return false
     }

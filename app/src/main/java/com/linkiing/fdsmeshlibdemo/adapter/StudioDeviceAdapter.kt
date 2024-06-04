@@ -25,8 +25,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
     fun update() {
         fdsNodeList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
-        LOGUtils.d("StudioDeviceAdapter fdsNodeList.size:${fdsNodeList.size}")
-        LOGUtils.i("fdsNodeList:${Gson().toJson(fdsNodeList)}")
+        LOGUtils.v("fdsNodeList.size:${fdsNodeList.size} fdsNodeList:${Gson().toJson(fdsNodeList)}")
         notifyDataSetChanged()
     }
 

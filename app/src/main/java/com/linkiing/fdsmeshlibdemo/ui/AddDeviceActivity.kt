@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
@@ -77,6 +78,8 @@ class AddDeviceActivity : BaseActivity() {
     private fun scanDevices() {
         isScanning = true
 
+        progressBar?.visibility = View.VISIBLE
+
         val filterName = if (MMKVSp.instance.isTestModel()) {
             ""
         } else {
@@ -92,6 +95,7 @@ class AddDeviceActivity : BaseActivity() {
 
             override fun onScanTimeOut() {
                 isScanning = false
+                progressBar?.visibility = View.GONE
             }
 
             /*
@@ -99,6 +103,7 @@ class AddDeviceActivity : BaseActivity() {
              */
             override fun onScanFail() {
                 isScanning = false
+                progressBar?.visibility = View.GONE
             }
         })
     }
@@ -106,6 +111,7 @@ class AddDeviceActivity : BaseActivity() {
     private fun stopScan() {
         searchDevices.stopScan()
         isScanning = false
+        progressBar?.visibility = View.GONE
     }
 
     private fun addDevice() {

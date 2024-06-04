@@ -52,6 +52,14 @@
         <item name="android:maxHeight">60dp</item>
     </style>
 
+    <!-- ProgressBar -->
+    <style name="CustomProgressStyle_min" parent="@android:style/Widget.DeviceDefault.ProgressBar.Large">
+        <item name="android:minWidth">20dp</item>
+        <item name="android:maxWidth">20dp</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:maxHeight">20dp</item>
+    </style>
+
     <style name="bomToTopDialogAnim">
         <item name="android:windowEnterAnimation">@anim/bom_dialog_show</item>
         <item name="android:windowExitAnimation">@anim/bom_dialog_dismiss</item>

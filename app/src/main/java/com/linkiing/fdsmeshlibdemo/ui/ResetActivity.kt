@@ -4,12 +4,15 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSSearchDevicesApi
 import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ResetDeviceAdapter
 import com.godox.sdk.api.FDSResetDeviceApi
+import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
@@ -76,6 +79,8 @@ class ResetActivity : BaseActivity() {
     private fun scanDevices() {
         isScanning = true
 
+        progressBar.visibility = View.VISIBLE
+
         val filterName = if (MMKVSp.instance.isTestModel()) {
             ""
         } else {
@@ -85,7 +90,7 @@ class ResetActivity : BaseActivity() {
         /**
          * 搜索已入网的设备
          */
-        searchDevices.startScanProvisionedDevice(this, filterName, 20 * 1000, object : FDSBleDevCallBack {
+        searchDevices.startScanProvisionedDevice(this, filterName, 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 resetDeviceAdapter.addDevices(advertisingDevice, type)
@@ -94,6 +99,7 @@ class ResetActivity : BaseActivity() {
 
             override fun onScanTimeOut() {
                 isScanning = false
+                progressBar.visibility = View.GONE
             }
 
             /*
@@ -101,6 +107,7 @@ class ResetActivity : BaseActivity() {
              */
             override fun onScanFail() {
                 isScanning = false
+                progressBar.visibility = View.GONE
             }
         })
     }
@@ -108,6 +115,7 @@ class ResetActivity : BaseActivity() {
     private fun stopScan() {
         searchDevices.stopScan()
         isScanning = false
+        progressBar.visibility = View.GONE
     }
 
     private fun resetDevice() {
