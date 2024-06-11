@@ -107,6 +107,7 @@ class ResetDeviceAdapter : RecyclerView.Adapter<ResetDeviceAdapter.MyHolder>() {
 
         holder.tv_name.text = "name:$devName"
         holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
+                " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}" +
                 " - rssi:${deviceBean.advertisingDevice.rssi}"
 
         if (deviceBean.isChecked) {

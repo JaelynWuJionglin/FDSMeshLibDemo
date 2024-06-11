@@ -19,7 +19,7 @@ import com.base.mesh.api.log.LOGUtils
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 
 class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>() {
-    private var fdsNodeList = FDSMeshApi.instance.getFDSNodes()
+    private var fdsNodeList = mutableListOf<FDSNodeInfo>()
     private var itemLongClickListener: (FDSNodeInfo) -> Unit = {}
     private var itemClickListener: (FDSNodeInfo) -> Unit = {}
 
@@ -80,7 +80,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
                 "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
         } else {
             holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - type:${fdsNodeInfo.type} - v:${fdsNodeInfo.firmwareVersion}"
+                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${fdsNodeInfo.firmwareVersion}"
         }
 
         //在线状态

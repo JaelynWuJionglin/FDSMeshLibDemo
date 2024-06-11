@@ -51,7 +51,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         super.onResume()
         LOGUtils.v("DeviceFragment onResume()")
         studioDeviceAdapter?.update()
-        tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+        tv_dev_list_msg?.text =
+            "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -59,7 +60,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         LOGUtils.v("DeviceFragment onHiddenChanged() hidden:$hidden")
         if (!hidden) {
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+            tv_dev_list_msg?.text =
+                "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }
 
@@ -118,8 +120,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
 
         tv_add_dev.setOnClickListener {
-            if(!MMKVSp.instance.isTestModel() && MMKVSp.instance.isFastProvision()){
-                goActivity(FastAddDeviceActivity::class.java,false)
+            if (!MMKVSp.instance.isTestModel() && MMKVSp.instance.isFastProvision()) {
+                goActivity(FastAddDeviceActivity::class.java, false)
             } else {
                 goActivity(AddDeviceActivity::class.java, false)
             }
@@ -133,72 +135,95 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                  */
                 FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
                 studioDeviceAdapter?.update()
-                tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+                tv_dev_list_msg?.text =
+                    "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
             }
         }
 
         stuDevBottomMenuDialog.setOnDialogListener {
             when (it) {
-                StuDevBottomMenuDialog.MENU_DELETE -> {
-                    //从Mesh中删除设备
-                    if (fdsNodeInfo != null) {
-                        loadingDialog.showDialog()
-                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
-                            fdsNodeInfo!!,
-                            true,
-                            fdsRemoveNodeCallBack)
-                    }
-                }
                 StuDevBottomMenuDialog.MENU_RENAME -> {
                     if (fdsNodeInfo != null) {
                         renameTextDialog.setDefText(fdsNodeInfo!!.name)
                         renameTextDialog.showDialog()
                     }
                 }
+
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     if (fdsNodeInfo != null) {
                         //获取固件版本
-                        GodoxCommandApi.instance.getFirmwareVersion(fdsNodeInfo!!.meshAddress, object : FirmwareCallBack{
-                            override fun onSuccess(
-                                fdsNodeInfo: FDSNodeInfo,
-                                version: Int,
-                                isPa: Boolean
-                            ) {
-                                /*
-                                 * 1,比对固件版本
-                                 * 2,判断是否是PA固件
-                                 */
-                                if (isPa) {
-                                    //PA固件打开PA升级功能
-                                    GodoxCommandApi.instance.openPaUpgrade(fdsNodeInfo.meshAddress, object : OpenPaCallback{
-                                        override fun openPaComplete() {
-                                            //打开PA升级成功，开始升级
-                                            meshOtaDialog?.setOldFirmwareInfo(true,version)
-                                            meshOtaDialog?.showDialog(fdsNodeInfo)
-                                        }
-                                    })
+                        GodoxCommandApi.instance.getFirmwareVersion(
+                            fdsNodeInfo!!.meshAddress,
+                            object : FirmwareCallBack {
+                                override fun onSuccess(
+                                    fdsNodeInfo: FDSNodeInfo,
+                                    version: Int,
+                                    isPa: Boolean
+                                ) {
+                                    /*
+                                     * 1,比对固件版本
+                                     * 2,判断是否是PA固件
+                                     */
+                                    if (isPa) {
+                                        //PA固件打开PA升级功能
+                                        GodoxCommandApi.instance.openPaUpgrade(
+                                            fdsNodeInfo.meshAddress,
+                                            object : OpenPaCallback {
+                                                override fun openPaComplete() {
+                                                    //打开PA升级成功，开始升级
+                                                    meshOtaDialog?.setOldFirmwareInfo(true, version)
+                                                    meshOtaDialog?.showDialog(fdsNodeInfo)
+                                                }
+                                            })
 
-                                } else {
-                                    //非PA固件，直接升级
-                                    meshOtaDialog?.setOldFirmwareInfo(false,version)
-                                    meshOtaDialog?.showDialog(fdsNodeInfo)
+                                    } else {
+                                        //非PA固件，直接升级
+                                        meshOtaDialog?.setOldFirmwareInfo(false, version)
+                                        meshOtaDialog?.showDialog(fdsNodeInfo)
+                                    }
                                 }
-                            }
-                        })
+                            })
                     }
                 }
+
                 StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {
                     if (fdsNodeInfo != null) {
                         meshMcuUpgradeDialog?.showDialog(fdsNodeInfo!!)
                     }
                 }
+
+                StuDevBottomMenuDialog.MENU_DELETE -> {
+                    //从Mesh中删除设备
+                    if (fdsNodeInfo != null) {
+                        loadingDialog.showDialog()
+                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
+                            fdsNodeInfo!!,
+                            false,
+                            fdsRemoveNodeCallBack
+                        )
+                    }
+                }
+
+                StuDevBottomMenuDialog.MENU_DELETE_FORCE -> {
+                    //强制删除离线设备
+                    if (fdsNodeInfo != null) {
+                        loadingDialog.showDialog()
+                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
+                            fdsNodeInfo!!,
+                            true,
+                            fdsRemoveNodeCallBack
+                        )
+                    }
+                }
+
                 StuDevBottomMenuDialog.MENU_DELETE_ALL -> {
                     if (studioDeviceAdapter != null && studioDeviceAdapter!!.itemCount > 0) {
                         loadingDialog.showDialog()
                         fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
                             studioDeviceAdapter!!.getAllFdsNodeList(),
-                            true,
-                            fdsRemoveNodeCallBack)
+                            false,
+                            fdsRemoveNodeCallBack
+                        )
                     }
                 }
             }
@@ -217,7 +242,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         ) {
             LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+            tv_dev_list_msg?.text =
+                "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
             loadingDialog.dismissDialog()
         }
     }
@@ -288,7 +314,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     fun updateList() {
         mActivity.runOnUiThread {
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text = "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+            tv_dev_list_msg?.text =
+                "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }
 

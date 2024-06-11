@@ -31,7 +31,7 @@ import java.util.Locale
 class FastAddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
-    private val handler = Handler(Looper.myLooper()!!)
+    private val handler = Handler(Looper.getMainLooper())
     private val searchDevices = FDSSearchDevicesApi()
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var isAllCheck = false
@@ -91,7 +91,7 @@ class FastAddDeviceActivity : BaseActivity() {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
 
-                //if (isFilterDev(advertisingDevice)) {
+                if (isFilterDev(advertisingDevice)) {
                     //固件版本 >= 0x39 才支持Fast模式
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
                     if (fv >= 0x39) {
@@ -99,7 +99,7 @@ class FastAddDeviceActivity : BaseActivity() {
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
                     }
-                //}
+                }
             }
 
             override fun onScanTimeOut() {
@@ -165,21 +165,17 @@ class FastAddDeviceActivity : BaseActivity() {
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-            //连接mesh
-            MeshLogin.instance.autoConnect(10 * 1000L) {
-                if (it) {
-                    //配置节点在线状态
-                    configPublishUtils.startConfigPublish(fdsNodes, handler) {isAllSuccess, susNumber ->
-                        runOnUiThread {
-                            loadingDialog.updateLoadingMsg("配置在线:$susNumber")
+            //配置节点在线状态
+            configPublishUtils.startConfigPublish(
+                fdsNodes,
+                handler
+            ) { isComplete, susNumber, failNumber ->
+                runOnUiThread {
+                    loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
 
-                            if (isAllSuccess) {
-                                loadingDialog.dismissDialog()
-                            }
-                        }
+                    if (isComplete) {
+                        loadingDialog.dismissDialog()
                     }
-                } else {
-                    loadingDialog.dismissDialog()
                 }
             }
         }
@@ -198,6 +194,9 @@ class FastAddDeviceActivity : BaseActivity() {
 
     private fun initListener() {
         iv_check.setOnClickListener {
+            //点击全选，停止搜索
+            stopScan()
+
             val isCheck = !isAllCheck
             setCheck(isCheck)
             addDevicesAdapter.allCheck(isCheck)
@@ -282,7 +281,6 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:46:D8:B0",
         "A4:C1:38:54:AF:73",
         "A4:C1:38:CB:1C:18",
-        "A4:C1:38:8D:C3:75",
         "A4:C1:38:24:50:CE",
         "A4:C1:38:E0:57:D6",
         "A4:C1:38:68:0C:3E",
@@ -319,7 +317,6 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:65:32:5D",
         "A4:C1:38:B1:DF:C0",
         "A4:C1:38:27:8B:B7",
-        "A4:C1:38:07:C3:75",
         "A4:C1:38:CD:8C:65",
         "A4:C1:38:01:6E:35",
         "A4:C1:38:B8:F0:03",
@@ -328,7 +325,23 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:17:A2:75",
         "A4:C1:38:15:B9:01",
         "A4:C1:38:EB:57:36",
-        "A4:C1:38:F5:45:02"
+        "A4:C1:38:F5:45:02",
+        "A4:C1:38:8D:C3:75",
+        "A4:C1:38:07:C3:75",
+
+        //Linkiing
+        "A4:C1:38:A0:49:C5",
+        "A4:C1:38:A0:49:C6",
+        "A4:C1:38:A0:49:C7",
+        "A4:C1:38:A0:49:C8",
+        "A4:C1:38:A0:49:C9",
+        "A4:C1:38:A0:49:CA",
+        "A4:C1:38:A0:49:CB",
+        "A4:C1:38:A0:49:CC",
+        "A4:C1:38:A0:49:BD",
+        "A4:C1:38:A0:49:BE",
+        "A4:C1:38:A0:49:BF",
+        "A4:C1:38:A0:49:C0"
     )
 
     @SuppressLint("SetTextI18n")

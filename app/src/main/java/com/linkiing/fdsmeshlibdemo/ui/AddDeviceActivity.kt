@@ -2,8 +2,11 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -17,15 +20,18 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.base.mesh.api.log.LOGUtils
+import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
 
 class AddDeviceActivity : BaseActivity() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
+    private val handler = Handler(Looper.getMainLooper())
     private val searchDevices = FDSSearchDevicesApi()
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
+    private val configPublishUtils = ConfigPublishUtils()
     private var isAllCheck = false
-    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()
+    private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()//保存配置在线状态失败的设备。
     private var isScanning = true
     private var addDeviceSize = 0
     private var addDeviceSusSize = 0
@@ -130,6 +136,7 @@ class AddDeviceActivity : BaseActivity() {
         addDeviceFailSize = 0
         loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
+        publishFdsNodeInfoList.clear()
         fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, fdeAddNetWorkCallBack)
     }
 
@@ -161,12 +168,29 @@ class AddDeviceActivity : BaseActivity() {
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-            //主动查询在线状态
-            val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
-            LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
 
-            loadingDialog.dismissDialog()
+            if (publishFdsNodeInfoList.isEmpty()) {
+                //主动查询在线状态
+                //val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
+                //LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
 
+                loadingDialog.dismissDialog()
+
+            } else {
+                //配置未配置成功的节点在线状态
+                configPublishUtils.startConfigPublish(
+                    publishFdsNodeInfoList,
+                    handler
+                ) { isComplete, susNumber, failNumber ->
+                    runOnUiThread {
+                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
+
+                        if (isComplete) {
+                            loadingDialog.dismissDialog()
+                        }
+                    }
+                }
+            }
         }
 
         /*
@@ -177,21 +201,17 @@ class AddDeviceActivity : BaseActivity() {
             addDeviceSusSize++
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-            //设备成功入网，配置打开设备主动上报在线状态
-            val isFDSNodeConfigPublish = isFDSNodeConfigPublish(fdsNodeInfo)
-            LOGUtils.i("onFDSNodeSuccess() =========> " + "FDSNodeState:${fdsNodeInfo.getFDSNodeState()}  macAddress:${fdsNodeInfo.macAddress} isFDSNodeConfigPublish:$isFDSNodeConfigPublish")
-            if (isFDSNodeConfigPublish) {
-                return
-            }
-
             if (!MMKVSp.instance.isTestModel()) {
                 /**
                  * 配置节点主动上报在线状态
                  */
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(true, fdsNodeInfo, null)
-                if (isOk) {
-                    publishFdsNodeInfoList.add(fdsNodeInfo)
-                }
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(
+                    true,
+                    fdsNodeInfo,
+                    configNodePublishStateListener
+                )
+                publishFdsNodeInfoList.add(fdsNodeInfo)
+
                 LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
             }
         }
@@ -206,8 +226,29 @@ class AddDeviceActivity : BaseActivity() {
         }
     }
 
+    /**
+     * 配置节点主动上报在线状态 结果回调
+     */
+    private val configNodePublishStateListener = object : ConfigNodePublishStateListener {
+        override fun onComplete(success: Boolean, meshAddress: Int) {
+            LOGUtils.d("configFDSNodePublishState onComplete() =====> success:$success  meshAddress:$meshAddress")
+            if (success) {
+                val iterator = publishFdsNodeInfoList.iterator()
+                while (iterator.hasNext()) {
+                    val fdsNodeInfo = iterator.next()
+                    if (fdsNodeInfo.meshAddress == meshAddress) {
+                        iterator.remove()
+                    }
+                }
+            }
+        }
+    }
+
     private fun initListener() {
         iv_check.setOnClickListener {
+            //点击全选，停止搜索
+            stopScan()
+
             val isCheck = !isAllCheck
             setCheck(isCheck)
             addDevicesAdapter.allCheck(isCheck)
@@ -225,18 +266,6 @@ class AddDeviceActivity : BaseActivity() {
         } else {
             iv_check.setBackgroundResource(R.drawable.checked_image_off)
         }
-    }
-
-    private fun isFDSNodeConfigPublish(fdsNodeInfo: FDSNodeInfo): Boolean {
-        if (publishFdsNodeInfoList.isEmpty()) {
-            return false
-        }
-        for (fdsNode in publishFdsNodeInfoList) {
-            if (fdsNode.meshAddress == fdsNodeInfo.meshAddress) {
-                return true
-            }
-        }
-        return false
     }
 
     override fun onDestroy() {

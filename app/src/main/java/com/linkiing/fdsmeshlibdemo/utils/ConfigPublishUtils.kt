@@ -9,10 +9,13 @@ import com.godox.sdk.model.FDSNodeInfo
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigPublishUtils : ConfigNodePublishStateListener {
-    private val publishNodeList = CopyOnWriteArrayList<FDSNodeInfo>()
+    private val tag = "ConfigPublishUtils"
+    private val publishNodeList = CopyOnWriteArrayList<SetPublishNodeInfo>()
     private var handler: Handler? = null
-    private var listenerComplete: (Boolean, Int) -> Unit = { _, _ -> }
+    private var listenerComplete: (Boolean, Int, Int) -> Unit = { _, _, _ -> }
     private var successNumber = 0
+    private var failNumber = 0
+    private var nowPublishNodeInfo: SetPublishNodeInfo? = null
 
     /**
      * 批量配置设备在线状态
@@ -20,50 +23,67 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
     fun startConfigPublish(
         fdsNodes: MutableList<FDSNodeInfo>,
         handler: Handler?,
-        listenerComplete: (Boolean, Int) -> Unit
+        listenerComplete: (Boolean, Int, Int) -> Unit
     ) {
         this.handler = handler
         this.listenerComplete = listenerComplete
         this.successNumber = 0
+        this.failNumber = 0
+        this.publishNodeList.clear()
 
-        publishNodeList.clear()
-        for (fdsNode in fdsNodes) {
-            publishNodeList.add(fdsNode)
+        //连接mesh
+        MeshLogin.instance.autoConnect(15 * 1000L) {
+            if (it) {
+                for (fdsNode in fdsNodes) {
+                    publishNodeList.add(SetPublishNodeInfo(fdsNode))
+                }
+
+                handler?.removeCallbacks(nextConfigRunnable)
+                handler?.postDelayed(nextConfigRunnable, 500)
+            } else {
+                listenerComplete(true, successNumber, failNumber)
+            }
         }
-        nextConfigPublish()
     }
 
     private fun nextConfigPublish() {
         if (!MeshLogin.instance.isLogin()) {
-            LOGUtils.e("nextConfigPublish() Error! isLogin false.")
-            listenerComplete(false, successNumber)
+            //mesh连接断开，重新连接
+            MeshLogin.instance.autoConnect(15 * 1000) {
+                if (it) {
+                    nextConfigPublish()
+                } else {
+                    LOGUtils.e("$tag nextConfigPublish() Error! isLogin false.")
+
+                    //连接失败，配置在线状态失败
+                    listenerComplete(true, successNumber, failNumber)
+                }
+            }
             return
         }
         if (publishNodeList.isEmpty()) {
-            listenerComplete(true, successNumber)
+            listenerComplete(true, successNumber, failNumber)
         } else {
             if (publishNodeList[0] != null) {
+                nowPublishNodeInfo = publishNodeList[0]
                 val isOk = FDSMeshApi.instance.configFDSNodePublishState(
                     true,
-                    publishNodeList[0],
+                    nowPublishNodeInfo!!.fdsNodeInfo,
                     this
                 )
                 LOGUtils.d(
-                    "nextConfigPublish() =====> " +
-                            "macAddress:${publishNodeList[0]!!.macAddress} " +
-                            "meshAddress:${publishNodeList[0]!!.meshAddress} " +
+                    "$tag nextConfigPublish() =====> " +
+                            "macAddress:${nowPublishNodeInfo!!.fdsNodeInfo.macAddress} " +
+                            "meshAddress:${nowPublishNodeInfo!!.fdsNodeInfo.meshAddress} " +
                             "isOk:$isOk"
                 )
 
                 publishNodeList.removeAt(0)
 
                 if (!isOk) {
-                    handler?.postDelayed({
-                        nextConfigPublish()
-                    }, 500)
+                    handler?.removeCallbacks(nextConfigRunnable)
+                    handler?.postDelayed(nextConfigRunnable, 600)
                 }
-                successNumber ++
-                listenerComplete(false, successNumber)
             } else {
                 publishNodeList.removeAt(0)
                 nextConfigPublish()
@@ -71,8 +91,33 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         }
     }
 
-    override fun onComplete(success: Boolean) {
-        LOGUtils.d("onComplete() =====> success:$success")
+    private val nextConfigRunnable = Runnable {
+        LOGUtils.d("$tag nextConfigRunnable =====>")
         nextConfigPublish()
+    }
+
+    override fun onComplete(success: Boolean, meshAddress: Int) {
+        LOGUtils.d("$tag onComplete() =====> success:$success  meshAddress:$meshAddress")
+        if (!success && nowPublishNodeInfo != null) {
+            nowPublishNodeInfo!!.retryIndex++
+            if (nowPublishNodeInfo!!.retryIndex < 3) {
+                publishNodeList.add(nowPublishNodeInfo)
+            } else {
+                //失败一个
+                failNumber++
+            }
+        }
+        if (success) {
+            successNumber++
+        }
+
+        listenerComplete(false, successNumber, failNumber)
+
+        handler?.removeCallbacks(nextConfigRunnable)
+        handler?.postDelayed(nextConfigRunnable, 300)
+    }
+
+    data class SetPublishNodeInfo constructor(val fdsNodeInfo: FDSNodeInfo) {
+        var retryIndex = 0
     }
 }

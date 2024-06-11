@@ -14,24 +14,10 @@
         android:background="@color/white" />
 
     <TextView
-        android:id="@+id/tv_delete"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text="删除"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/grey" />
-
-    <TextView
         android:id="@+id/tv_rename"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="重名了"
         android:textColor="@color/white"
@@ -63,6 +49,34 @@
         android:gravity="center"
         android:text="MCU固件升级"
         android:textColor="@color/white"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey" />
+
+    <TextView
+        android:id="@+id/tv_delete"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="删除"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey" />
+
+    <TextView
+        android:id="@+id/tv_delete_force"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="离线强制删除"
+        android:textColor="@color/blue"
         android:textSize="14sp" />
 
     <View

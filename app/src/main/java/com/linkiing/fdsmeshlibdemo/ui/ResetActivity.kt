@@ -93,8 +93,11 @@ class ResetActivity : BaseActivity() {
         searchDevices.startScanProvisionedDevice(this, filterName, 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                resetDeviceAdapter.addDevices(advertisingDevice, type)
-                tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:${resetDeviceAdapter.itemCount}"
+                val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
+                if (fv >= 0x48) {
+                    resetDeviceAdapter.addDevices(advertisingDevice, type)
+                    tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:${resetDeviceAdapter.itemCount}"
+                }
             }
 
             override fun onScanTimeOut() {
