@@ -4,9 +4,13 @@ import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.utils.SendQueueUtils
 import com.godox.agm.GodoxCommandApi
-import com.godox.agm.callback.*
+import com.godox.agm.callback.BatteryPowerCallBack
+import com.godox.agm.callback.FirmwareCallBack
+import com.godox.agm.callback.MCUCallBack
+import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
@@ -15,9 +19,13 @@ import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.base.mesh.api.log.LOGUtils
-import com.godox.sdk.api.FDSMeshApi
-import kotlinx.android.synthetic.main.mode_list_activity.*
+import kotlinx.android.synthetic.main.mode_list_activity.bt_test1
+import kotlinx.android.synthetic.main.mode_list_activity.bt_test2
+import kotlinx.android.synthetic.main.mode_list_activity.mode_titleBar
+import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v2
+import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
+import kotlinx.android.synthetic.main.mode_list_activity.seekbarBrightness_v2
+import kotlinx.android.synthetic.main.mode_list_activity.seekbarBrightness_v3
 
 /**
  * 功能列表页

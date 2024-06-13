@@ -2,7 +2,6 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.CompoundButton
 import com.base.mesh.api.log.FileJaUtils
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
@@ -13,7 +12,13 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_setting.*
+import kotlinx.android.synthetic.main.activity_setting.menu_fast_provision
+import kotlinx.android.synthetic.main.activity_setting.mesh_lib_ver
+import kotlinx.android.synthetic.main.activity_setting.my_about
+import kotlinx.android.synthetic.main.activity_setting.my_shear_json
+import kotlinx.android.synthetic.main.activity_setting.my_shear_log
+import kotlinx.android.synthetic.main.activity_setting.reset_dev_network
+import kotlinx.android.synthetic.main.activity_setting.switch_test_model
 import java.io.File
 
 class SettingActivity : BaseActivity() {

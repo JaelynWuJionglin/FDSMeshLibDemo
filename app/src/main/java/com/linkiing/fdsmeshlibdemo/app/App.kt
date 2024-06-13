@@ -52,10 +52,10 @@ class App : MeshApp() {
         val meshConfigure = MeshConfigure()
 
         /*
-         * 设备配网连接设备超时时长。(秒)
-         * 注意：太短的时长会影响配网成功率，建议 >= 15s
+         * 设备配网连接设备超时时长。(秒) >= 30s
+         * 注意：太短的时长会影响配网成功率
          */
-        meshConfigure.provisionMaxConnectOutTime = 45
+        meshConfigure.provisionMaxConnectOutTime = 60
 
         /*
          * 配网连接设备失败，等待重试下一次的等待时间（建议500ms - 3000ms）

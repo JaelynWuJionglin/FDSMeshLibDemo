@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.annotation.StringRes
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.input_text_dialog_layout.*
+import kotlinx.android.synthetic.main.input_text_dialog_layout.et_input
+import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_cancel
+import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_confirm
+import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_title
 
 class InputTextDialog(context: Context)
     : BaseFullDialog(context, R.layout.input_text_dialog_layout) {

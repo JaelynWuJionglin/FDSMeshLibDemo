@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import com.base.mesh.api.listener.MeshLoginListener
+import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
@@ -12,9 +13,10 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.base.mesh.api.log.LOGUtils
 import com.telink.ble.mesh.core.networking.ExtendBearerMode
-import kotlinx.android.synthetic.main.activity_studio.*
+import kotlinx.android.synthetic.main.activity_studio.tab_devices
+import kotlinx.android.synthetic.main.activity_studio.tab_group
+import kotlinx.android.synthetic.main.activity_studio.titleBar
 
 class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {
     private val deviceFragment = DeviceFragment()

@@ -3,14 +3,14 @@ package com.linkiing.fdsmeshlibdemo.ui
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.agm.GodoxCommandApi
+import com.godox.agm.bean.ColorBlockBean
+import com.godox.agm.bean.RainbowColorBlockBean
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
-import com.godox.agm.bean.ColorBlockBean
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
-import com.godox.agm.bean.RainbowColorBlockBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import kotlinx.android.synthetic.main.light_fx_list_activity.*
+import kotlinx.android.synthetic.main.light_fx_list_activity.titleBar
 import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
 
 /**

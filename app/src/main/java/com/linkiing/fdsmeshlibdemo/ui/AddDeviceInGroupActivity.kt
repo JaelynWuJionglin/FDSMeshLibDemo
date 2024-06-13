@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceInGroupAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
-import kotlinx.android.synthetic.main.activity_add_device_in_group.*
+import kotlinx.android.synthetic.main.activity_add_device_in_group.iv_check
+import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
+import kotlinx.android.synthetic.main.activity_add_device_in_group.titleBar
 import java.io.Serializable
 
 /**

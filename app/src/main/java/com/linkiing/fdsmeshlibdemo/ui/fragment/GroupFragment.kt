@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.google.gson.Gson
@@ -15,8 +16,8 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
-import com.base.mesh.api.log.LOGUtils
-import kotlinx.android.synthetic.main.group_fragment.*
+import kotlinx.android.synthetic.main.group_fragment.recyclerView_group
+import kotlinx.android.synthetic.main.group_fragment.tv_add_group
 
 class GroupFragment : BaseFragment(R.layout.group_fragment) {
     private lateinit var loadingDialog: LoadingDialog

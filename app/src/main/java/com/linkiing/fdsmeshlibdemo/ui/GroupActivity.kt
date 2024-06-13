@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.godox.sdk.model.FDSNodeInfo
@@ -13,9 +14,9 @@ import com.linkiing.fdsmeshlibdemo.adapter.GroupDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.base.mesh.api.log.LOGUtils
 import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
-import kotlinx.android.synthetic.main.activity_group.*
+import kotlinx.android.synthetic.main.activity_group.bt_add_device
+import kotlinx.android.synthetic.main.activity_group.bt_remove_device
 import kotlinx.android.synthetic.main.activity_group.iv_check
 
 class GroupActivity : BaseActivity() {

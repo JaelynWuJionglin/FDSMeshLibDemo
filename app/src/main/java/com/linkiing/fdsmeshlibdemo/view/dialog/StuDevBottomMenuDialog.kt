@@ -7,7 +7,13 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.*
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_ble_upgrade
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_cancel
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete_all
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete_force
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_mcu_upgrade
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_rename
 
 class StuDevBottomMenuDialog(context: Context) :
     BaseFullDialog(context, R.layout.stu_dev_bottom_dialog_layout),

@@ -5,8 +5,8 @@ buildscript {
         gson_version = "2.10"
         minSdk = 21
         targetSdk = 33
-        versionCode = 123
-        versionName = "1.2.3"
+        versionCode = 124
+        versionName = "1.2.4"
     }
     repositories {
         google()

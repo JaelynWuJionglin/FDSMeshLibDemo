@@ -11,7 +11,6 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.DeviceLisBean
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import com.telink.ble.mesh.util.PermissionUtils
 

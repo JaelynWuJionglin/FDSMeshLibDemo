@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.base.mesh.api.log.LOGUtils
 
 class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
     private var studioList = mutableListOf<StudioListBean>()

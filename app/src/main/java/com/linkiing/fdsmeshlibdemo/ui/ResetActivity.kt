@@ -6,13 +6,12 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.log.LOGUtils
+import com.godox.sdk.api.FDSResetDeviceApi
 import com.godox.sdk.api.FDSSearchDevicesApi
 import com.godox.sdk.callbacks.FDSBleDevCallBack
+import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.ResetDeviceAdapter
-import com.godox.sdk.api.FDSResetDeviceApi
-import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog

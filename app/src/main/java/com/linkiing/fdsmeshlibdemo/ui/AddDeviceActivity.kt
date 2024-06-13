@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.ConfigNodePublishStateListener
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -17,10 +18,9 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
+import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import com.base.mesh.api.log.LOGUtils
-import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import kotlinx.android.synthetic.main.activity_add_device.*
 
 class AddDeviceActivity : BaseActivity() {
@@ -52,6 +52,7 @@ class AddDeviceActivity : BaseActivity() {
         titleBar?.setTitle("搜索设备")
         titleBar?.setOnEndImageListener {
             addDevicesAdapter.clearList()
+            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:0"
             if (isScanning) {
                 stopScan()
             }
@@ -175,6 +176,8 @@ class AddDeviceActivity : BaseActivity() {
                 //LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
 
                 loadingDialog.dismissDialog()
+                tv_dev_network_equipment?.text =
+                    "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
 
             } else {
                 //配置未配置成功的节点在线状态
@@ -187,6 +190,8 @@ class AddDeviceActivity : BaseActivity() {
 
                         if (isComplete) {
                             loadingDialog.dismissDialog()
+                            tv_dev_network_equipment?.text =
+                                "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
                         }
                     }
                 }

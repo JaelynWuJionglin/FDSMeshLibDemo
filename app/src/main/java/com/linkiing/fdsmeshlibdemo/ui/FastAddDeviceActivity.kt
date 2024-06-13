@@ -4,12 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
-import com.base.mesh.api.main.MeshLogin
-import com.base.mesh.api.utils.ByteUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -21,7 +18,6 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
-import com.linkiing.fdsmeshlibdemo.utils.BleUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -46,7 +42,6 @@ class FastAddDeviceActivity : BaseActivity() {
 
         initView()
         initRecyclerView()
-//        initTestDev()
         scanDevices()
         initListener()
     }
@@ -56,6 +51,7 @@ class FastAddDeviceActivity : BaseActivity() {
         titleBar?.setTitle("搜索设备(Fast)")
         titleBar?.setOnEndImageListener {
             addDevicesAdapter.clearList()
+            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:0"
             if (isScanning) {
                 stopScan()
             }
@@ -90,8 +86,9 @@ class FastAddDeviceActivity : BaseActivity() {
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-
-                if (isFilterDev(advertisingDevice)) {
+                val isFilterDev = true//isFilterDev(advertisingDevice)
+                //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
+                if (isFilterDev) {
                     //固件版本 >= 0x39 才支持Fast模式
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
                     if (fv >= 0x39) {
@@ -175,6 +172,8 @@ class FastAddDeviceActivity : BaseActivity() {
 
                     if (isComplete) {
                         loadingDialog.dismissDialog()
+                        tv_dev_network_equipment?.text =
+                            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
                     }
                 }
             }
@@ -229,6 +228,19 @@ class FastAddDeviceActivity : BaseActivity() {
 
 
     //=============================================================================================
+
+    private fun isFilterDev(advertisingDevice: AdvertisingDevice): Boolean {
+        for (mac in macList) {
+            val devMac = advertisingDevice.device?.address?.uppercase(Locale.ENGLISH)?.trim() ?: ""
+            if (devMac != "") {
+                if (devMac == mac.uppercase(Locale.ENGLISH).trim()) {
+                    return true
+                }
+            }
+
+        }
+        return false
+    }
 
     private val macList = mutableListOf(
         "A4:C1:38:E4:14:13",
@@ -343,44 +355,4 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:A0:49:BF",
         "A4:C1:38:A0:49:C0"
     )
-
-    @SuppressLint("SetTextI18n")
-    private fun initTestDev() {
-        val list = mutableListOf<AdvertisingDevice>()
-        val mBluetoothAdapter = BleUtils.instance.getBluetoothAdapter()
-        if (mBluetoothAdapter != null) {
-            for (mac in macList) {
-                if (!TextUtils.isEmpty(mac)) {
-                    val dev = mBluetoothAdapter.getRemoteDevice(mac)
-                    if (dev != null) {
-                        list.add(
-                            AdvertisingDevice(
-                                dev,
-                                -50,
-                                ByteUtils.hexStringToBytes("0201060303271815162718110201003335690007004ECDFD38C1A40000070947445F4C454416FF4ECDFD38C1A401004E4D0000FFFF420000000000000000")
-                            )
-                        )
-                    }
-                }
-            }
-
-        }
-
-        addDevicesAdapter.addDevicesTest(list)
-        tv_dev_network_equipment?.text =
-            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
-    }
-
-    private fun isFilterDev(advertisingDevice: AdvertisingDevice): Boolean {
-        for (mac in macList) {
-            val devMac = advertisingDevice.device?.address?.uppercase(Locale.ENGLISH)?.trim() ?: ""
-            if (devMac != "") {
-                if (devMac == mac.uppercase(Locale.ENGLISH).trim()) {
-                    return true
-                }
-            }
-
-        }
-        return false
-    }
 }

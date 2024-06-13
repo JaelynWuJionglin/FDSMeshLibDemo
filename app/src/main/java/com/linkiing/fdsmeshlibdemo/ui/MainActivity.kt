@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.tool.HttpUtils
 import com.google.gson.Gson
@@ -19,8 +20,10 @@ import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.base.mesh.api.log.LOGUtils
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.bt_add_studio
+import kotlinx.android.synthetic.main.activity_main.bt_import_json
+import kotlinx.android.synthetic.main.activity_main.recyclerView_studio
+import kotlinx.android.synthetic.main.activity_main.titleBar
 
 class MainActivity : BaseActivity() {
     private lateinit var studioAdapter: StudioAdapter

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
+import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.FirmwareCallBack
@@ -14,18 +15,21 @@ import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
+import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
-import com.base.mesh.api.log.LOGUtils
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
-import kotlinx.android.synthetic.main.device_fragment.*
+import kotlinx.android.synthetic.main.device_fragment.dev_switch
+import kotlinx.android.synthetic.main.device_fragment.recyclerView_devices
+import kotlinx.android.synthetic.main.device_fragment.tv_add_dev
+import kotlinx.android.synthetic.main.device_fragment.tv_dev_list_msg
+import kotlinx.android.synthetic.main.device_fragment.tv_refresh
 
 class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog

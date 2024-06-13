@@ -7,7 +7,10 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.*
+import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_cancel
+import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_delete
+import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_edit
+import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_rename
 
 class StuGpBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout.stu_gp_bottom_dialog_layout),
     View.OnClickListener {
