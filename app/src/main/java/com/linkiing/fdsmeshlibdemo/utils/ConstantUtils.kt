@@ -8,10 +8,12 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import com.base.mesh.api.log.LOGUtils
+import com.godox.sdk.api.FDSMeshApi
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import java.io.File
 
 object ConstantUtils {
-    var scanTime = 0L
     private var toast: Toast? = null
 
     fun toast(context: Context, msg: String) {
@@ -44,6 +46,24 @@ object ConstantUtils {
             intent.type = "*/*"
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             activity.startActivity(Intent.createChooser(intent, "share"))
+        }
+    }
+
+    /**
+     * 保存Studio数据到json
+     */
+    fun saveJson(index: Int) {
+        LOGUtils.i("ConstantUtils ==> saveJson index:$index")
+        if (index > 0) {
+            //保存当前MeshJson数据
+            val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
+            val studioList = MMKVSp.instance.getStudioList()
+            for (bean in studioList) {
+                if (bean.index == index) {
+                    bean.meshJsonStr = meshJsonStr
+                }
+            }
+            MMKVSp.instance.setStudioList(studioList)
         }
     }
 }

@@ -12,7 +12,6 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
-import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.telink.ble.mesh.core.networking.ExtendBearerMode
 import kotlinx.android.synthetic.main.activity_studio.tab_devices
 import kotlinx.android.synthetic.main.activity_studio.tab_group
@@ -45,8 +44,6 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
 //        }
 
         resetExtendBearerMode()
-
-        ConstantUtils.scanTime = System.currentTimeMillis()
     }
 
     override fun onMeshDisconnect() {
@@ -75,10 +72,12 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
 
     private fun initView() {
         index = intent.getIntExtra("index", 0)
+        LOGUtils.d("StudioActivity =============> index:$index")
         if (index == 0) {
-            LOGUtils.e(" =============> index == 0")
             finish()
         }
+
+        deviceFragment.setIndex(index)
 
         setTab(0)
     }
@@ -132,21 +131,8 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             fragmentTransaction.show(fragment)
         }
         nowFragment = fragment
-        fragmentTransaction.commit()
-    }
 
-    private fun saveJson() {
-        if (index != 0) {
-            //保存当前MeshJson数据
-            val meshJsonStr = FDSMeshApi.instance.getCurrentMeshJson()
-            val studioList = MMKVSp.instance.getStudioList()
-            for (bean in studioList) {
-                if (bean.index == index) {
-                    bean.meshJsonStr = meshJsonStr
-                }
-            }
-            MMKVSp.instance.setStudioList(studioList)
-        }
+        fragmentTransaction.commit()
     }
 
     private fun resetExtendBearerMode() {
@@ -209,11 +195,6 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             }
         }
         return version
-    }
-
-    override fun finish() {
-        super.finish()
-        saveJson()
     }
 
     override fun onDestroy() {

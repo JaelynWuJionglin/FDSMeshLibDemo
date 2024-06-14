@@ -19,6 +19,7 @@ import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import kotlinx.android.synthetic.main.activity_add_device.*
@@ -34,6 +35,7 @@ class FastAddDeviceActivity : BaseActivity() {
     private var isScanning = true
     private var fastFoundDeviceSize = 0
     private var addDeviceSize = 0
+    private var index = 0
     private val configPublishUtils = ConfigPublishUtils()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,12 @@ class FastAddDeviceActivity : BaseActivity() {
     }
 
     private fun initView() {
+        index = intent.getIntExtra("index", 0)
+        LOGUtils.d("FastAddDeviceActivity =============> index:$index")
+        if (index == 0) {
+            finish()
+        }
+
         titleBar?.initTitleBar(true, R.drawable.refresh)
         titleBar?.setTitle("搜索设备(Fast)")
         titleBar?.setOnEndImageListener {
@@ -86,7 +94,7 @@ class FastAddDeviceActivity : BaseActivity() {
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                val isFilterDev = true//isFilterDev(advertisingDevice)
+                val isFilterDev = isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
                 if (isFilterDev) {
                     //固件版本 >= 0x39 才支持Fast模式
@@ -171,6 +179,7 @@ class FastAddDeviceActivity : BaseActivity() {
                     loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
 
                     if (isComplete) {
+                        ConstantUtils.saveJson(index)
                         loadingDialog.dismissDialog()
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
@@ -187,6 +196,7 @@ class FastAddDeviceActivity : BaseActivity() {
 
         override fun onInNetworkAllFail() {
             loadingDialog.updateLoadingMsg("配网失败!")
+            ConstantUtils.saveJson(index)
             loadingDialog.dismissDialog()
         }
     }

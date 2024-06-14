@@ -42,6 +42,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var connectedFDSNodeInfo: FDSNodeInfo? = null
     private var isResetConnectDevice = false
+    private var index = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -124,10 +125,12 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
 
         tv_add_dev.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt("index", index)
             if (!MMKVSp.instance.isTestModel() && MMKVSp.instance.isFastProvision()) {
-                goActivity(FastAddDeviceActivity::class.java, false)
+                goActivityBundle(FastAddDeviceActivity::class.java, false, bundle)
             } else {
-                goActivity(AddDeviceActivity::class.java, false)
+                goActivityBundle(AddDeviceActivity::class.java, false, bundle)
             }
         }
 
@@ -141,6 +144,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                 studioDeviceAdapter?.update()
                 tv_dev_list_msg?.text =
                     "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+
+                ConstantUtils.saveJson(index)
             }
         }
 
@@ -244,10 +249,13 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             isAllSuccess: Boolean,
             fdsNodes: MutableList<FDSNodeInfo>,
         ) {
-            LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+            LOGUtils.d("DeviceFragment fdsRemoveNodeCallBack isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
             studioDeviceAdapter?.update()
             tv_dev_list_msg?.text =
                 "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
+
+            ConstantUtils.saveJson(index)
+
             loadingDialog.dismissDialog()
         }
     }
@@ -313,6 +321,10 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             MeshLogin.instance.disconnect()
             MeshLogin.instance.autoConnect()
         }
+    }
+
+    fun setIndex(index: Int) {
+        this.index = index
     }
 
     fun updateList() {

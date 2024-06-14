@@ -19,6 +19,7 @@ import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
+import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
 import kotlinx.android.synthetic.main.activity_add_device.*
@@ -36,6 +37,7 @@ class AddDeviceActivity : BaseActivity() {
     private var addDeviceSize = 0
     private var addDeviceSusSize = 0
     private var addDeviceFailSize = 0
+    private var index = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +50,12 @@ class AddDeviceActivity : BaseActivity() {
     }
 
     private fun initView() {
+        index = intent.getIntExtra("index", 0)
+        LOGUtils.d("AddDeviceActivity =============> index:$index")
+        if (index == 0) {
+            finish()
+        }
+
         titleBar?.initTitleBar(true, R.drawable.refresh)
         titleBar?.setTitle("搜索设备")
         titleBar?.setOnEndImageListener {
@@ -175,6 +183,7 @@ class AddDeviceActivity : BaseActivity() {
                 //val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
                 //LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
 
+                ConstantUtils.saveJson(index)
                 loadingDialog.dismissDialog()
                 tv_dev_network_equipment?.text =
                     "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
@@ -189,6 +198,7 @@ class AddDeviceActivity : BaseActivity() {
                         loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
 
                         if (isComplete) {
+                            ConstantUtils.saveJson(index)
                             loadingDialog.dismissDialog()
                             tv_dev_network_equipment?.text =
                                 "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
