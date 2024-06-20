@@ -12,7 +12,8 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
     private val tag = "ConfigPublishUtils"
     private val publishNodeList = CopyOnWriteArrayList<SetPublishNodeInfo>()
     private var handler: Handler? = null
-    private var listenerComplete: (Boolean, Int, Int) -> Unit = { _, _, _ -> }
+    private var listenerComplete: (Boolean, Int, Int, Int) -> Unit = { _, _, _, _ -> }
+    private var allNumber = 0
     private var successNumber = 0
     private var failNumber = 0
     private var nowPublishNodeInfo: SetPublishNodeInfo? = null
@@ -23,7 +24,7 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
     fun startConfigPublish(
         fdsNodes: MutableList<FDSNodeInfo>,
         handler: Handler?,
-        listenerComplete: (Boolean, Int, Int) -> Unit
+        listenerComplete: (Boolean, Int, Int, Int) -> Unit
     ) {
         this.handler = handler
         this.listenerComplete = listenerComplete
@@ -35,13 +36,23 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         MeshLogin.instance.autoConnect(15 * 1000L) {
             if (it) {
                 for (fdsNode in fdsNodes) {
-                    publishNodeList.add(SetPublishNodeInfo(fdsNode))
+                    if (fdsNode.firmwareVersion >= 0x49) {
+                        FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNode)
+                    } else {
+                        publishNodeList.add(SetPublishNodeInfo(fdsNode))
+                    }
+                }
+                this.allNumber = publishNodeList.size
+
+                if (publishNodeList.isEmpty()) {
+                    listenerComplete(true, allNumber, successNumber, failNumber)
+                    return@autoConnect
                 }
 
                 handler?.removeCallbacks(nextConfigRunnable)
                 handler?.postDelayed(nextConfigRunnable, 500)
             } else {
-                listenerComplete(true, successNumber, failNumber)
+                listenerComplete(true, allNumber, successNumber, failNumber)
             }
         }
     }
@@ -56,13 +67,13 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
                     LOGUtils.e("$tag nextConfigPublish() Error! isLogin false.")
 
                     //连接失败，配置在线状态失败
-                    listenerComplete(true, successNumber, failNumber)
+                    listenerComplete(true, allNumber, successNumber, failNumber)
                 }
             }
             return
         }
         if (publishNodeList.isEmpty()) {
-            listenerComplete(true, successNumber, failNumber)
+            listenerComplete(true, allNumber, successNumber, failNumber)
         } else {
             if (publishNodeList[0] != null) {
                 nowPublishNodeInfo = publishNodeList[0]
@@ -111,7 +122,7 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
             successNumber++
         }
 
-        listenerComplete(false, successNumber, failNumber)
+        listenerComplete(false, allNumber, successNumber, failNumber)
 
         handler?.removeCallbacks(nextConfigRunnable)
         handler?.postDelayed(nextConfigRunnable, 300)

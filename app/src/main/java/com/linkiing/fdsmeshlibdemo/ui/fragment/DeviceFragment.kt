@@ -43,6 +43,9 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private var connectedFDSNodeInfo: FDSNodeInfo? = null
     private var isResetConnectDevice = false
     private var index = 0
+    private var resetDeviceSize = 0
+    private var resetDeviceSusSize = 0
+    private var resetDeviceFailSize = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -205,11 +208,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                     //从Mesh中删除设备
                     if (fdsNodeInfo != null) {
                         loadingDialog.showDialog()
-                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
-                            fdsNodeInfo!!,
-                            false,
-                            fdsRemoveNodeCallBack
-                        )
+                        resetDevice(mutableListOf(fdsNodeInfo!!),false)
                     }
                 }
 
@@ -217,22 +216,14 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                     //强制删除离线设备
                     if (fdsNodeInfo != null) {
                         loadingDialog.showDialog()
-                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
-                            fdsNodeInfo!!,
-                            true,
-                            fdsRemoveNodeCallBack
-                        )
+                        resetDevice(mutableListOf(fdsNodeInfo!!),true)
                     }
                 }
 
                 StuDevBottomMenuDialog.MENU_DELETE_ALL -> {
                     if (studioDeviceAdapter != null && studioDeviceAdapter!!.itemCount > 0) {
                         loadingDialog.showDialog()
-                        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
-                            studioDeviceAdapter!!.getAllFdsNodeList(),
-                            false,
-                            fdsRemoveNodeCallBack
-                        )
+                        resetDevice(studioDeviceAdapter!!.getAllFdsNodeList(),false)
                     }
                 }
             }
@@ -257,6 +248,18 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             ConstantUtils.saveJson(index)
 
             loadingDialog.dismissDialog()
+        }
+
+        override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
+            super.onFDSNodeSuccess(fdsNodeInfo)
+            resetDeviceSusSize++
+            loadingDialog.updateLoadingMsg("$resetDeviceSusSize/$resetDeviceSize 失败:$resetDeviceFailSize")
+        }
+
+        override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
+            super.onFDSNodeFail(fdsNodeInfo)
+            resetDeviceFailSize++
+            loadingDialog.updateLoadingMsg("$resetDeviceSusSize/$resetDeviceSize 失败:$resetDeviceFailSize")
         }
     }
 
@@ -302,6 +305,21 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                 }
             }
         }
+    }
+
+    private fun resetDevice(list: MutableList<FDSNodeInfo>, isSupportOutOfLine: Boolean,){
+
+        resetDeviceSize = list.size
+        resetDeviceSusSize = 0
+        resetDeviceFailSize = 0
+
+        loadingDialog.updateLoadingMsg("$resetDeviceSusSize/$resetDeviceSize 失败:$resetDeviceFailSize")
+
+        fdsAddOrRemoveDeviceApi?.deviceRemoveNetWork(
+            list,
+            isSupportOutOfLine,
+            fdsRemoveNodeCallBack
+        )
     }
 
     /**

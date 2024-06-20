@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.utils.ByteUtils
 import com.godox.sdk.api.FDSResetDeviceApi
 import com.godox.sdk.api.FDSSearchDevicesApi
 import com.godox.sdk.callbacks.FDSBleDevCallBack
@@ -37,7 +40,7 @@ class ResetActivity : BaseActivity() {
         initListener()
     }
 
-    private fun initView(){
+    private fun initView() {
         titleBar?.initTitleBar(true, R.drawable.refresh)
         titleBar?.setOnEndImageListener {
             resetDeviceAdapter.clearList()
@@ -89,29 +92,34 @@ class ResetActivity : BaseActivity() {
         /**
          * 搜索已入网的设备
          */
-        searchDevices.startScanProvisionedDevice(this, filterName, 60 * 1000, object : FDSBleDevCallBack {
-            @SuppressLint("SetTextI18n")
-            override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                if (fv >= 0x48) {
-                    resetDeviceAdapter.addDevices(advertisingDevice, type)
-                    tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:${resetDeviceAdapter.itemCount}"
+        searchDevices.startScanProvisionedDevice(
+            this,
+            filterName,
+            60 * 1000,
+            object : FDSBleDevCallBack {
+                @SuppressLint("SetTextI18n")
+                override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
+                    val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
+                    if (fv >= 0x48) {
+                        resetDeviceAdapter.addDevices(advertisingDevice, type)
+                        tv_dev_network_equipment?.text =
+                            "${getString(R.string.text_dev_network_equipment)}:${resetDeviceAdapter.itemCount}"
+                    }
                 }
-            }
 
-            override fun onScanTimeOut() {
-                isScanning = false
-                progressBar.visibility = View.GONE
-            }
+                override fun onScanTimeOut() {
+                    isScanning = false
+                    progressBar.visibility = View.GONE
+                }
 
-            /*
-             * 开启搜索设备失败。
-             */
-            override fun onScanFail() {
-                isScanning = false
-                progressBar.visibility = View.GONE
-            }
-        })
+                /*
+                 * 开启搜索设备失败。
+                 */
+                override fun onScanFail() {
+                    isScanning = false
+                    progressBar.visibility = View.GONE
+                }
+            })
     }
 
     private fun stopScan() {
@@ -124,6 +132,10 @@ class ResetActivity : BaseActivity() {
         stopScan()
 
         val list = resetDeviceAdapter.getCheckDevices()
+        if (list.isEmpty()) {
+            return
+        }
+
         resetSize = list.size
 
         loadingDialog.showDialog()
@@ -131,12 +143,16 @@ class ResetActivity : BaseActivity() {
 
         /**
          * 重置设备入网状态
-         * (注：本质是通过蓝牙Advertise的方式，给特定设备发广播，使用这个方法注意程序是否已经开启了其他Advertise，
-         *  避免广播的占用导致调用方法的失败。)
+         * (注：1，本质是通过蓝牙Advertise的方式，给特定设备发特定的广播。
+         *     2，使用这个方法注意程序是否已经开启了其他Advertise，避免广播的占用导致调用方法的失败。
+         *     3，此方式适用于丢失了mesh的网络数据，又需要重置设备的时候使用。
+         *     4，此方式禁止用于恶意破坏其他的mesh网络。)
          *  @param deviceList 需要重置的设备列表
          *  @param advertiseTime 单个设备重置广播的时长
+         *  @param fixedKey 密钥，和固件端协定
          */
-        FDSResetDeviceApi.instance.startResetAdvertise(list,2000L){ isOk, number ->
+        val fixedKey = resources.getInteger(R.integer.reset_private_key_fixed)
+        FDSResetDeviceApi.instance.startResetAdvertise(list, 2000L, fixedKey) { isOk, number ->
             runOnUiThread {
                 loadingDialog.updateLoadingMsg("重置中...$number/$resetSize")
 

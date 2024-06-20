@@ -193,9 +193,9 @@ class AddDeviceActivity : BaseActivity() {
                 configPublishUtils.startConfigPublish(
                     publishFdsNodeInfoList,
                     handler
-                ) { isComplete, susNumber, failNumber ->
+                ) { isComplete, allNumber, susNumber, failNumber ->
                     runOnUiThread {
-                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
+                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
 
                         if (isComplete) {
                             ConstantUtils.saveJson(index)

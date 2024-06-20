@@ -1,0 +1,3 @@
+<resources>
+    <integer name="reset_private_key_fixed">0x6c736574</integer>
+</resources>

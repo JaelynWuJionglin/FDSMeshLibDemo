@@ -33,7 +33,8 @@ class FastAddDeviceActivity : BaseActivity() {
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
     private var isAllCheck = false
     private var isScanning = true
-    private var fastFoundDeviceSize = 0
+    private var deviceSetSusNumber = 0
+    private var deviceSetFailNumber = 0
     private var addDeviceSize = 0
     private var index = 0
     private val configPublishUtils = ConfigPublishUtils()
@@ -94,12 +95,12 @@ class FastAddDeviceActivity : BaseActivity() {
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                val isFilterDev = isFilterDev(advertisingDevice)
+                val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
                 if (isFilterDev) {
-                    //固件版本 >= 0x39 才支持Fast模式
+                    //固件版本 >= 0x50
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 0x39) {
+                    if (fv >= 0x50) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
@@ -137,7 +138,8 @@ class FastAddDeviceActivity : BaseActivity() {
             return
         }
 
-        fastFoundDeviceSize = 0
+        deviceSetSusNumber = 0
+        deviceSetFailNumber = 0
         addDeviceSize = deviceList.size
 
         loadingDialog.showDialog()
@@ -145,7 +147,7 @@ class FastAddDeviceActivity : BaseActivity() {
 
         /**
          * Fast配网模式。
-         *（注意：固件版本 >= 39 支持）
+         *（注意：固件版本 >= 39 支持 [实际要求固件版本 >= 50, 39-49固件端存在一些问题]）
          */
         fdsAddOrRemoveDeviceApi.deviceFastAddNetWork(deviceList, fdeFastAddNetWorkCallBack)
     }
@@ -156,48 +158,60 @@ class FastAddDeviceActivity : BaseActivity() {
     private val fdeFastAddNetWorkCallBack = object : FDSFastAddNetWorkCallBack {
 
         //配网成功
-        override fun onInNetworkSuccess(isAllSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
+        override fun onInNetworkComplete(isSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
             LOGUtils.d("FastAddDeviceActivity onSuccess() size:${fdsNodes.size}")
 
-            loadingDialog.updateLoadingMsg("配网成功!")
+            if (isSuccess) {
+                loadingDialog.updateLoadingMsg("配网成功!")
 
-            //节点设置默认名称
-            if (!MMKVSp.instance.isTestModel()) {
-                for (fdsNode in fdsNodes) {
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
+                //节点设置默认名称
+                if (!MMKVSp.instance.isTestModel()) {
+                    Thread {
+                        for (fdsNode in fdsNodes) {
+                            FDSMeshApi.instance.renameFDSNodeInfo(
+                                fdsNode,
+                                "GD_LED_${fdsNode.type}",
+                                ""
+                            )
+                        }
+                    }.start()
                 }
-            }
 
-            addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
+                addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-            //配置节点在线状态
-            configPublishUtils.startConfigPublish(
-                fdsNodes,
-                handler
-            ) { isComplete, susNumber, failNumber ->
-                runOnUiThread {
-                    loadingDialog.updateLoadingMsg("配置在线:$susNumber/$failNumber")
+                //配置节点在线状态
+                configPublishUtils.startConfigPublish(
+                    fdsNodes,
+                    handler
+                ) { isComplete, allNumber, susNumber, failNumber ->
+                    runOnUiThread {
+                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
 
-                    if (isComplete) {
-                        ConstantUtils.saveJson(index)
-                        loadingDialog.dismissDialog()
-                        tv_dev_network_equipment?.text =
-                            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                        if (isComplete) {
+                            ConstantUtils.saveJson(index)
+                            loadingDialog.dismissDialog()
+                            tv_dev_network_equipment?.text =
+                                "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                        }
                     }
                 }
+            } else {
+                loadingDialog.updateLoadingMsg("配网失败!")
+                ConstantUtils.saveJson(index)
+                loadingDialog.dismissDialog()
             }
         }
 
-        override fun onDeviceFound(macAddress: String) {
-            super.onDeviceFound(macAddress)
-            fastFoundDeviceSize++
-            loadingDialog.updateLoadingMsg("找到设备:$fastFoundDeviceSize/$addDeviceSize")
+        override fun onDeviceSetSuccess(macAddress: String) {
+            super.onDeviceSetSuccess(macAddress)
+            deviceSetSusNumber++
+            loadingDialog.updateLoadingMsg("SET:$deviceSetSusNumber/$addDeviceSize 失败:$deviceSetFailNumber")
         }
 
-        override fun onInNetworkAllFail() {
-            loadingDialog.updateLoadingMsg("配网失败!")
-            ConstantUtils.saveJson(index)
-            loadingDialog.dismissDialog()
+        override fun onDeviceSetFail(macAddress: String) {
+            super.onDeviceSetFail(macAddress)
+            deviceSetFailNumber++
+            loadingDialog.updateLoadingMsg("SET:$deviceSetSusNumber/$addDeviceSize 失败:$deviceSetFailNumber")
         }
     }
 
@@ -253,7 +267,7 @@ class FastAddDeviceActivity : BaseActivity() {
     }
 
     private val macList = mutableListOf(
-        "A4:C1:38:E4:14:13",
+        /*"A4:C1:38:E4:14:13",
         "A4:C1:38:88:55:96",
         "A4:C1:38:58:3C:FE",
         "A4:C1:38:60:32:75",
@@ -349,20 +363,89 @@ class FastAddDeviceActivity : BaseActivity() {
         "A4:C1:38:EB:57:36",
         "A4:C1:38:F5:45:02",
         "A4:C1:38:8D:C3:75",
-        "A4:C1:38:07:C3:75",
+        "A4:C1:38:07:C3:75",*/
 
-        //Linkiing
-        "A4:C1:38:A0:49:C5",
-        "A4:C1:38:A0:49:C6",
-        "A4:C1:38:A0:49:C7",
-        "A4:C1:38:A0:49:C8",
-        "A4:C1:38:A0:49:C9",
-        "A4:C1:38:A0:49:CA",
-        "A4:C1:38:A0:49:CB",
-        "A4:C1:38:A0:49:CC",
-        "A4:C1:38:A0:49:BD",
-        "A4:C1:38:A0:49:BE",
-        "A4:C1:38:A0:49:BF",
-        "A4:C1:38:A0:49:C0"
+        //48
+        "A4:C1:38:08:7E:6C",
+        "A4:C1:38:08:7E:80",
+        "A4:C1:38:08:7E:7C",
+        "A4:C1:38:08:7E:85",
+        "A4:C1:38:08:7E:81",
+        "A4:C1:38:08:7E:84",
+        "A4:C1:38:08:7E:7E",
+        "A4:C1:38:08:7E:68",
+        "A4:C1:38:08:7E:70",
+        "A4:C1:38:08:7E:76",
+        "A4:C1:38:08:7E:79",
+        "A4:C1:38:08:7E:7B",
+        "A4:C1:38:08:7E:66",
+        "A4:C1:38:08:7E:6D",
+        "A4:C1:38:08:7E:6F",
+        "A4:C1:38:08:7E:5D",
+        "A4:C1:38:08:7E:8B",
+        "A4:C1:38:08:7E:73",
+        "A4:C1:38:08:7E:67",
+        "A4:C1:38:08:7E:71",
+        "A4:C1:38:08:7E:5C",
+        "A4:C1:38:08:7E:64",
+        "A4:C1:38:08:7E:87",
+        "A4:C1:38:08:7E:75",
+        "A4:C1:38:08:7E:7D",
+        "A4:C1:38:08:7E:69",
+        "A4:C1:38:08:7E:6B",
+        "A4:C1:38:08:7E:77",
+        "A4:C1:38:08:7E:6E",
+        "A4:C1:38:08:7E:83",
+        "A4:C1:38:08:7E:63",
+        "A4:C1:38:08:7E:61",
+        "A4:C1:38:08:7E:5E",
+        "A4:C1:38:07:C3:75",
+        "A4:C1:38:08:7E:82",
+        "A4:C1:38:08:7E:5F",
+        "A4:C1:38:08:7E:65",
+        "A4:C1:38:08:7E:60",
+        "A4:C1:38:08:7E:7F",
+        "A4:C1:38:08:7E:6A",
+        "A4:C1:38:08:7E:78",
+        "A4:C1:38:08:7E:62",
+        "A4:C1:38:08:7E:89",
+        "A4:C1:38:08:7E:72",
+        "A4:C1:38:08:7E:86",
+        "A4:C1:38:08:7E:74",
+        "A4:C1:38:08:7E:7A",
+        "A4:C1:38:08:7E:8A",
+        "A4:C1:38:08:7E:88",
+
+        //30
+        "A4:C1:38:08:7E:8C",
+        "A4:C1:38:08:7E:A8",
+        "A4:C1:38:08:7E:8F",
+        "A4:C1:38:08:7E:A9",
+        "A4:C1:38:08:7E:90",
+        "A4:C1:38:08:7E:A6",
+        "A4:C1:38:08:7E:8E",
+        "A4:C1:38:08:7E:A7",
+        "A4:C1:38:08:7E:9F",
+        "A4:C1:38:08:7E:94",
+        "A4:C1:38:08:7E:9B",
+        "A4:C1:38:08:7E:8D",
+        "A4:C1:38:08:7E:A5",
+        "A4:C1:38:08:7E:A4",
+        "A4:C1:38:08:7E:A3",
+        "A4:C1:38:08:7E:9D",
+        "A4:C1:38:08:7E:A2",
+        "A4:C1:38:08:7E:99",
+        "A4:C1:38:08:7E:93",
+        "A4:C1:38:08:7E:9C",
+        "A4:C1:38:08:7E:91",
+        "A4:C1:38:08:7E:9A",
+        "A4:C1:38:08:7E:96",
+        "A4:C1:38:08:7E:92",
+        "A4:C1:38:08:7E:98",
+        "A4:C1:38:08:7E:A0",
+        "A4:C1:38:08:7E:9E",
+        "A4:C1:38:08:7E:A1",
+        "A4:C1:38:08:7E:95",
+        "A4:C1:38:08:7E:97"
     )
 }

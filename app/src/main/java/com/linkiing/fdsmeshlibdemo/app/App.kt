@@ -70,6 +70,12 @@ class App : MeshApp() {
          */
         meshConfigure.isPrivateMode = true
 
+        /*
+         * 是否支持节点主动上报在线状态
+         * (方案私有协议，具体看固件是否支持)
+         */
+        meshConfigure.nodePublishSupport = true
+
 
         FDSMeshApi.instance.setMeshConfigure(meshConfigure)
     }
