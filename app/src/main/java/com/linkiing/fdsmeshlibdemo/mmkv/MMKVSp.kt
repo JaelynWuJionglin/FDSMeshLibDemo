@@ -17,6 +17,7 @@ class MMKVSp {
     private val KV_StudioList = "KV_StudioList"
     private val KV_IsTestModel = "KV_IsTestModel"
     private val KV_IsFastProvision = "KV_IsFastProvision"
+    private val KV_SaveFmPath = "KV_SaveFmPath"
 
     companion object {
         val instance: MMKVSp by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -51,7 +52,7 @@ class MMKVSp {
     }
 
     fun isTestModel(): Boolean {
-        return kv.decodeBool(KV_IsTestModel,false)
+        return kv.decodeBool(KV_IsTestModel, false)
     }
 
     fun setFastProvision(isFastProvision: Boolean) {
@@ -59,6 +60,20 @@ class MMKVSp {
     }
 
     fun isFastProvision(): Boolean {
-        return kv.decodeBool(KV_IsFastProvision,false)
+        return kv.decodeBool(KV_IsFastProvision, false)
+    }
+
+    fun setFmPath(path: String) {
+        kv.encode(
+            KV_SaveFmPath, if (TextUtils.isEmpty(path)) {
+                ""
+            } else {
+                path
+            }
+        )
+    }
+
+    fun getFmPath(): String {
+        return kv.decodeString(KV_SaveFmPath) ?: ""
     }
 }

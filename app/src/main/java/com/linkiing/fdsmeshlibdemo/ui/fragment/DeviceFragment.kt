@@ -19,6 +19,7 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
+import com.linkiing.fdsmeshlibdemo.ui.OtaActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
@@ -35,8 +36,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var renameTextDialog: InputTextDialog
-    private var meshOtaDialog: MeshOtaDialog? = null
-    private var meshMcuUpgradeDialog: MeshOtaDialog? = null
     private var studioDeviceAdapter: StudioDeviceAdapter? = null
     private var fdsAddOrRemoveDeviceApi: FDSAddOrRemoveDeviceApi? = null
     private var fdsNodeInfo: FDSNodeInfo? = null
@@ -81,9 +80,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         renameTextDialog.setTitleText("重命名节点？")
 
         fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(mActivity)
-
-        meshOtaDialog = MeshOtaDialog(mActivity, false)
-        meshMcuUpgradeDialog = MeshOtaDialog(mActivity, true)
     }
 
     private fun initRecyclerView() {
@@ -163,44 +159,19 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
 
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     if (fdsNodeInfo != null) {
-                        //获取固件版本
-                        GodoxCommandApi.instance.getFirmwareVersion(
-                            fdsNodeInfo!!.meshAddress,
-                            object : FirmwareCallBack {
-                                override fun onSuccess(
-                                    fdsNodeInfo: FDSNodeInfo,
-                                    version: Int,
-                                    isPa: Boolean
-                                ) {
-                                    /*
-                                     * 1,比对固件版本
-                                     * 2,判断是否是PA固件
-                                     */
-                                    if (isPa) {
-                                        //PA固件打开PA升级功能
-                                        GodoxCommandApi.instance.openPaUpgrade(
-                                            fdsNodeInfo.meshAddress,
-                                            object : OpenPaCallback {
-                                                override fun openPaComplete() {
-                                                    //打开PA升级成功，开始升级
-                                                    meshOtaDialog?.setOldFirmwareInfo(true, version)
-                                                    meshOtaDialog?.showDialog(fdsNodeInfo)
-                                                }
-                                            })
-
-                                    } else {
-                                        //非PA固件，直接升级
-                                        meshOtaDialog?.setOldFirmwareInfo(false, version)
-                                        meshOtaDialog?.showDialog(fdsNodeInfo)
-                                    }
-                                }
-                            })
+                        val bundle = Bundle()
+                        bundle.putBoolean("isMcuUpgrade", false)
+                        bundle.putInt("meshAddress", fdsNodeInfo!!.meshAddress)
+                        goActivityBundle(OtaActivity::class.java, false, bundle)
                     }
                 }
 
                 StuDevBottomMenuDialog.MENU_MCU_UPGRADE -> {
                     if (fdsNodeInfo != null) {
-                        meshMcuUpgradeDialog?.showDialog(fdsNodeInfo!!)
+                        val bundle = Bundle()
+                        bundle.putBoolean("isMcuUpgrade", true)
+                        bundle.putInt("meshAddress", fdsNodeInfo!!.meshAddress)
+                        goActivityBundle(OtaActivity::class.java, false, bundle)
                     }
                 }
 
@@ -355,8 +326,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
 
     override fun onDestroy() {
         super.onDestroy()
-        meshOtaDialog?.dismiss()
-        meshMcuUpgradeDialog?.dismiss()
         fdsAddOrRemoveDeviceApi?.destroy()
         FDSMeshApi.instance.removeFDSNodeStatusChangeCallBack(this)
     }

@@ -11,6 +11,7 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import kotlinx.android.synthetic.main.layout_dialog_fm.*
+import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 
@@ -20,26 +21,23 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var isPa = false
-    private var version = 0
 
-    fun showDialog(fdsNodeInfo: FDSNodeInfo) {
+    fun showDialog(fdsNodeInfo: FDSNodeInfo, path: String) {
         this.fdsNodeInfo = fdsNodeInfo
         if (isShowing) {
             dismiss()
         }
-        readFirmware()
+        readFirmwarePath(path)
         show()
     }
 
-    fun setOldFirmwareInfo(isPa: Boolean, version: Int) {
+    fun setOldFirmwareInfo(isPa: Boolean) {
         this.isPa = isPa
-        this.version = version
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setCanceledOnTouchOutside(false)
-        //readFirmware()
     }
 
     override fun onStart() {
@@ -114,28 +112,29 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         }
     }
 
-    private fun readFirmware() {
+    // 从sdcard获取固件
+    private fun readFirmwarePath(path: String) {
         try {
-            LOGUtils.e("GATT_OTA ================ isPa:$isPa 升级前:$version ================")
-            var path = if (version == 0x42) {
-                LOGUtils.e("GATT_OTA ================ 升级后:${0x48} ================")
-                "LK8620_mesh_GD_v000048_20240527_beta.bin"
-            } else {
-                LOGUtils.e("GATT_OTA ================ 升级后:${0x42} ================")
-                "LK8620_mesh_GD_9p81_v000042_20221215.bin"
-            }
-            if (isPa) {
-                path = if (version == 0x49) {
-                    LOGUtils.e("GATT_OTA ================ 升级后:${0x48} ================")
-                    "8258_mesh_otaTest_v48.bin"
-                } else {
-                    LOGUtils.e("GATT_OTA ================ 升级后:${0x49} ================")
-                    "8258_mesh_otaTest_v49.bin"
-                }
-            }
-            if (isMcuUpgrade) {
-                path = "TP2R_V139.bin" //新
-            }
+            val inputStream: InputStream = FileInputStream(path)
+            val length = inputStream.available()
+            mFirmware = ByteArray(length)
+            inputStream.read(mFirmware)
+            inputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            mFirmware = ByteArray(0)
+            dismiss()
+        }
+    }
+
+    //从assets获取固件
+    private fun readFirmwareAssets() {
+        var path ="LK8620_mesh_GD_v000048_20240527_beta.bin"
+        if (isMcuUpgrade) {
+            path = "TP2R_V139.bin"
+        }
+
+        try {
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()
             mFirmware = ByteArray(length)
@@ -144,6 +143,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         } catch (e: IOException) {
             e.printStackTrace()
             mFirmware = ByteArray(0)
+            dismiss()
         }
     }
 }
