@@ -80,7 +80,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
                 "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
         } else {
             holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${fdsNodeInfo.firmwareVersion}"
+                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${fdsNodeInfo.firmwareVersion.toString(16)}"
         }
 
         //在线状态

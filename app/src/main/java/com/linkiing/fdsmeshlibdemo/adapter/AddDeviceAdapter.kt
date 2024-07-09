@@ -128,7 +128,7 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
         } else {
             holder.tv_name.text = "${devName}_${deviceBean.deviceType}"
             holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
-                    " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord)}" +
+                    " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord).toString(16)}" +
                     " - rssi:${deviceBean.advertisingDevice.rssi}"
         }
 

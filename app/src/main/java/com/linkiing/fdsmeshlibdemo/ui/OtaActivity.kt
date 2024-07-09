@@ -56,8 +56,16 @@ class OtaActivity : BaseActivity() {
         }
 
         loadingDialog = LoadingDialog(this)
+
         meshOtaDialog = MeshOtaDialog(this, false)
+        meshOtaDialog?.setListener {
+            finish()
+        }
+
         meshMcuUpgradeDialog = MeshOtaDialog(this, true)
+        meshMcuUpgradeDialog?.setListener {
+            finish()
+        }
 
         titleBar?.setTitle(
             if (isMcuUpgrade) {
@@ -137,7 +145,9 @@ class OtaActivity : BaseActivity() {
                     upFdsNodeInfo = fdsNodeInfo
                     upIsPa = isPa
 
-                    tv_msg1?.text = "固件版本:$version"
+                    LOGUtils.v("OTA_VER ==> version:${version.toString(16)}")
+
+                    tv_msg1?.text = "固件版本:${version.toString(16)}"
                     tv_msg2?.text = "是否是带PA的固件:${
                         if (isPa) {
                             "是"
@@ -148,10 +158,18 @@ class OtaActivity : BaseActivity() {
 
                     loadingDialog?.dismissDialog()
 
+                    //test =========================================================================
+//                    path = if (version <= 0x50) {
+//                        "LK8620_mesh_GD_v000051_20240709_OTA_3.bin"
+//                    } else {
+//                        "LK8620_mesh_GD_v000050_20240709_OTA_3.bin"
+//                    }
+//                    tv_fm?.text = "固件:$path"
+                    //==============================================================================
+
                     if (isStart) {
                         bleUpgrade(upFdsNodeInfo,upIsPa)
                     }
-
                 }
             })
         }

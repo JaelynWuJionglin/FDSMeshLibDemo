@@ -21,6 +21,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var isPa = false
+    private var listener: (Boolean) -> Unit = {}
 
     fun showDialog(fdsNodeInfo: FDSNodeInfo, path: String) {
         this.fdsNodeInfo = fdsNodeInfo
@@ -28,7 +29,12 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
             dismiss()
         }
         readFirmwarePath(path)
+        //readFirmwareAssets(path)
         show()
+    }
+
+    fun setListener(listener: (Boolean) -> Unit){
+        this.listener = listener
     }
 
     fun setOldFirmwareInfo(isPa: Boolean) {
@@ -102,6 +108,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         activity.runOnUiThread {
             dismiss()
             ConstantUtils.toast(activity, "升级成功！")
+            listener(true)
         }
     }
 
@@ -109,6 +116,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         activity.runOnUiThread {
             dismiss()
             ConstantUtils.toast(activity, "升级失败！errorCode：$errorCode")
+            listener(false)
         }
     }
 
@@ -128,12 +136,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     }
 
     //从assets获取固件
-    private fun readFirmwareAssets() {
-        var path ="LK8620_mesh_GD_v000048_20240527_beta.bin"
-        if (isMcuUpgrade) {
-            path = "TP2R_V139.bin"
-        }
-
+    private fun readFirmwareAssets(path: String) {
         try {
             val inputStream: InputStream = activity.assets.open(path)
             val length = inputStream.available()
