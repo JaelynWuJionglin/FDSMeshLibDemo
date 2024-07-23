@@ -179,15 +179,7 @@ class AddDeviceActivity : BaseActivity() {
 
 
             if (publishFdsNodeInfoList.isEmpty()) {
-                //主动查询在线状态
-                //val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
-                //LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
-
-                ConstantUtils.saveJson(index)
-                loadingDialog.dismissDialog()
-                tv_dev_network_equipment?.text =
-                    "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
-
+                onAddDeviceComplete()
             } else {
                 //配置未配置成功的节点在线状态
                 configPublishUtils.startConfigPublish(
@@ -198,10 +190,7 @@ class AddDeviceActivity : BaseActivity() {
                         loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
 
                         if (isComplete) {
-                            ConstantUtils.saveJson(index)
-                            loadingDialog.dismissDialog()
-                            tv_dev_network_equipment?.text =
-                                "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                            onAddDeviceComplete()
                         }
                     }
                 }
@@ -239,6 +228,17 @@ class AddDeviceActivity : BaseActivity() {
             addDeviceFailSize++
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
         }
+    }
+
+    private fun onAddDeviceComplete() {
+        //主动查询在线状态
+        val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
+        LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
+
+        ConstantUtils.saveJson(index)
+        loadingDialog.dismissDialog()
+        tv_dev_network_equipment?.text =
+            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
     }
 
     /**
