@@ -100,6 +100,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ui.streetlam.StreetLampCmdListActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.LightFXListActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

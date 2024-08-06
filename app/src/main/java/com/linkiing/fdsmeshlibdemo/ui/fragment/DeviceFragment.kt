@@ -21,6 +21,7 @@ import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.OtaActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
+import com.linkiing.fdsmeshlibdemo.ui.streetlam.StreetLampCmdListActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
@@ -95,13 +96,17 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
 
         studioDeviceAdapter?.setItemClickListener {
-            if (it.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-                ConstantUtils.toast(mContext, getString(R.string.equipment_not_online_text))
+            val bundle = Bundle()
+            bundle.putInt("address", it.meshAddress)
+            bundle.putString("typeName", it.name)
+            if (MMKVSp.instance.isStreetLamp()) {
+                goActivityBundle(StreetLampCmdListActivity::class.java, false, bundle)
             } else {
-                val bundle = Bundle()
-                bundle.putInt("address", it.meshAddress)
-                bundle.putString("typeName", it.name)
-                goActivityBundle(ModeListActivity::class.java, false, bundle)
+                if (it.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
+                    ConstantUtils.toast(mContext, getString(R.string.equipment_not_online_text))
+                } else {
+                    goActivityBundle(ModeListActivity::class.java, false, bundle)
+                }
             }
         }
     }

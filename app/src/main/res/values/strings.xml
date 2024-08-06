@@ -17,4 +17,6 @@
     <string name="text_reset_start">开始重置</string>
     <string name="text_fast_provision">使用FastProvision</string>
     <string name="text_device_list">设备列表</string>
+    <string name="text_street_lamp">路灯测试</string>
+    <string name="text_on_off_line_state_test">在线状态检测</string>
 </resources>

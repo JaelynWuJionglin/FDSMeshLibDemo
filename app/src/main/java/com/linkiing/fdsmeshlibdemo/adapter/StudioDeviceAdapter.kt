@@ -77,7 +77,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
         if (MMKVSp.instance.isTestModel()) {
             holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
+                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} t:${fdsNodeInfo.type}"
         } else {
             holder.tv_mac.text =
                 "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${fdsNodeInfo.firmwareVersion.toString(16)}"
@@ -101,7 +101,12 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         }
 
         //开关状态
-        holder.iv_switch.isChecked = fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_ON
+        if (MMKVSp.instance.isTestModel()){
+            holder.iv_switch.visibility = View.GONE
+        } else {
+            holder.iv_switch.visibility = View.VISIBLE
+            holder.iv_switch.isChecked = fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_ON
+        }
 
         val connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
         if (connectedFDSNodeInfo != null) {

@@ -10,9 +10,11 @@ import com.godox.sdk.model.FDSGroupInfo
 import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioGroupAdapter
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.GroupActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
+import com.linkiing.fdsmeshlibdemo.ui.streetlam.StreetLampCmdListActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
@@ -67,7 +69,11 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
             val bundle = Bundle()
             bundle.putInt("address", it.address)
             bundle.putString("typeName", it.name)
-            goActivityBundle(ModeListActivity::class.java, false, bundle)
+            if (MMKVSp.instance.isStreetLamp()) {
+                goActivityBundle(StreetLampCmdListActivity::class.java, false, bundle)
+            } else {
+                goActivityBundle(ModeListActivity::class.java, false, bundle)
+            }
         }
     }
 

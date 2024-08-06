@@ -29,14 +29,17 @@ class SettingActivity : BaseActivity() {
         my_about?.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
 
         menu_fast_provision?.switchCompatChecked(MMKVSp.instance.isFastProvision())
+        menu_street_lamp?.switchCompatChecked(MMKVSp.instance.isStreetLamp())
         switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
 
         if(MMKVSp.instance.isTestModel()) {
             menu_fast_provision?.visibility = View.GONE
             reset_dev_network?.visibility = View.GONE
+            menu_street_lamp?.visibility = View.VISIBLE
         } else {
             menu_fast_provision?.visibility = View.VISIBLE
             reset_dev_network?.visibility = View.VISIBLE
+            menu_street_lamp?.visibility = View.GONE
         }
 
         initListener()
@@ -49,6 +52,10 @@ class SettingActivity : BaseActivity() {
 
         menu_fast_provision?.setSwitchChangeListener { buttonView, isChecked ->
             MMKVSp.instance.setFastProvision(isChecked)
+        }
+
+        menu_street_lamp?.setSwitchChangeListener { buttonView, isChecked ->
+            MMKVSp.instance.setStreetLamp(isChecked)
         }
 
         my_shear_json?.setOnClickListener {
@@ -66,9 +73,11 @@ class SettingActivity : BaseActivity() {
             if(isChecked) {
                 menu_fast_provision?.visibility = View.GONE
                 reset_dev_network?.visibility = View.GONE
+                menu_street_lamp?.visibility = View.VISIBLE
             } else {
                 menu_fast_provision?.visibility = View.VISIBLE
                 reset_dev_network?.visibility = View.VISIBLE
+                menu_street_lamp?.visibility = View.GONE
             }
             if (isChecked) {
                 App.getInstance().defMeshConfigure()

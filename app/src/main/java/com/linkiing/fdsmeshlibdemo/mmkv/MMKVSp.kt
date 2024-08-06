@@ -18,6 +18,7 @@ class MMKVSp {
     private val KV_IsTestModel = "KV_IsTestModel"
     private val KV_IsFastProvision = "KV_IsFastProvision"
     private val KV_SaveFmPath = "KV_SaveFmPath"
+    private val KV_IsStreetLamp = "KV_IsStreetLamp" //路灯测试协议
 
     companion object {
         val instance: MMKVSp by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -75,5 +76,13 @@ class MMKVSp {
 
     fun getFmPath(): String {
         return kv.decodeString(KV_SaveFmPath) ?: ""
+    }
+
+    fun setStreetLamp(isStreetLamp: Boolean) {
+        kv.encode(KV_IsStreetLamp, isStreetLamp)
+    }
+
+    fun isStreetLamp(): Boolean {
+        return kv.decodeBool(KV_IsStreetLamp, false)
     }
 }

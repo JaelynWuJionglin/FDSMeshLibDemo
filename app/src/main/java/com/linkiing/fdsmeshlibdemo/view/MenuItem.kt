@@ -39,45 +39,49 @@ class MenuItem(context: Context, attrs: AttributeSet?) : LinearLayout(context, a
     }
 
     private fun initAttrs(context: Context, attrs: AttributeSet?) {
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MenuItem)
-        val text = typedArray.getString(R.styleable.MenuItem_menu_text) ?: ""
-        val textEnd = typedArray.getString(R.styleable.MenuItem_menu_text_end) ?: ""
-        val image = typedArray.getResourceId(R.styleable.MenuItem_menu_image, 0)
-        val imageEnd = typedArray.getResourceId(R.styleable.MenuItem_menu_image_end, 0)
-        val isSwitch = typedArray.getBoolean(R.styleable.MenuItem_menu_switch, false)
-        val isBtLine = typedArray.getBoolean(R.styleable.MenuItem_menu_bt_line, true)
-        typedArray.recycle()
+        try {
+            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MenuItem)
+            val text = typedArray.getString(R.styleable.MenuItem_menu_text) ?: ""
+            val textEnd = typedArray.getString(R.styleable.MenuItem_menu_text_end) ?: ""
+            val image = typedArray.getResourceId(R.styleable.MenuItem_menu_image, 0)
+            val imageEnd = typedArray.getResourceId(R.styleable.MenuItem_menu_image_end, 0)
+            val isSwitch = typedArray.getBoolean(R.styleable.MenuItem_menu_switch, false)
+            val isBtLine = typedArray.getBoolean(R.styleable.MenuItem_menu_bt_line, true)
+            typedArray.recycle()
 
-        tv.text = text
+            tv.text = text
 
-        tvEnd.text = textEnd
+            tvEnd.text = textEnd
 
-        if (image == 0) {
-            iv.visibility = GONE
-        } else {
-            iv.visibility = VISIBLE
-            iv.setImageResource(image)
-        }
+            if (image == 0) {
+                iv.visibility = GONE
+            } else {
+                iv.visibility = VISIBLE
+                iv.setImageResource(image)
+            }
 
-        if (imageEnd == 0) {
-            ivEnd.visibility = GONE
-        } else {
-            ivEnd.visibility = VISIBLE
-            ivEnd.setImageResource(imageEnd)
-        }
+            if (imageEnd == 0) {
+                ivEnd.visibility = GONE
+            } else {
+                ivEnd.visibility = VISIBLE
+                ivEnd.setImageResource(imageEnd)
+            }
 
-        switchCompat.visibility = if (isSwitch) {
-            lrEnd.visibility = View.GONE
-            View.VISIBLE
-        } else {
-            lrEnd.visibility = View.VISIBLE
-            View.GONE
-        }
+            switchCompat.visibility = if (isSwitch) {
+                lrEnd.visibility = View.GONE
+                View.VISIBLE
+            } else {
+                lrEnd.visibility = View.VISIBLE
+                View.GONE
+            }
 
-        btLine.visibility = if (isBtLine) {
-            View.VISIBLE
-        } else {
-            View.GONE
+            btLine.visibility = if (isBtLine) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
