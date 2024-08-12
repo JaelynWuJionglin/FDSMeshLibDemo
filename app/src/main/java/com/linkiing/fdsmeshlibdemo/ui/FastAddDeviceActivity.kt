@@ -49,6 +49,7 @@ class FastAddDeviceActivity : BaseActivity() {
         initListener()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initView() {
         index = intent.getIntExtra("index", 0)
         LOGUtils.d("FastAddDeviceActivity =============> index:$index")
@@ -60,7 +61,7 @@ class FastAddDeviceActivity : BaseActivity() {
         titleBar?.setTitle("搜索设备(Fast)")
         titleBar?.setOnEndImageListener {
             addDevicesAdapter.clearList()
-            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:0"
+            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_number)}:0/0"
             if (isScanning) {
                 stopScan()
             }
@@ -70,6 +71,7 @@ class FastAddDeviceActivity : BaseActivity() {
         loadingDialog = LoadingDialog(this)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initRecyclerView() {
         addDevicesAdapter = AddDeviceAdapter()
         val manager = LinearLayoutManager(this)
@@ -79,6 +81,8 @@ class FastAddDeviceActivity : BaseActivity() {
 
         addDevicesAdapter.setIsAllCheckListener {
             setCheck(it)
+            tv_dev_network_equipment?.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
     }
 
@@ -103,7 +107,7 @@ class FastAddDeviceActivity : BaseActivity() {
                     if (fv >= 0x50) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
-                            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                            "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
                     }
                 }
             }
@@ -142,14 +146,17 @@ class FastAddDeviceActivity : BaseActivity() {
         deviceSetFailNumber = 0
         addDeviceSize = deviceList.size
 
-        loadingDialog.showDialog()
-        loadingDialog.updateLoadingMsg("设备配网中...")
 
         /**
          * Fast配网模式。
-         *（注意：固件版本 >= 39 支持 [实际要求固件版本 >= 50, 39-49固件端存在一些问题]）
+         *（注意：固件版本 >= 52 支持
          */
-        fdsAddOrRemoveDeviceApi.deviceFastAddNetWork(deviceList, fdeFastAddNetWorkCallBack)
+        val isFastStart =
+            fdsAddOrRemoveDeviceApi.deviceFastAddNetWork(deviceList, fdeFastAddNetWorkCallBack)
+        if (isFastStart) {
+            loadingDialog.showDialog()
+            loadingDialog.updateLoadingMsg("设备配网中...")
+        }
     }
 
     /**
@@ -158,6 +165,7 @@ class FastAddDeviceActivity : BaseActivity() {
     private val fdeFastAddNetWorkCallBack = object : FDSFastAddNetWorkCallBack {
 
         //配网成功
+        @SuppressLint("SetTextI18n")
         override fun onInNetworkComplete(isSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
             LOGUtils.d("FastAddDeviceActivity onSuccess() size:${fdsNodes.size}")
 
@@ -191,7 +199,7 @@ class FastAddDeviceActivity : BaseActivity() {
                             ConstantUtils.saveJson(index)
                             loadingDialog.dismissDialog()
                             tv_dev_network_equipment?.text =
-                                "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
                         }
                     }
                 }
@@ -215,6 +223,7 @@ class FastAddDeviceActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initListener() {
         iv_check.setOnClickListener {
             //点击全选，停止搜索
@@ -223,6 +232,9 @@ class FastAddDeviceActivity : BaseActivity() {
             val isCheck = !isAllCheck
             setCheck(isCheck)
             addDevicesAdapter.allCheck(isCheck)
+
+            tv_dev_network_equipment?.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
 
         bt_add_device.setOnClickListener {

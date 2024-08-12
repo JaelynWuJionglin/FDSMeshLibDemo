@@ -4,11 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.TextUtils
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.base.mesh.api.log.LOGUtils
-import com.base.mesh.api.utils.ByteUtils
 import com.godox.sdk.api.FDSResetDeviceApi
 import com.godox.sdk.api.FDSSearchDevicesApi
 import com.godox.sdk.callbacks.FDSBleDevCallBack
@@ -103,7 +100,7 @@ class ResetActivity : BaseActivity() {
                     if (fv >= 0x48) {
                         resetDeviceAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
-                            "${getString(R.string.text_dev_network_equipment)}:${resetDeviceAdapter.itemCount}"
+                            "${getString(R.string.text_dev_number)}:${resetDeviceAdapter.itemCount}"
                     }
                 }
 

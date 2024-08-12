@@ -49,6 +49,7 @@ class AddDeviceActivity : BaseActivity() {
         initListener()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initView() {
         index = intent.getIntExtra("index", 0)
         LOGUtils.d("AddDeviceActivity =============> index:$index")
@@ -60,7 +61,7 @@ class AddDeviceActivity : BaseActivity() {
         titleBar?.setTitle("搜索设备")
         titleBar?.setOnEndImageListener {
             addDevicesAdapter.clearList()
-            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_network_equipment)}:0"
+            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_number)}:0/0"
             if (isScanning) {
                 stopScan()
             }
@@ -78,6 +79,7 @@ class AddDeviceActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initRecyclerView() {
         addDevicesAdapter = AddDeviceAdapter()
         val manager = LinearLayoutManager(this)
@@ -87,6 +89,8 @@ class AddDeviceActivity : BaseActivity() {
 
         addDevicesAdapter.setIsAllCheckListener {
             setCheck(it)
+            tv_dev_network_equipment?.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
     }
 
@@ -105,7 +109,7 @@ class AddDeviceActivity : BaseActivity() {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 addDevicesAdapter.addDevices(advertisingDevice, type)
                 tv_dev_network_equipment?.text =
-                    "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+                    "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
             }
 
             override fun onScanTimeOut() {
@@ -230,6 +234,7 @@ class AddDeviceActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun onAddDeviceComplete() {
         //主动查询在线状态
         val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
@@ -238,7 +243,7 @@ class AddDeviceActivity : BaseActivity() {
         ConstantUtils.saveJson(index)
         loadingDialog.dismissDialog()
         tv_dev_network_equipment?.text =
-            "${getString(R.string.text_dev_network_equipment)}:${addDevicesAdapter.itemCount}"
+            "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
     }
 
     /**
@@ -259,6 +264,7 @@ class AddDeviceActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initListener() {
         iv_check.setOnClickListener {
             //点击全选，停止搜索
@@ -267,6 +273,8 @@ class AddDeviceActivity : BaseActivity() {
             val isCheck = !isAllCheck
             setCheck(isCheck)
             addDevicesAdapter.allCheck(isCheck)
+            tv_dev_network_equipment?.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
 
         bt_add_device.setOnClickListener {
