@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.utils.ByteUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -22,6 +23,7 @@ import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
+import com.telink.ble.mesh.util.Strings
 import kotlinx.android.synthetic.main.activity_add_device.*
 import java.util.Locale
 
@@ -101,10 +103,10 @@ class FastAddDeviceActivity : BaseActivity() {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
-                if (isFilterDev) {
+                if (isFilterDev /*&& deviceMacNumber(advertisingDevice) < 0x7e86*/) {
                     //固件版本 >= 0x50
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 0x50) {
+                    if (fv >= 0x52) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
@@ -264,6 +266,17 @@ class FastAddDeviceActivity : BaseActivity() {
 
 
     //=============================================================================================
+
+    private fun deviceMacNumber(advertisingDevice: AdvertisingDevice): Int {
+        val mac = advertisingDevice.device.address.replace(":", "")
+        val macBytes = ByteUtils.hexStringToBytes(mac)
+        if (macBytes.size == 6) {
+            val num = ByteUtils.byteArrayToInt(byteArrayOf(macBytes[4],macBytes[5]))
+            LOGUtils.e("TAGGG ====> num:${num.toString(16)}  $num")
+            return num
+        }
+        return 0
+    }
 
     private fun isFilterDev(advertisingDevice: AdvertisingDevice): Boolean {
         for (mac in macList) {
