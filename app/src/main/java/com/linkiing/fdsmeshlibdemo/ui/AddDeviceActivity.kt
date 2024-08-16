@@ -210,17 +210,23 @@ class AddDeviceActivity : BaseActivity() {
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             if (!MMKVSp.instance.isTestModel()) {
+
                 /**
                  * 配置节点主动上报在线状态
                  */
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(
-                    true,
-                    fdsNodeInfo,
-                    configNodePublishStateListener
-                )
-                publishFdsNodeInfoList.add(fdsNodeInfo)
+                if (fdsNodeInfo.firmwareVersion >= 0x49) {
+                    FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfo)
+                    LOGUtils.i("setFDSNodePublishModel() =====> true")
+                } else {
+                    val isOk = FDSMeshApi.instance.configFDSNodePublishState(
+                        true,
+                        fdsNodeInfo,
+                        configNodePublishStateListener
+                    )
+                    publishFdsNodeInfoList.add(fdsNodeInfo)
 
-                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+                    LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+                }
             }
         }
 
