@@ -104,7 +104,7 @@ class FastAddDeviceActivity : BaseActivity() {
                 val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
                 if (isFilterDev /*&& deviceMacNumber(advertisingDevice) < 0x7e86*/) {
-                    //固件版本 >= 0x50
+                    //固件版本 >= 0x52
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
                     if (fv >= 0x52) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
@@ -166,13 +166,13 @@ class FastAddDeviceActivity : BaseActivity() {
      */
     private val fdeFastAddNetWorkCallBack = object : FDSFastAddNetWorkCallBack {
 
-        //配网成功
+        //配网完成
         @SuppressLint("SetTextI18n")
         override fun onInNetworkComplete(isSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
             LOGUtils.d("FastAddDeviceActivity onSuccess() size:${fdsNodes.size}")
 
             if (isSuccess) {
-                loadingDialog.updateLoadingMsg("配网成功!")
+                loadingDialog.updateLoadingMsg("配网完成!")
 
                 //节点设置默认名称
                 if (!MMKVSp.instance.isTestModel()) {
