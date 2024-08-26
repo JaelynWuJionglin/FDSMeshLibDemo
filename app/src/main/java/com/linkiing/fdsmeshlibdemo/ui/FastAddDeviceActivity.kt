@@ -103,7 +103,7 @@ class FastAddDeviceActivity : BaseActivity() {
             override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
                 val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
-                if (isFilterDev /*&& deviceMacNumber(advertisingDevice) < 0x7e86*/) {
+                if (isFilterDev /*&& deviceMacNumber(advertisingDevice) >= 0x7e86*/) {
                     //固件版本 >= 0x52
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
                     if (fv >= 0x52) {
