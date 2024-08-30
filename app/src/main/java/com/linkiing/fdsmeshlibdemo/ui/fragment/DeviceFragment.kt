@@ -115,6 +115,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                 return@setOnCheckedChangeListener
             }
             GodoxCommandApi.instance.changeLightSwitch(0xFFFF, isSwitch)
+
+            studioDeviceAdapter?.allOnOrOff(isSwitch)
         }
 
         tv_refresh.setOnClickListener {

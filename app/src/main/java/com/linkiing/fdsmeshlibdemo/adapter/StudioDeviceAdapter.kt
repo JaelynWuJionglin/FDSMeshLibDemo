@@ -22,16 +22,24 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
     private var fdsNodeList = mutableListOf<FDSNodeInfo>()
     private var itemLongClickListener: (FDSNodeInfo) -> Unit = {}
     private var itemClickListener: (FDSNodeInfo) -> Unit = {}
+    private val hashMap = HashMap<Int, Boolean>()
 
     fun update() {
         fdsNodeList = FDSMeshApi.instance.getFDSNodeWhitOutGroup()
         LOGUtils.v("fdsNodeList.size:${fdsNodeList.size} fdsNodeList:${Gson().toJson(fdsNodeList)}")
+
+        hashMap.clear()
+        for (bean in fdsNodeList) {
+            hashMap[bean.meshAddress] = false
+        }
+
         notifyDataSetChanged()
     }
 
     fun update(meshAddressList: MutableList<Int>) {
         for ((index, dev) in fdsNodeList.withIndex()) {
             if (listHaveMeshAddress(dev.meshAddress, meshAddressList)) {
+                hashMap[dev.meshAddress] = false
                 notifyItemChanged(index)
             }
         }
@@ -47,6 +55,15 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
 
     fun setItemClickListener(itemClickListener: (FDSNodeInfo) -> Unit) {
         this.itemClickListener = itemClickListener
+    }
+
+    fun allOnOrOff(allOn: Boolean) {
+        if (itemCount > 0 && fdsNodeList.size > 0) {
+            for (bean in fdsNodeList) {
+                hashMap[bean.meshAddress] = allOn
+            }
+            notifyItemRangeChanged(0,itemCount)
+        }
     }
 
     private fun listHaveMeshAddress(meshAddress: Int, meshAddressList: MutableList<Int>): Boolean {
@@ -80,7 +97,11 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
                 "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
         } else {
             holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${fdsNodeInfo.firmwareVersion.toString(16)}"
+                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${
+                    fdsNodeInfo.firmwareVersion.toString(
+                        16
+                    )
+                }"
         }
 
         //在线状态
@@ -101,7 +122,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         }
 
         //开关状态
-        holder.iv_switch.isChecked = fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_ON
+        holder.iv_switch.isChecked = hashMap[fdsNodeInfo.meshAddress] ?: false
 
         val connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
         if (connectedFDSNodeInfo != null) {
@@ -144,6 +165,7 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
                 return@setOnCheckedChangeListener
             }
             GodoxCommandApi.instance.changeLightSwitch(fdsNodeInfo.meshAddress, b)
+            hashMap[fdsNodeInfo.meshAddress] = b
         }
 
         //长按事件
