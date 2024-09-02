@@ -133,7 +133,10 @@ class GroupActivity : BaseActivity() {
         if (index >= checkDeviceList.size) {
             loadingDialog.dismissDialog()
             setCheck(false)
-            groupAdapter?.update()
+
+            runOnUiThread {
+                groupAdapter?.update()
+            }
 
             //一次执行完成
             ConstantUtils.toast(
