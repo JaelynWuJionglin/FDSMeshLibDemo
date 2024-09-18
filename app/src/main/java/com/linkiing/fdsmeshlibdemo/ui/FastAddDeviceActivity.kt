@@ -23,7 +23,6 @@ import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import com.telink.ble.mesh.util.Strings
 import kotlinx.android.synthetic.main.activity_add_device.*
 import java.util.Locale
 
@@ -104,9 +103,9 @@ class FastAddDeviceActivity : BaseActivity() {
                 val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
                 if (isFilterDev /*&& deviceMacNumber(advertisingDevice) >= 0x7e86*/) {
-                    //固件版本 >= 0x52
+                    //固件版本 >= 0x55
                     val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 0x52) {
+                    if (fv >= 0x55) {
                         addDevicesAdapter.addDevices(advertisingDevice, type)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
@@ -168,16 +167,20 @@ class FastAddDeviceActivity : BaseActivity() {
 
         //配网完成
         @SuppressLint("SetTextI18n")
-        override fun onInNetworkComplete(isSuccess: Boolean, fdsNodes: MutableList<FDSNodeInfo>) {
-            LOGUtils.d("FastAddDeviceActivity onSuccess() size:${fdsNodes.size}")
+        override fun onInNetworkComplete(isSuccess: Boolean, resultList: MutableList<FDSNodeInfo>) {
+            LOGUtils.d("FastAddDeviceActivity onSuccess() size:${resultList.size}")
 
             if (isSuccess) {
                 loadingDialog.updateLoadingMsg("配网完成!")
+                if (resultList.isEmpty()) {
+                    loadingDialog.dismissDialog()
+                    return
+                }
 
                 //节点设置默认名称
                 if (!MMKVSp.instance.isTestModel()) {
                     Thread {
-                        for (fdsNode in fdsNodes) {
+                        for (fdsNode in resultList) {
                             FDSMeshApi.instance.renameFDSNodeInfo(
                                 fdsNode,
                                 "GD_LED_${fdsNode.type}",
@@ -187,11 +190,11 @@ class FastAddDeviceActivity : BaseActivity() {
                     }.start()
                 }
 
-                addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
+                addDevicesAdapter.removeItemAtInNetWork(resultList)
 
                 //配置节点在线状态
                 configPublishUtils.startConfigPublish(
-                    fdsNodes,
+                    resultList,
                     handler
                 ) { isComplete, allNumber, susNumber, failNumber ->
                     runOnUiThread {
