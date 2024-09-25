@@ -57,7 +57,9 @@ class SettingActivity : BaseActivity() {
 
         my_shear_log?.setOnClickListener {
             LOGUtils.shareAppLogFile { file ->
-                FileJaUtils.shareFile(this, file, getString(R.string.app_name))
+                if (file != null) {
+                    FileJaUtils.shareFile(this, file, getString(R.string.app_name))
+                }
             }
         }
 
