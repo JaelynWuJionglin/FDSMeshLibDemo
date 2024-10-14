@@ -1,6 +1,7 @@
 package com.linkiing.fdsmeshlibdemo.adapter
 
 import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,18 +20,18 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<DeviceLisBean>()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 
-    fun addDevices(advertisingDevice: AdvertisingDevice, type: String) {
+    fun addDevices(advertisingDevice: AdvertisingDevice, deviceName: String, type: String, firmwareVersion: Int) {
         if (haveDevice(advertisingDevice)) {
             return
         }
-        devList.add(DeviceLisBean(advertisingDevice, type))
+        devList.add(DeviceLisBean(advertisingDevice, deviceName, type, firmwareVersion))
         notifyItemChanged(devList.size - 1)
     }
 
     fun addDevicesTest(mutableList: MutableList<AdvertisingDevice>) {
         for (advertisingDevice in mutableList) {
             if (!haveDevice(advertisingDevice)) {
-                devList.add(DeviceLisBean(advertisingDevice, "0000"))
+                devList.add(DeviceLisBean(advertisingDevice, "","0000",0))
             }
         }
         notifyDataSetChanged()
@@ -115,10 +116,10 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
     @SuppressLint("SetTextI18n", "MissingPermission")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
-        val devName = if (PermissionUtils.checkPermissionBle()) {
-            deviceBean.advertisingDevice.device?.name ?: "null"
-        } else {
+        val devName = if (TextUtils.isEmpty(deviceBean.deviceName)) {
             "null"
+        } else {
+            deviceBean.deviceName
         }
 
         if (MMKVSp.instance.isTestModel()) {
@@ -126,9 +127,9 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
             holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
                     " - rssi:${deviceBean.advertisingDevice.rssi}"
         } else {
-            holder.tv_name.text = "${devName}_${deviceBean.deviceType}"
+            holder.tv_name.text = "${devName}_${deviceBean.type}"
             holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
-                    " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord).toString(16)}" +
+                    " - ver:${deviceBean.firmwareVersion.toString(16)}" +
                     " - rssi:${deviceBean.advertisingDevice.rssi}"
         }
 

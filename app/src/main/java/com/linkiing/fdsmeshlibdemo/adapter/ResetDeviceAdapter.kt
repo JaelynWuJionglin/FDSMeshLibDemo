@@ -1,6 +1,7 @@
 package com.linkiing.fdsmeshlibdemo.adapter
 
 import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,11 +19,11 @@ class ResetDeviceAdapter : RecyclerView.Adapter<ResetDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<DeviceLisBean>()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 
-    fun addDevices(advertisingDevice: AdvertisingDevice, type: String) {
+    fun addDevices(advertisingDevice: AdvertisingDevice, deviceName: String, type: String, firmwareVersion: Int) {
         if (haveDevice(advertisingDevice)) {
             return
         }
-        devList.add(DeviceLisBean(advertisingDevice, type))
+        devList.add(DeviceLisBean(advertisingDevice, deviceName, type, firmwareVersion))
         notifyItemChanged(devList.size - 1)
     }
 
@@ -98,15 +99,15 @@ class ResetDeviceAdapter : RecyclerView.Adapter<ResetDeviceAdapter.MyHolder>() {
     @SuppressLint("SetTextI18n", "MissingPermission")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val deviceBean = devList[position]
-        val devName = if (PermissionUtils.checkPermissionBle()) {
-            deviceBean.advertisingDevice.device?.name ?: "null"
-        } else {
+        val devName = if (TextUtils.isEmpty(deviceBean.deviceName)) {
             "null"
+        } else {
+            deviceBean.deviceName
         }
 
-        holder.tv_name.text = "name:$devName"
+        holder.tv_name.text = "${devName}_${deviceBean.type}"
         holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
-                " - ver:${DevicesUtils.getFirmwareVersion(deviceBean.advertisingDevice.scanRecord).toString(16)}" +
+                " - ver:${deviceBean.firmwareVersion.toString(16)}" +
                 " - rssi:${deviceBean.advertisingDevice.rssi}"
 
         if (deviceBean.isChecked) {

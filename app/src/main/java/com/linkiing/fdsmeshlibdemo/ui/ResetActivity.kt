@@ -95,10 +95,14 @@ class ResetActivity : BaseActivity() {
             60 * 1000,
             object : FDSBleDevCallBack {
                 @SuppressLint("SetTextI18n")
-                override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
-                    val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 0x48) {
-                        resetDeviceAdapter.addDevices(advertisingDevice, type)
+                override fun onDeviceSearch(
+                    advertisingDevice: AdvertisingDevice,
+                    deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
+                    type: String,
+                    firmwareVersion: Int
+                ) {
+                    if (firmwareVersion >= 0x48) {
+                        resetDeviceAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_number)}:${resetDeviceAdapter.itemCount}"
                     }

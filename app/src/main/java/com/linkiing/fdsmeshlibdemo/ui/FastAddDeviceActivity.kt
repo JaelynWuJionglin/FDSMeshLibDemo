@@ -98,15 +98,20 @@ class FastAddDeviceActivity : BaseActivity() {
             "GD_LED"
         }
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
+
             @SuppressLint("SetTextI18n")
-            override fun onDeviceSearch(advertisingDevice: AdvertisingDevice, type: String) {
+            override fun onDeviceSearch(
+                advertisingDevice: AdvertisingDevice,
+                deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
+                type: String,
+                firmwareVersion: Int
+            ) {
                 val isFilterDev = true//isFilterDev(advertisingDevice)
                 //LOGUtils.e("FDSSearchDevicesApi ${advertisingDevice.device.address} type:$type  fv:$fv  isFilterDev:$isFilterDev")
                 if (isFilterDev /*&& deviceMacNumber(advertisingDevice) >= 0x7e86*/) {
                     //固件版本 >= 0x55
-                    val fv = DevicesUtils.getFirmwareVersion(advertisingDevice.scanRecord)
-                    if (fv >= 0x55) {
-                        addDevicesAdapter.addDevices(advertisingDevice, type)
+                    if (firmwareVersion >= 0x55) {
+                        addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
                         tv_dev_network_equipment?.text =
                             "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
                     }
@@ -274,7 +279,7 @@ class FastAddDeviceActivity : BaseActivity() {
         val mac = advertisingDevice.device.address.replace(":", "")
         val macBytes = ByteUtils.hexStringToBytes(mac)
         if (macBytes.size == 6) {
-            val num = ByteUtils.byteArrayToInt(byteArrayOf(macBytes[4],macBytes[5]))
+            val num = ByteUtils.byteArrayToInt(byteArrayOf(macBytes[4], macBytes[5]))
             LOGUtils.e("TAGGG ====> num:${num.toString(16)}  $num")
             return num
         }

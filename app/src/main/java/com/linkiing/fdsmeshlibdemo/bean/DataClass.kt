@@ -8,7 +8,9 @@ import com.telink.ble.mesh.entity.AdvertisingDevice
  */
 data class DeviceLisBean(
     var advertisingDevice: AdvertisingDevice,
-    var deviceType: String
+    var deviceName: String,
+    var type: String,
+    var firmwareVersion: Int
 ) {
     var isChecked = false
 }
