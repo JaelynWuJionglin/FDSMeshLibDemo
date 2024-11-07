@@ -26,49 +26,103 @@
             android:id="@+id/reset_dev_network"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/text_reset_dev_network"
             app:menu_image_end="@drawable/arrow_right"
-            app:menu_text_end=""/>
+            app:menu_text="@string/text_reset_dev_network"
+            app:menu_text_end="" />
 
-        <com.linkiing.fdsmeshlibdemo.view.MenuItem
-            android:id="@+id/menu_fast_provision"
+        <LinearLayout
+            android:id="@+id/menu_provision_model"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/text_fast_provision"
-            app:menu_switch="true"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/text_provision_model"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/radio_group_pv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="6dp">
+
+                <RadioButton
+                    android:id="@+id/rd_def"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"
+                    android:text="@string/text_pv_model_def"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rd_fast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"
+                    android:text="@string/text_pv_model_fast"
+                    android:checked="false"/>
+
+                <RadioButton
+                    android:id="@+id/rd_ver_auto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/grey1"
+                    android:text="@string/text_pv_model_auto"
+                    android:checked="false"
+                    android:visibility="gone"/>
+            </RadioGroup>
+
+            <View
+                android:id="@+id/bt_line"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_line"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentBottom="true"/>
+        </LinearLayout>
 
         <com.linkiing.fdsmeshlibdemo.view.MenuItem
             android:id="@+id/my_shear_json"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/shear_json"
             app:menu_image_end="@drawable/arrow_right"
-            app:menu_text_end=""/>
+            app:menu_text="@string/shear_json"
+            app:menu_text_end="" />
 
         <com.linkiing.fdsmeshlibdemo.view.MenuItem
             android:id="@+id/my_shear_log"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/shear_log"
             app:menu_image_end="@drawable/arrow_right"
-            app:menu_text_end=""/>
+            app:menu_text="@string/shear_log"
+            app:menu_text_end="" />
 
         <com.linkiing.fdsmeshlibdemo.view.MenuItem
             android:id="@+id/mesh_lib_ver"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/mesh_lib_ver"
             app:menu_image_end="@drawable/arrow_right"
-            app:menu_text_end="v1.0.0"/>
+            app:menu_text="@string/mesh_lib_ver"
+            app:menu_text_end="v1.0.0" />
 
         <com.linkiing.fdsmeshlibdemo.view.MenuItem
             android:id="@+id/my_about"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu_text="@string/my_about"
+            app:menu_bt_line="false"
             app:menu_image_end="@drawable/arrow_right"
-            app:menu_text_end="v1.0.0"
-            app:menu_bt_line="false"/>
+            app:menu_text="@string/my_about"
+            app:menu_text_end="v1.0.0" />
 
     </LinearLayout>
 

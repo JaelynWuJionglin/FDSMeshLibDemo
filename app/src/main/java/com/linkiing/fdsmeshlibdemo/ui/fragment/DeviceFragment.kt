@@ -7,8 +7,6 @@ import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
-import com.godox.agm.callback.FirmwareCallBack
-import com.godox.agm.callback.OpenPaCallback
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
@@ -16,15 +14,15 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.linkiing.fdsmeshlibdemo.ui.AddDeviceActivity
-import com.linkiing.fdsmeshlibdemo.ui.FastAddDeviceActivity
+import com.linkiing.fdsmeshlibdemo.ui.provision.AddDeviceActivity
+import com.linkiing.fdsmeshlibdemo.ui.provision.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
 import com.linkiing.fdsmeshlibdemo.ui.OtaActivity
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
+import com.linkiing.fdsmeshlibdemo.ui.provision.VerAutoAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import kotlinx.android.synthetic.main.device_fragment.dev_switch
 import kotlinx.android.synthetic.main.device_fragment.recyclerView_devices
@@ -128,10 +126,22 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         tv_add_dev.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt("index", index)
-            if (!MMKVSp.instance.isTestModel() && MMKVSp.instance.isFastProvision()) {
-                goActivityBundle(FastAddDeviceActivity::class.java, false, bundle)
-            } else {
+            if (MMKVSp.instance.isTestModel()) {
                 goActivityBundle(AddDeviceActivity::class.java, false, bundle)
+            } else {
+                when (MMKVSp.instance.getProvisionModel()) {
+                    MMKVSp.PROVISION_MODEL_FAST -> {
+                        goActivityBundle(FastAddDeviceActivity::class.java, false, bundle)
+                    }
+
+                    MMKVSp.PROVISION_MODEL_AUTO -> {
+                        goActivityBundle(VerAutoAddDeviceActivity::class.java, false, bundle)
+                    }
+
+                    else -> {
+                        goActivityBundle(AddDeviceActivity::class.java, false, bundle)
+                    }
+                }
             }
         }
 
@@ -141,7 +151,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                  * 重命名节点
                  * type == "", 则不修改类型
                  */
-                FDSMeshApi.instance.renameFDSNodeInfo(fdsNodeInfo!!, it, "")
+                FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(fdsNodeInfo!!), it, "")
                 studioDeviceAdapter?.update()
                 tv_dev_list_msg?.text =
                     "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"

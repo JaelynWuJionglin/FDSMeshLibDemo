@@ -88,11 +88,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.StudioActivity" />
         <activity
-            android:name=".ui.AddDeviceActivity"
+            android:name=".ui.provision.AddDeviceActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.FastAddDeviceActivity"
+            android:name=".ui.provision.FastAddDeviceActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity

@@ -1,7 +1,9 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsetsController
 import androidx.fragment.app.FragmentActivity
 import com.base.mesh.api.listener.MeshLoginListener
 import com.base.mesh.api.log.LOGUtils
@@ -32,6 +34,19 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         initListener()
 
         MeshLogin.instance.addLoginListener(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // 设置状态栏文字颜色为暗色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window?.insetsController?.setSystemBarsAppearance(
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        }
     }
 
     override fun onResume() {

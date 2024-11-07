@@ -1,11 +1,26 @@
 package com.linkiing.fdsmeshlibdemo.ui.base
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 
 open class BaseActivity : AppCompatActivity() {
+    override fun onStart() {
+        super.onStart()
+
+        // 设置状态栏文字颜色为暗色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window?.insetsController?.setSystemBarsAppearance(
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        }
+    }
 
     protected fun goActivity(cls: Class<*>, isFinish: Boolean) {
         startActivity(Intent(this, cls))

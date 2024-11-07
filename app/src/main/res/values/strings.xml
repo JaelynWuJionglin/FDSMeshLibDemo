@@ -15,6 +15,9 @@
     <string name="text_reset_dev_network">重置设备配网</string>
     <string name="text_reset_dev_list">可重置设备列表</string>
     <string name="text_reset_start">开始重置</string>
-    <string name="text_fast_provision">使用FastProvision</string>
+    <string name="text_provision_model">配网模式</string>
     <string name="text_device_list">设备列表</string>
+    <string name="text_pv_model_def">Def默认配网模式</string>
+    <string name="text_pv_model_fast">Fast配网模式</string>
+    <string name="text_pv_model_auto">Auto版本自适应</string>
 </resources>

@@ -28,14 +28,28 @@ class SettingActivity : BaseActivity() {
         mesh_lib_ver?.setTextHint("V${FDSMeshApi.instance.getVersion()}")
         my_about?.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
 
-        menu_fast_provision?.switchCompatChecked(MMKVSp.instance.isFastProvision())
+        radio_group_pv?.check(
+            when (MMKVSp.instance.getProvisionModel()) {
+                MMKVSp.PROVISION_MODEL_FAST -> {
+                    R.id.rd_fast
+                }
+
+                MMKVSp.PROVISION_MODEL_AUTO -> {
+                    R.id.rd_ver_auto
+                }
+
+                else -> {
+                    R.id.rd_def
+                }
+            }
+        )
         switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
 
-        if(MMKVSp.instance.isTestModel()) {
-            menu_fast_provision?.visibility = View.GONE
+        if (MMKVSp.instance.isTestModel()) {
+            menu_provision_model?.visibility = View.GONE
             reset_dev_network?.visibility = View.GONE
         } else {
-            menu_fast_provision?.visibility = View.VISIBLE
+            menu_provision_model?.visibility = View.VISIBLE
             reset_dev_network?.visibility = View.VISIBLE
         }
 
@@ -47,8 +61,20 @@ class SettingActivity : BaseActivity() {
             goActivity(ResetActivity::class.java, false)
         }
 
-        menu_fast_provision?.setSwitchChangeListener { buttonView, isChecked ->
-            MMKVSp.instance.setFastProvision(isChecked)
+        radio_group_pv?.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rd_def -> {
+                    MMKVSp.instance.setProvisionModel(MMKVSp.PROVISION_MODEL_DEF)
+                }
+
+                R.id.rd_fast -> {
+                    MMKVSp.instance.setProvisionModel(MMKVSp.PROVISION_MODEL_FAST)
+                }
+
+                R.id.rd_ver_auto -> {
+                    MMKVSp.instance.setProvisionModel(MMKVSp.PROVISION_MODEL_AUTO)
+                }
+            }
         }
 
         my_shear_json?.setOnClickListener {
@@ -65,11 +91,11 @@ class SettingActivity : BaseActivity() {
 
         switch_test_model?.setOnCheckedChangeListener { _, isChecked ->
             MMKVSp.instance.setTestModel(isChecked)
-            if(isChecked) {
-                menu_fast_provision?.visibility = View.GONE
+            if (isChecked) {
+                menu_provision_model?.visibility = View.GONE
                 reset_dev_network?.visibility = View.GONE
             } else {
-                menu_fast_provision?.visibility = View.VISIBLE
+                menu_provision_model?.visibility = View.VISIBLE
                 reset_dev_network?.visibility = View.VISIBLE
             }
             if (isChecked) {

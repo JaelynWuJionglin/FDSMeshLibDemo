@@ -1,4 +1,4 @@
-package com.linkiing.fdsmeshlibdemo.ui
+package com.linkiing.fdsmeshlibdemo.ui.provision
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -180,7 +180,7 @@ class AddDeviceActivity : BaseActivity() {
             //节点设置默认名称
             if (!MMKVSp.instance.isTestModel()) {
                 for (fdsNode in fdsNodes) {
-                    FDSMeshApi.instance.renameFDSNodeInfo(fdsNode, "GD_LED_${fdsNode.type}", "")
+                    FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(fdsNode), "GD_LED_${fdsNode.type}", "")
                 }
             }
 

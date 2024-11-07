@@ -16,10 +16,14 @@ class MMKVSp {
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val KV_StudioList = "KV_StudioList"
     private val KV_IsTestModel = "KV_IsTestModel"
-    private val KV_IsFastProvision = "KV_IsFastProvision"
+    private val KV_ProvisionModel = "KV_ProvisionModel"
     private val KV_SaveFmPath = "KV_SaveFmPath"
 
     companion object {
+        const val PROVISION_MODEL_DEF = 0
+        const val PROVISION_MODEL_FAST = 1
+        const val PROVISION_MODEL_AUTO = 2
+
         val instance: MMKVSp by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             MMKVSp()
         }
@@ -55,12 +59,12 @@ class MMKVSp {
         return kv.decodeBool(KV_IsTestModel, false)
     }
 
-    fun setFastProvision(isFastProvision: Boolean) {
-        kv.encode(KV_IsFastProvision, isFastProvision)
+    fun setProvisionModel(provisionModel: Int) {
+        kv.encode(KV_ProvisionModel, provisionModel)
     }
 
-    fun isFastProvision(): Boolean {
-        return kv.decodeBool(KV_IsFastProvision, false)
+    fun getProvisionModel(): Int {
+        return kv.decodeInt(KV_ProvisionModel, 0)
     }
 
     fun setFmPath(path: String) {
