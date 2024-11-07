@@ -244,12 +244,13 @@ fun getGroupByDeviceAddressFirst(meshAddress: Int): FDSGroupInfo?
 
 /**
  * 重命名节点名称和类型
- * @param fdsNodeInfo 节点
- * @param name 节点名称
- * @param symbol 节点类型
+ * @param renameList 要修改的设备信息列表
+ *        renameBean.meshAddress 节点地址
+ *        renameBean.name 节点名称
+ *        renameBean.type 节点类型
  * @return true表示重命名成功，false表示重命名失败
  */
-fun renameFDSNodeInfo(fdsNodeInfo: FDSNodeInfo, name: String, symbol: String): Boolean
+fun renameFDSNodeInfo(renameList: MutableList<RenameBean>): Boolean
 
 /**
  * 创建组

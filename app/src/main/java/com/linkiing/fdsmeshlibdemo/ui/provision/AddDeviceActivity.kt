@@ -11,6 +11,7 @@ import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
+import com.godox.sdk.api.bean.RenameBean
 import com.godox.sdk.callbacks.FDSAddNetWorkCallBack
 import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.godox.sdk.model.FDSNodeInfo
@@ -179,9 +180,11 @@ class AddDeviceActivity : BaseActivity() {
 
             //节点设置默认名称
             if (!MMKVSp.instance.isTestModel()) {
+                val renameList = mutableListOf<RenameBean>()
                 for (fdsNode in fdsNodes) {
-                    FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(fdsNode), "GD_LED_${fdsNode.type}", "")
+                    renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
                 }
+                FDSMeshApi.instance.renameFDSNodeInfo(renameList)
             }
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)

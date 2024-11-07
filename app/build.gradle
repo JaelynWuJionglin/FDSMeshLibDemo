@@ -29,7 +29,7 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -69,19 +69,19 @@ dependencies {
 
     //SDK需要#######################################################################################
     //引入aar包
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
-
-    //加密（SDK需要）
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+//    implementation fileTree(dir: 'libs', include: ['*.aar'])
+//
+//    //加密（SDK需要）
+//    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+//    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
 
     //gson（SDK需要）
     implementation "com.google.code.gson:gson:${project.gson_version}"
     //END###########################################################################################
 
-//    implementation project(path: ':GodoxAgmLib')
-//    implementation project(path: ':GodoxMeshLib')
-//    implementation project(path: ':LsTiBleMeshLib')
+    implementation project(path: ':GodoxAgmLib')
+    implementation project(path: ':GodoxMeshLib')
+    implementation project(path: ':LsTiBleMeshLib')
 
     //权限
     implementation 'com.github.getActivity:XXPermissions:13.2'

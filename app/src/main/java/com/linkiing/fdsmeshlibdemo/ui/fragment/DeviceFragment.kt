@@ -9,6 +9,7 @@ import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
+import com.godox.sdk.api.bean.RenameBean
 import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
@@ -151,7 +152,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                  * 重命名节点
                  * type == "", 则不修改类型
                  */
-                FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(fdsNodeInfo!!), it, "")
+                FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(RenameBean(fdsNodeInfo!!.meshAddress, it)))
                 studioDeviceAdapter?.update()
                 tv_dev_list_msg?.text =
                     "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
