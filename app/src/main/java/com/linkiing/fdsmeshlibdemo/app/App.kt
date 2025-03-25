@@ -28,9 +28,6 @@ class App : MeshApp() {
         //输出和保存SDK日志
         LOGUtils.init(this, true, true)
 
-        //appId认证
-        FDSMeshApi.instance.setWithAppId(appId)
-
         //BleUtils 初始化
         BleUtils.instance.init(this)
 
@@ -42,10 +39,10 @@ class App : MeshApp() {
         }
 
         /**
-         * 初始化mesh数据
-         *（会获取Android_ID等设备信息，生成唯一ID，故首次启动app，需要在用户同意隐私政策后调用）
+         * 初始化mesh数据 和 AppId认证
+         *（会获取Android_ID等设备信息，生成ID，故首次启动app，需要在用户同意隐私政策后调用）
          */
-        initMeshData()
+        initMesh(appId)
     }
 
     fun setMeshConfigure() {
@@ -76,12 +73,11 @@ class App : MeshApp() {
          */
         meshConfigure.nodePublishSupport = true
 
-
-        FDSMeshApi.instance.setMeshConfigure(meshConfigure)
+        meshConfigure.configureSet()
     }
 
     fun defMeshConfigure() {
-        FDSMeshApi.instance.setMeshConfigure(MeshConfigure())
+        MeshConfigure().configureSet()
         FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.NONE)
     }
 }

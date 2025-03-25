@@ -1,14 +1,12 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.WindowInsetsController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.utils.HttpUtils
 import com.godox.sdk.api.FDSMeshApi
-import com.godox.sdk.tool.HttpUtils
 import com.google.gson.Gson
 import com.hjq.permissions.OnPermissionCallback
 import com.linkiing.fdsmeshlibdemo.R
