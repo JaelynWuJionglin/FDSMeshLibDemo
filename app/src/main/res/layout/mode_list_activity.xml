@@ -19,7 +19,8 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_margin"
-            android:paddingRight="@dimen/activity_margin">
+            android:paddingRight="@dimen/activity_margin"
+            android:paddingBottom="35dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -86,19 +87,58 @@
                     android:layout_below="@+id/recyclerView_v3"/>
             </RelativeLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="测试次数:"/>
+
+                <EditText
+                    android:id="@+id/et_number"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:textColor="@color/black1"
+                    android:text="0"
+                    android:gravity="center"
+                    android:inputType="number"/>
+
+                <View
+                    android:layout_width="30dp"
+                    android:layout_height="1px"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="间隔时间:"/>
+
+                <EditText
+                    android:id="@+id/et_inv_time"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:textColor="@color/black1"
+                    android:hint="0"
+                    android:gravity="center"
+                    android:inputType="number"/>
+
+            </LinearLayout>
+
             <Button
                 android:id="@+id/bt_test1"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:text="OnOff连续测试"
-                android:textSize="14sp"
-                android:textColor="@color/black"/>
-
-            <Button
-                android:id="@+id/bt_test2"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="TEST"
                 android:textSize="14sp"
                 android:textColor="@color/black"/>
 

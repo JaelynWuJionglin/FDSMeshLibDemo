@@ -76,7 +76,7 @@ class GroupActivity : BaseActivity() {
             addDevInGroupActivityLauncher?.launch(
                 Intent(
                     this,
-                    AddDeviceInGroupActivity::class.java
+                    SelectNetWorkDeviceActivity::class.java
                 )
             )
         }

@@ -47,6 +47,13 @@ data class ModelInfo(
  */
 data class FDSNodeBean(var fdsNodeInfo: FDSNodeInfo){
     var isChecked = false
+    var upgradeResults = UPGRADE_OTA_IDLE
+
+    companion object {
+        const val UPGRADE_OTA_IDLE = 0
+        const val UPGRADE_OTA_SUS = 1
+        const val UPGRADE_OTA_FAIL = 2
+    }
 }
 
 /**

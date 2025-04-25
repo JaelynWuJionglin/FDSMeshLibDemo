@@ -12,7 +12,7 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 
-class AddDeviceInGroupAdapter : RecyclerView.Adapter<AddDeviceInGroupAdapter.MyHolder>() {
+class SelectNetWorkDeviceAdapter : RecyclerView.Adapter<SelectNetWorkDeviceAdapter.MyHolder>() {
     private var devList = getFDSNodeList()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 

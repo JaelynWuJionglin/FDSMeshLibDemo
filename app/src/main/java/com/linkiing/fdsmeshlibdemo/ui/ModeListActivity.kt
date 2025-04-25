@@ -10,6 +10,7 @@ import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.BatteryPowerCallBack
 import com.godox.agm.callback.FirmwareCallBack
 import com.godox.agm.callback.MCUCallBack
+import com.godox.sdk.MeshApp
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
@@ -19,13 +20,8 @@ import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.mode_list_activity.bt_test1
-import kotlinx.android.synthetic.main.mode_list_activity.bt_test2
-import kotlinx.android.synthetic.main.mode_list_activity.mode_titleBar
-import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v2
-import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
-import kotlinx.android.synthetic.main.mode_list_activity.seekbarBrightness_v2
-import kotlinx.android.synthetic.main.mode_list_activity.seekbarBrightness_v3
+import com.telink.ble.mesh.foundation.MeshService
+import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**
  * 功能列表页
@@ -41,6 +37,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     private lateinit var loadingDialog: LoadingDialog
     private val fdsCommandApi = GodoxCommandApi.instance
     private val sendQueueUtils = SendQueueUtils.instance
+    private var sendIntervalTime = 0L
+    private var testNumber = 20
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +54,9 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     private fun initView() {
         loadingDialog = LoadingDialog(this)
         mode_titleBar.initTitleBar(typeName, 0)
+
+        et_number?.setText("$testNumber")
+        et_inv_time?.setText("$sendIntervalTime")
     }
 
     private fun initData() {
@@ -203,11 +204,11 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         }
     }
 
-    private fun initSeekBar() {/*
+    private fun initSeekBar() {
+        /*
          * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
          */
-        sendQueueUtils.setSamplingTime(200)//数据采样间隔
-            .start {
+        sendQueueUtils.start {
                 if (it is SeekBarBean) {
                     when (it.model) {
                         0 -> {
@@ -247,7 +248,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
+                sendQueueUtils.setSamplingTime(sendIntervalTime)//数据采样间隔
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
@@ -263,7 +264,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
+                sendQueueUtils.setSamplingTime(sendIntervalTime)//数据采样间隔
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
@@ -278,10 +279,6 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         bt_test1?.setOnClickListener {
             testOnOff()
         }
-
-        bt_test2.setOnClickListener {
-
-        }
     }
 
     private fun testOnOff() {
@@ -290,9 +287,13 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         }
         isTestOnOffStart = true
 
+        testNumber = et_number?.text?.toString()?.toInt() ?: 1
+        sendIntervalTime = et_inv_time?.text?.toString()?.toLong() ?: SendQueueUtils.SEND_INTERVAL_TIME
+        sendQueueUtils.setSamplingTime(sendIntervalTime)//数据采样间隔
+
         Thread {
             var c = 0
-            while (c < 200) {
+            while (c < testNumber) {
                 if (sendQueueUtils.addDataSampling(SeekBarBean(3, c))) {
                     c++
                 }

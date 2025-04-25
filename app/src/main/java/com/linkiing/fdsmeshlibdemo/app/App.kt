@@ -73,6 +73,13 @@ class App : MeshApp() {
          */
         meshConfigure.nodePublishSupport = true
 
+        /*
+         * Mesh发包间隔
+         * 不安全的设置，低于默认值可能会导致丢包。需配合设备调试安全的值
+         * (小于0或大于240无效）
+         */
+        meshConfigure.netPktSendInterval = 100
+
         meshConfigure.configureSet()
     }
 

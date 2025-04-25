@@ -104,7 +104,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.AddDeviceInGroupActivity"
+            android:name=".ui.SelectNetWorkDeviceActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
@@ -117,6 +117,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.OtaActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.MeshOtaActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.SelectDeviceActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
     </application>

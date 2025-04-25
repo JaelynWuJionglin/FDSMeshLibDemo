@@ -26,14 +26,15 @@
 
     <TextView
         android:id="@+id/tv_end"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:gravity="center"
         android:text=""
         android:textColor="@color/black"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        android:layout_marginEnd="10dp"/>
 
     <LinearLayout
         android:id="@+id/lr_end_image"

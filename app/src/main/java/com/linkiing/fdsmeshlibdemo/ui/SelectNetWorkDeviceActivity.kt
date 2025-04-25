@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceInGroupAdapter
+import com.linkiing.fdsmeshlibdemo.adapter.SelectNetWorkDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_add_device_in_group.iv_check
 import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
@@ -14,8 +14,8 @@ import java.io.Serializable
 /**
  * 添加设备到组
  */
-class AddDeviceInGroupActivity : BaseActivity() {
-    private var addDeviceInGroupAdapter: AddDeviceInGroupAdapter? = null
+class SelectNetWorkDeviceActivity : BaseActivity() {
+    private var selectNetWorkDeviceAdapter: SelectNetWorkDeviceAdapter? = null
     private var isAllCheck = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,20 +31,20 @@ class AddDeviceInGroupActivity : BaseActivity() {
         titleBar?.initTitleBar("选择设备","确定")
         titleBar?.setOnEndTextListener{
             val intent = Intent()
-            intent.putExtra("checkDeviceList",addDeviceInGroupAdapter?.getCheckDevices() as Serializable)
+            intent.putExtra("checkDeviceList",selectNetWorkDeviceAdapter?.getCheckDevices() as Serializable)
             setResult(RESULT_OK, intent)
             finish()
         }
     }
 
     private fun initRecyclerView() {
-        addDeviceInGroupAdapter = AddDeviceInGroupAdapter()
+        selectNetWorkDeviceAdapter = SelectNetWorkDeviceAdapter()
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_devices?.layoutManager = manager
-        this.addDeviceInGroupAdapter.also { recyclerView_devices?.adapter = it }
+        this.selectNetWorkDeviceAdapter.also { recyclerView_devices?.adapter = it }
 
-        addDeviceInGroupAdapter?.setIsAllCheckListener {
+        selectNetWorkDeviceAdapter?.setIsAllCheckListener {
             setCheck(it)
         }
     }
@@ -53,7 +53,7 @@ class AddDeviceInGroupActivity : BaseActivity() {
         iv_check.setOnClickListener {
             val isCheck = !isAllCheck
             setCheck(isCheck)
-            addDeviceInGroupAdapter?.allCheck(isCheck)
+            selectNetWorkDeviceAdapter?.allCheck(isCheck)
         }
     }
 

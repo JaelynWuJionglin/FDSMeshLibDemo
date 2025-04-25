@@ -7,13 +7,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_ble_upgrade
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_cancel
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete_all
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_delete_force
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_mcu_upgrade
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.tv_rename
+import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.*
 
 class StuDevBottomMenuDialog(context: Context) :
     BaseFullDialog(context, R.layout.stu_dev_bottom_dialog_layout),
@@ -23,10 +17,11 @@ class StuDevBottomMenuDialog(context: Context) :
     companion object {
         const val MENU_DELETE = 0
         const val MENU_RENAME = 1
-        const val MENU_BLE_UPGRADE = 2
-        const val MENU_MCU_UPGRADE = 3
-        const val MENU_DELETE_ALL = 4
-        const val MENU_DELETE_FORCE = 5
+        const val MENU_MESH_OTA = 2
+        const val MENU_BLE_UPGRADE = 3
+        const val MENU_MCU_UPGRADE = 4
+        const val MENU_DELETE_ALL = 5
+        const val MENU_DELETE_FORCE = 6
     }
 
     init {
@@ -70,6 +65,7 @@ class StuDevBottomMenuDialog(context: Context) :
 
         tv_rename.setOnClickListener(this)
         tv_delete.setOnClickListener(this)
+        tv_mesh_ota.setOnClickListener(this)
         tv_ble_upgrade.setOnClickListener(this)
         tv_mcu_upgrade.setOnClickListener(this)
         tv_delete_all.setOnClickListener(this)
@@ -81,6 +77,10 @@ class StuDevBottomMenuDialog(context: Context) :
         when (v.id) {
             R.id.tv_rename -> {
                 listener(MENU_RENAME)
+            }
+
+            R.id.tv_mesh_ota -> {
+                listener(MENU_MESH_OTA)
             }
 
             R.id.tv_ble_upgrade -> {

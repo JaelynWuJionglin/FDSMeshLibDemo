@@ -15,6 +15,7 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
+import com.linkiing.fdsmeshlibdemo.ui.MeshOtaActivity
 import com.linkiing.fdsmeshlibdemo.ui.provision.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.provision.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
@@ -168,6 +169,10 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                         renameTextDialog.setDefText(fdsNodeInfo!!.name)
                         renameTextDialog.showDialog()
                     }
+                }
+
+                StuDevBottomMenuDialog.MENU_MESH_OTA -> {
+                    goActivity(MeshOtaActivity::class.java, false)
                 }
 
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
