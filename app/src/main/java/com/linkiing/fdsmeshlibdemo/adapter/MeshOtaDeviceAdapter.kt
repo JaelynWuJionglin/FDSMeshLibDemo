@@ -53,7 +53,6 @@ class MeshOtaDeviceAdapter : RecyclerView.Adapter<MeshOtaDeviceAdapter.MyHolder>
                     FDSNodeBean.UPGRADE_OTA_FAIL
                 }
                 notifyItemChanged(index)
-                return
             }
         }
     }

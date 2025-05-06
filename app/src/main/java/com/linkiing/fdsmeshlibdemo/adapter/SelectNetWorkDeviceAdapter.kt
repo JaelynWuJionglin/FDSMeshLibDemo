@@ -74,18 +74,30 @@ class SelectNetWorkDeviceAdapter : RecyclerView.Adapter<SelectNetWorkDeviceAdapt
         holder.tv_name.text = device.fdsNodeInfo.name
         holder.tv_mac.text = device.fdsNodeInfo.macAddress
 
-        if (device.isChecked) {
-            holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
+        if (FDSMeshApi.instance.isMeshOtaSupport(device.fdsNodeInfo.meshAddress)) {
+
+            holder.iv_check.visibility = View.VISIBLE
+            holder.tv_up_result.visibility = View.GONE
+
+            if (device.isChecked) {
+                holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)
+            } else {
+                holder.iv_check.setBackgroundResource(R.drawable.checked_image_off)
+            }
+
+            holder.itemView.setOnClickListener {
+                val isCheck = device.isChecked
+                device.isChecked = !isCheck
+                notifyItemChanged(position)
+
+                isAllCheckListener(isAllCheck())
+            }
+
         } else {
-            holder.iv_check.setBackgroundResource(R.drawable.checked_image_off)
-        }
+            holder.iv_check.visibility = View.GONE
+            holder.tv_up_result.visibility = View.VISIBLE
 
-        holder.itemView.setOnClickListener {
-            val isCheck = device.isChecked
-            device.isChecked = !isCheck
-            notifyItemChanged(position)
-
-            isAllCheckListener(isAllCheck())
+            holder.tv_up_result.text = "不支持"
         }
     }
 
@@ -97,5 +109,6 @@ class SelectNetWorkDeviceAdapter : RecyclerView.Adapter<SelectNetWorkDeviceAdapt
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
         val tv_mac = itemView.findViewById<TextView>(R.id.tv_mac)
         val iv_check = itemView.findViewById<ImageView>(R.id.iv_check)
+        val tv_up_result = itemView.findViewById<TextView>(R.id.tv_up_result)
     }
 }
