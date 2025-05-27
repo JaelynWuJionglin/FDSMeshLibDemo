@@ -44,6 +44,7 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     private var path = ""
     private var firmwareData = byteArrayOf()
     private var meshOtaDeviceAdapter: MeshOtaDeviceAdapter? = null
+    private var isPa = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +65,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
 
     private fun initView() {
         titleBar?.initTitleBar("MeshOta", "选择设备")
+
+        isPa = intent.getIntExtra("isPA",0)
 
         path = MMKVSp.instance.getFmPath()
         tv_fm?.text = "固件:$path"
@@ -121,7 +124,9 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         }
 
         titleBar?.setOnEndTextListener {
-            selectResultLauncher?.launch(Intent(this, SelectNetWorkDeviceActivity::class.java))
+            val intent = Intent(this, SelectNetWorkDeviceActivity::class.java)
+            intent.putExtra("isPA",isPa)
+            selectResultLauncher?.launch(intent)
         }
     }
 

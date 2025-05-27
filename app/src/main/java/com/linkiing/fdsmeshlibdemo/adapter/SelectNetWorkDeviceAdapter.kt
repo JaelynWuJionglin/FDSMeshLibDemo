@@ -12,7 +12,7 @@ import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 
-class SelectNetWorkDeviceAdapter : RecyclerView.Adapter<SelectNetWorkDeviceAdapter.MyHolder>() {
+class SelectNetWorkDeviceAdapter(private val isPA: Int) : RecyclerView.Adapter<SelectNetWorkDeviceAdapter.MyHolder>() {
     private var devList = getFDSNodeList()
     private var isAllCheckListener: (Boolean) -> Unit = {}
 
@@ -48,7 +48,13 @@ class SelectNetWorkDeviceAdapter : RecyclerView.Adapter<SelectNetWorkDeviceAdapt
         for (node in nodes) {
             val nodeBean = FDSNodeBean(node)
             nodeBean.isChecked = false
-            list.add(nodeBean)
+            if (isPA == -1) {
+                list.add(nodeBean)
+            } else {
+                if (node.isPA == isPA) {
+                    list.add(nodeBean)
+                }
+            }
         }
         return list
     }

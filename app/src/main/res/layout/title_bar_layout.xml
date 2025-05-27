@@ -32,8 +32,8 @@
         android:layout_centerVertical="true"
         android:gravity="center"
         android:text=""
-        android:textColor="@color/black"
-        android:textSize="12sp"
+        android:textColor="@color/blue"
+        android:textSize="14sp"
         android:layout_marginEnd="10dp"/>
 
     <LinearLayout

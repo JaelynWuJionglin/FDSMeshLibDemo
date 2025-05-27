@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
@@ -46,12 +47,17 @@ class MeshOtaDeviceAdapter : RecyclerView.Adapter<MeshOtaDeviceAdapter.MyHolder>
 
     fun updateItemOtherSusOrFail(isSus: Boolean) {
         for ((index, fdsNodeBean) in devList.withIndex()) {
-            if (fdsNodeBean.upgradeResults == FDSNodeBean.UPGRADE_OTA_IDLE) {
+            if (fdsNodeBean.upgradeResults != FDSNodeBean.UPGRADE_OTA_SUS
+                && fdsNodeBean.upgradeResults != FDSNodeBean.UPGRADE_OTA_FAIL
+            ) {
+
                 fdsNodeBean.upgradeResults = if (isSus) {
                     FDSNodeBean.UPGRADE_OTA_SUS
                 } else {
                     FDSNodeBean.UPGRADE_OTA_FAIL
                 }
+
+                LOGUtils.d("updateItemOtherSusOrFail ==> macAddress:${fdsNodeBean.fdsNodeInfo.macAddress} upgradeResults:${fdsNodeBean.upgradeResults}")
                 notifyItemChanged(index)
             }
         }

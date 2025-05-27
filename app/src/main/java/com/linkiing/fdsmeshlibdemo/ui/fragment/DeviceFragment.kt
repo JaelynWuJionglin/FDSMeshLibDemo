@@ -171,10 +171,6 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                     }
                 }
 
-                StuDevBottomMenuDialog.MENU_MESH_OTA -> {
-                    goActivity(MeshOtaActivity::class.java, false)
-                }
-
                 StuDevBottomMenuDialog.MENU_BLE_UPGRADE -> {
                     if (fdsNodeInfo != null) {
                         val bundle = Bundle()

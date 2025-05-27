@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -14,12 +15,15 @@ import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
+import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
+import com.linkiing.fdsmeshlibdemo.view.dialog.StuPaBottomMenuDialog
 import com.telink.ble.mesh.core.networking.ExtendBearerMode
 import kotlinx.android.synthetic.main.activity_studio.tab_devices
 import kotlinx.android.synthetic.main.activity_studio.tab_group
 import kotlinx.android.synthetic.main.activity_studio.titleBar
 
 class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {
+    private lateinit var stuPaBottomMenuDialog: StuPaBottomMenuDialog
     private val deviceFragment = DeviceFragment()
     private val groupFragment = GroupFragment()
     private var nowFragment: BaseFragment? = null
@@ -86,11 +90,14 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun initView() {
+        titleBar?.initTitleBar("","MeshOta")
         index = intent.getIntExtra("index", 0)
         LOGUtils.d("StudioActivity =============> index:$index")
         if (index == 0) {
             finish()
         }
+
+        stuPaBottomMenuDialog = StuPaBottomMenuDialog(this)
 
         deviceFragment.setIndex(index)
 
@@ -100,6 +107,26 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     private fun initListener() {
         tab_devices.setOnClickListener(this)
         tab_group.setOnClickListener(this)
+
+        titleBar?.setOnEndTextListener{
+            stuPaBottomMenuDialog.showDialog()
+        }
+
+        stuPaBottomMenuDialog.setOnDialogListener {
+            when(it) {
+                StuPaBottomMenuDialog.MENU_NOT_PA -> {
+                    val intent = Intent(this, MeshOtaActivity::class.java)
+                    intent.putExtra("isPA",0)
+                    startActivity(intent)
+                }
+
+                StuPaBottomMenuDialog.MENU_PA -> {
+                    val intent = Intent(this, MeshOtaActivity::class.java)
+                    intent.putExtra("isPA",1)
+                    startActivity(intent)
+                }
+            }
+        }
     }
 
     private fun setTab(id: Int) {

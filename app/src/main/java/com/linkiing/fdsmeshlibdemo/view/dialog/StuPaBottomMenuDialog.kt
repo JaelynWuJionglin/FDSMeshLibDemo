@@ -7,20 +7,15 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.*
+import kotlinx.android.synthetic.main.stu_pa_bottom_dialog_layout.*
 
-class StuDevBottomMenuDialog(context: Context) :
-    BaseFullDialog(context, R.layout.stu_dev_bottom_dialog_layout),
+class StuPaBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout.stu_pa_bottom_dialog_layout),
     View.OnClickListener {
     private var listener: (Int) -> Unit = {}
 
     companion object {
-        const val MENU_DELETE = 0
-        const val MENU_RENAME = 1
-        const val MENU_BLE_UPGRADE = 2
-        const val MENU_MCU_UPGRADE = 3
-        const val MENU_DELETE_ALL = 4
-        const val MENU_DELETE_FORCE = 5
+        const val MENU_PA = 0
+        const val MENU_NOT_PA = 1
     }
 
     init {
@@ -62,39 +57,21 @@ class StuDevBottomMenuDialog(context: Context) :
         setCancelable(true)
         setCanceledOnTouchOutside(true)
 
-        tv_rename.setOnClickListener(this)
-        tv_delete.setOnClickListener(this)
-        tv_ble_upgrade.setOnClickListener(this)
-        tv_mcu_upgrade.setOnClickListener(this)
-        tv_delete_all.setOnClickListener(this)
+        tv_pa.setOnClickListener(this)
+        tv_not_pa.setOnClickListener(this)
         tv_cancel.setOnClickListener(this)
-        tv_delete_force.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.tv_rename -> {
-                listener(MENU_RENAME)
+            R.id.tv_pa -> {
+                listener(MENU_PA)
             }
-
-            R.id.tv_ble_upgrade -> {
-                listener(MENU_BLE_UPGRADE)
+            R.id.tv_not_pa -> {
+                listener(MENU_NOT_PA)
             }
+            R.id.tv_cancel -> {
 
-            R.id.tv_mcu_upgrade -> {
-                listener(MENU_MCU_UPGRADE)
-            }
-
-            R.id.tv_delete -> {
-                listener(MENU_DELETE)
-            }
-
-            R.id.tv_delete_force -> {
-                listener(MENU_DELETE_FORCE)
-            }
-
-            R.id.tv_delete_all -> {
-                listener(MENU_DELETE_ALL)
             }
         }
         dismissDialog()
