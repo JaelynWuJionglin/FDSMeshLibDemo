@@ -97,6 +97,13 @@ class MainActivity : BaseActivity() {
                     //权限申请成功
                     if (!it.choose && !TextUtils.isEmpty(it.meshJsonStr)) {
                         //需要切换Mesh网络
+
+                        //先保存之前的mesh
+                        val oldIndex = studioAdapter.getChooseIndex()
+                        if (oldIndex >= 0) {
+                            ConstantUtils.saveJson(oldIndex)
+                        }
+
                         LOGUtils.e("切换网络 =============> ${it.name}")
                         FDSMeshApi.instance.importMeshJson(it.meshJsonStr)
                     }

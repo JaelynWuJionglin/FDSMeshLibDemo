@@ -27,7 +27,9 @@ class GroupActivity : BaseActivity() {
     private var addDevInGroupActivityLauncher: ActivityResultLauncher<Intent>? = null
     private var isAllCheck = false
     private var checkDeviceList = mutableListOf<FDSNodeInfo>()
+    private var subIndex = 0
     private var index = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +50,12 @@ class GroupActivity : BaseActivity() {
         if (fdsGroupInfo == null) {
             finish()
             return
+        }
+
+        index = intent.getIntExtra("index", 0)
+        LOGUtils.d("StudioActivity =============> index:$index")
+        if (index == 0) {
+            finish()
         }
 
         loadingDialog = LoadingDialog(this)
@@ -112,7 +120,7 @@ class GroupActivity : BaseActivity() {
         if (fdsGroupInfo != null && checkDeviceList.isNotEmpty()) {
             loadingDialog.showDialog()
             this.checkDeviceList = checkDeviceList
-            this.index = 0
+            this.subIndex = 0
 
             nextSubscribe(isSubscribe)
         } else {
@@ -130,13 +138,16 @@ class GroupActivity : BaseActivity() {
      * 设备订阅组
      */
     private fun nextSubscribe(isSubscribe: Boolean) {
-        if (index >= checkDeviceList.size) {
+        if (subIndex >= checkDeviceList.size) {
             loadingDialog.dismissDialog()
             setCheck(false)
 
             runOnUiThread {
                 groupAdapter?.update()
             }
+
+            //保存json修改
+            ConstantUtils.saveJson(index)
 
             //一次执行完成
             ConstantUtils.toast(
@@ -148,11 +159,11 @@ class GroupActivity : BaseActivity() {
                 }
             )
         } else {
-            val fdsNodeInfo = checkDeviceList[index]
+            val fdsNodeInfo = checkDeviceList[subIndex]
             if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE){
                 //离线设备不可进行订阅操作
                 LOGUtils.e("Error! nextSubscribe 设备离线 ==> MAC:${fdsNodeInfo.macAddress}")
-                index++
+                subIndex++
                 nextSubscribe(isSubscribe)
             } else {
                 /**
@@ -161,7 +172,7 @@ class GroupActivity : BaseActivity() {
                  */
                 FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
                     LOGUtils.d("nextSubscribe 订阅结果 ==>Mac:${fdsNodeInfo.macAddress} GroupAddress${fdsGroupInfo?.address}  it:$it")
-                    index++
+                    subIndex++
                     nextSubscribe(isSubscribe)
                 }
             }

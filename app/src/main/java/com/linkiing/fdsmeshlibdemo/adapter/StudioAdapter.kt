@@ -16,7 +16,7 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
     private var studioList = mutableListOf<StudioListBean>()
     private var onItemClickListener: (StudioListBean) -> Unit = {}
 
-    fun updateData(){
+    fun updateData() {
         studioList = MMKVSp.instance.getStudioList()
 
         val iterator = studioList.iterator()
@@ -58,14 +58,23 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
                     index = bean.index
                 }
             }
-            index+1
+            index + 1
         }
+    }
+
+    fun getChooseIndex(): Int {
+        for (studio in studioList) {
+            if (studio.choose) {
+                return studio.index
+            }
+        }
+        return -1
     }
 
     /**
      * 选择改变
      */
-    fun changeChoose(bean: StudioListBean){
+    fun changeChoose(bean: StudioListBean) {
         for (studio in studioList) {
             studio.choose = studio.name == bean.name
         }
@@ -99,7 +108,7 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             bean.name
         }
 
-        if (position == 0){
+        if (position == 0) {
             holder.tv_delete.visibility = View.GONE
         } else {
             holder.tv_delete.visibility = View.VISIBLE

@@ -17,6 +17,8 @@ import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 class MeshOtaDeviceAdapter : RecyclerView.Adapter<MeshOtaDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<FDSNodeBean>()
 
+    var itemListener: (meshAddress: Int) -> Unit = {}
+
     fun updateItem(list: MutableList<FDSNodeInfo>) {
         if (list.isEmpty()) {
             return
@@ -35,32 +37,37 @@ class MeshOtaDeviceAdapter : RecyclerView.Adapter<MeshOtaDeviceAdapter.MyHolder>
         notifyDataSetChanged()
     }
 
-    fun updateItem(meshAddress: Int, upgradeResults: Int) {
+    fun updateItemFDSNodeInfo(fdsNodeInfo: FDSNodeInfo) {
         for ((index, fdsNodeBean) in devList.withIndex()) {
-            if (fdsNodeBean.fdsNodeInfo.meshAddress == meshAddress) {
-                fdsNodeBean.upgradeResults = upgradeResults
+            if (fdsNodeBean.fdsNodeInfo.meshAddress == fdsNodeInfo.meshAddress) {
+                fdsNodeBean.fdsNodeInfo = fdsNodeInfo
                 notifyItemChanged(index)
-                return
             }
         }
     }
 
-    fun updateItemOtherSusOrFail(isSus: Boolean) {
-        for ((index, fdsNodeBean) in devList.withIndex()) {
-            if (fdsNodeBean.upgradeResults != FDSNodeBean.UPGRADE_OTA_SUS
-                && fdsNodeBean.upgradeResults != FDSNodeBean.UPGRADE_OTA_FAIL
-            ) {
+    //更新item状态， 不刷新，在onComplete后一起刷新。
+    fun updateItemStatus(meshAddress: Int, upgradeResults: Int) {
+        for (fdsNodeBean in devList) {
+            if (fdsNodeBean.fdsNodeInfo.meshAddress == meshAddress) {
+                fdsNodeBean.upgradeResults = upgradeResults
+                break
+            }
+        }
+    }
 
+    fun updateAllItemSusOrFail(isSus: Boolean) {
+        for (fdsNodeBean in devList) {
+            LOGUtils.d("updateAllItemSusOrFail ==> macAddress:${fdsNodeBean.fdsNodeInfo.macAddress} upgradeResults:${fdsNodeBean.upgradeResults} isSus:$isSus")
+            if (fdsNodeBean.upgradeResults == FDSNodeBean.UPGRADE_OTA_IDLE) {
                 fdsNodeBean.upgradeResults = if (isSus) {
                     FDSNodeBean.UPGRADE_OTA_SUS
                 } else {
                     FDSNodeBean.UPGRADE_OTA_FAIL
                 }
-
-                LOGUtils.d("updateItemOtherSusOrFail ==> macAddress:${fdsNodeBean.fdsNodeInfo.macAddress} upgradeResults:${fdsNodeBean.upgradeResults}")
-                notifyItemChanged(index)
             }
         }
+        notifyDataSetChanged()
     }
 
     fun getItemList(): MutableList<FDSNodeInfo> {
@@ -153,6 +160,10 @@ class MeshOtaDeviceAdapter : RecyclerView.Adapter<MeshOtaDeviceAdapter.MyHolder>
                     )
                 )
             }
+        }
+
+        holder.itemView.setOnClickListener {
+            itemListener(deviceBean.fdsNodeInfo.meshAddress)
         }
     }
 

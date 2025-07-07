@@ -74,7 +74,7 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         setEndImage(false)
     }
 
-    fun initTitleBar(isBack:Boolean, @DrawableRes endImageViewId: Int) {
+    fun initTitleBar(isBack: Boolean, @DrawableRes endImageViewId: Int) {
         if (isBack) {
             back.visibility = View.VISIBLE
         } else {
@@ -82,7 +82,7 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
         }
         endText.text = ""
         setEndImage(endImageViewId != 0)
-        if(endImageViewId != 0) {
+        if (endImageViewId != 0) {
             ivEndImage.setBackgroundResource(endImageViewId)
         }
     }
@@ -97,6 +97,10 @@ class TitleBar(context: Context, attrs: AttributeSet) : RelativeLayout(context, 
 
     fun setTitle(@StringRes titleTextId: Int) {
         titleText.setText(titleTextId)
+    }
+
+    fun getBackView(): ImageView {
+        return back
     }
 
     private fun setEndImage(isEndImage: Boolean) {

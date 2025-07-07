@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,15 +10,16 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.MeshNetworkOtaListener
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
+import com.godox.agm.GodoxCommandApi
+import com.godox.agm.callback.FirmwareCallBack
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.MeshOtaDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
@@ -26,8 +28,7 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileSelectorUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
-import com.telink.ble.mesh.core.MeshUtils
+import com.telink.ble.mesh.foundation.MeshService
 import com.telink.ble.mesh.util.Arrays
 import kotlinx.android.synthetic.main.activity_mesh_ota.*
 import kotlinx.android.synthetic.main.activity_select_devices.recyclerView_devices
@@ -35,11 +36,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
-import java.nio.ByteOrder
 import kotlin.math.floor
 
 class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
-    MeshNetworkOtaListener {
+    MeshNetworkOtaListener, FirmwareCallBack {
+    private lateinit var loadingDialog: LoadingDialog
+    private var exitWarningAlert: AlertDialog.Builder? = null
     private var selectResultLauncher: ActivityResultLauncher<Intent>? = null
     private var path = ""
     private var firmwareData = byteArrayOf()
@@ -66,7 +68,9 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     private fun initView() {
         titleBar?.initTitleBar("MeshOta", "选择设备")
 
-        isPa = intent.getIntExtra("isPA",0)
+        loadingDialog = LoadingDialog(this)
+
+        isPa = intent.getIntExtra("isPA", 0)
 
         path = MMKVSp.instance.getFmPath()
         tv_fm?.text = "固件:$path"
@@ -81,6 +85,13 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         manager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_devices.layoutManager = manager
         recyclerView_devices.adapter = meshOtaDeviceAdapter
+
+        meshOtaDeviceAdapter?.itemListener = {
+            if (bt_start.isEnabled) {
+                loadingDialog.showDialog(3000)
+                GodoxCommandApi.instance.getFirmwareVersion(it, this)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -105,13 +116,14 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
 
             //start
             progressBar.progress = 0
+            tv_progress.text = "0%"
             meshOtaDeviceAdapter?.updateItemDef()
             val list = meshOtaDeviceAdapter?.getItemList() ?: mutableListOf()
             val start = FDSMeshApi.instance.startMeshOTAWithOtaData(firmwareData, list, this)
             if (start) {
-                ConstantUtils.toast(this,"开始升级!")
+                ConstantUtils.toast(this, "开始升级!")
                 bt_start?.isEnabled = false
-                bt_start?.setBackgroundColor(ContextCompat.getColor(this,R.color.grey))
+                bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
             }
         }
 
@@ -125,8 +137,16 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
 
         titleBar?.setOnEndTextListener {
             val intent = Intent(this, SelectNetWorkDeviceActivity::class.java)
-            intent.putExtra("isPA",isPa)
+            intent.putExtra("isPA", isPa)
             selectResultLauncher?.launch(intent)
+        }
+
+        titleBar?.getBackView()?.setOnClickListener {
+            if (!bt_start.isEnabled) {
+                showWarningDialog()
+            } else {
+                finish()
+            }
         }
     }
 
@@ -176,6 +196,7 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onProgress(type: Int, progress: Int) {
         val pro = if (type == 0) {
             val rp = (progress / 100.0f) * 10
@@ -196,32 +217,79 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         }
         runOnUiThread {
             progressBar?.progress = pro
+            tv_progress.text = "$pro%"
         }
     }
 
-    override fun onDeviceFailed(meshAddress: Int) {
+    override fun onDeviceStatus(isSuccess: Boolean, meshAddress: Int) {
         runOnUiThread {
-            meshOtaDeviceAdapter?.updateItem(meshAddress, FDSNodeBean.UPGRADE_OTA_FAIL)
+            meshOtaDeviceAdapter?.updateItemStatus(
+                meshAddress,
+                if (isSuccess) {
+                    FDSNodeBean.UPGRADE_OTA_SUS
+                } else {
+                    FDSNodeBean.UPGRADE_OTA_FAIL
+                }
+            )
         }
     }
 
     override fun onComplete() {
         runOnUiThread {
-            meshOtaDeviceAdapter?.updateItemOtherSusOrFail(true)
+            meshOtaDeviceAdapter?.updateAllItemSusOrFail(true)
             ConstantUtils.toast(this, "升级完成!")
             bt_start?.isEnabled = true
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this,R.color.color_92e5e9))
+            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
         }
     }
 
     override fun onFailed(errorCode: Int) {
         runOnUiThread {
-            meshOtaDeviceAdapter?.updateItemOtherSusOrFail(false)
+            meshOtaDeviceAdapter?.updateAllItemSusOrFail(false)
             ConstantUtils.toast(this, "升级失败! errorCode:$errorCode")
             bt_start?.isEnabled = true
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this,R.color.color_92e5e9))
+            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
         }
         LOGUtils.e("MeshOtaActivity onFailed  errorCode:$errorCode")
+    }
+
+    override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
+        loadingDialog.dismissDialog()
+
+        //更新蓝牙固件版本
+        val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address) ?: return
+        FDSMeshApi.instance.updateFirmwareVersion(fdsNodeInfo, version)
+
+        val msg = "固件版本:$version"
+        LOGUtils.i("GATT_OTA ==> $msg")
+        ConstantUtils.toast(this, msg)
+
+        meshOtaDeviceAdapter?.updateItemFDSNodeInfo(fdsNodeInfo)
+    }
+
+    override fun onBackPressed() {
+       if (!bt_start.isEnabled) {
+           showWarningDialog()
+       } else {
+           super.onBackPressed()
+       }
+    }
+
+    private fun showWarningDialog() {
+        if (exitWarningAlert == null) {
+            exitWarningAlert = AlertDialog.Builder(this)
+            exitWarningAlert?.setCancelable(true)
+            exitWarningAlert?.setTitle("警告")
+            exitWarningAlert?.setMessage("正在OTA中,退出会导致OTA失败!")
+            exitWarningAlert?.setNegativeButton("退出") { _, _ ->
+                FDSMeshApi.instance.stopMeshOTA()
+                finish()
+            }
+            exitWarningAlert?.setPositiveButton("取消") { dialog, _ ->
+                dialog.dismiss()
+            }
+        }
+        exitWarningAlert?.show()
     }
 
     override fun onDestroy() {

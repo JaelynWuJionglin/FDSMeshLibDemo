@@ -100,6 +100,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         stuPaBottomMenuDialog = StuPaBottomMenuDialog(this)
 
         deviceFragment.setIndex(index)
+        groupFragment.setIndex(index)
 
         setTab(0)
     }

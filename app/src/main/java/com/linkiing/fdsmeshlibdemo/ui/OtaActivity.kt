@@ -9,6 +9,7 @@ import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.FirmwareCallBack
 import com.godox.agm.callback.MCUCallBack
 import com.godox.agm.callback.OpenPaCallback
+import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
@@ -120,10 +121,8 @@ class OtaActivity : BaseActivity() {
         if (isMcuUpgrade) {
             GodoxCommandApi.instance.getMcuVersion(meshAddress, object : MCUCallBack {
                 @SuppressLint("SetTextI18n")
-                override fun onSuccess(
-                    fdsNodeInfo: FDSNodeInfo, productVersion: String, mcuVersion: String
-                ) {
-                    upFdsNodeInfo = fdsNodeInfo
+                override fun onSuccess(address: Int, productVersion: String, mcuVersion: String) {
+                    upFdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address)
 
                     tv_msg1?.text = "产品版本:$productVersion"
                     tv_msg2?.text = "MCU方案版本:$mcuVersion"
@@ -139,10 +138,9 @@ class OtaActivity : BaseActivity() {
         } else {
             GodoxCommandApi.instance.getFirmwareVersion(meshAddress, object : FirmwareCallBack {
                 @SuppressLint("SetTextI18n")
-                override fun onSuccess(
-                    fdsNodeInfo: FDSNodeInfo, version: Int, isPa: Boolean
-                ) {
-                    upFdsNodeInfo = fdsNodeInfo
+                override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
+                    upFdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address)
+
                     upIsPa = isPa
 
                     LOGUtils.v("OTA_VER ==> version:${version.toString(16)}")

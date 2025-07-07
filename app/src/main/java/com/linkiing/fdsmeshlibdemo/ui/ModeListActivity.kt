@@ -305,32 +305,30 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     /**
      * 电量回调
      *
-     * @param fdsNodeInfo 节点信息
+     * @param address 地址
      * @param state 1-未充电 2-充电中 其它-未知
      * @param hour 使用时间小时部分
      * @param minute 使用时间分钟部分
      * @param option 0-电量百分比，1-电量格子
      * @param power 如果option为0则范围0-100，如果option为1则范围0-3
      */
-    override fun onSuccess(
-        fdsNodeInfo: FDSNodeInfo, state: Int, hour: Int, minute: Int, option: Int, power: Int
-    ) {
+    override fun onSuccess(address: Int, state: Int, hour: Int, minute: Int, option: Int, power: Int) {
         loadingDialog.dismissDialog()
-        val msg =
-            "设备地址：${fdsNodeInfo.macAddress} 充电状态：${state} 使用时间小时部分：${hour} 使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
+        val msg = "设备地址：$address 充电状态：${state} 使用时间小时部分：${hour} 使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
         LOGUtils.d(msg)
         ConstantUtils.toast(this, msg)
     }
 
     /**
      * 蓝牙固件版本回调
-     * @param fdsNodeInfo 节点信息
+     * @param address 地址
      * @param version 固件版本
      */
-    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, version: Int, isPa: Boolean) {
+    override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
         loadingDialog.dismissDialog()
 
         //更新蓝牙固件版本
+        val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address) ?: return
         FDSMeshApi.instance.updateFirmwareVersion(fdsNodeInfo, version)
 
         val msg = "固件版本:$version"
@@ -340,11 +338,11 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
 
     /**
      * MCU固件版本回调
-     * @param fdsNodeInfo 节点信息
+     * @param address 地址
      * @param productVersion 产品版本 （表示产品的版本信息）
      * @param mcuVersion MCU方案版本 （用于区分同一个型号产品使用的不同的MCU平台）
      */
-    override fun onSuccess(fdsNodeInfo: FDSNodeInfo, productVersion: String, mcuVersion: String) {
+    override fun onSuccess(address: Int, productVersion: String, mcuVersion: String) {
         loadingDialog.dismissDialog()
         val msg = "产品版本:$productVersion  MCU方案版本:$mcuVersion"
         LOGUtils.d(msg)

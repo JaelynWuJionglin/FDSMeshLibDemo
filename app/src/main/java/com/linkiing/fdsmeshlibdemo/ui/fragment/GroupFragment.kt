@@ -26,6 +26,7 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
     private lateinit var renameTextDialog: InputTextDialog
     private var studioGroupAdapter: StudioGroupAdapter? = null
     private var fdsGroupInfo: FDSGroupInfo? = null
+    private var index = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -119,10 +120,15 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
                     if (fdsGroupInfo != null) {
                         val bundle= Bundle()
                         bundle.putInt("address",fdsGroupInfo!!.address)
+                        bundle.putInt("index", index)
                         goActivityBundle(GroupActivity::class.java,false,bundle)
                     }
                 }
             }
         }
+    }
+
+    fun setIndex(index: Int) {
+        this.index = index
     }
 }
