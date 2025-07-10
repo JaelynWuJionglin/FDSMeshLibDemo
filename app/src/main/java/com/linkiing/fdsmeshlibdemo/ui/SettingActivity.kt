@@ -45,14 +45,6 @@ class SettingActivity : BaseActivity() {
         )
         switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
 
-        if (MMKVSp.instance.isTestModel()) {
-            menu_provision_model?.visibility = View.GONE
-            reset_dev_network?.visibility = View.GONE
-        } else {
-            menu_provision_model?.visibility = View.VISIBLE
-            reset_dev_network?.visibility = View.VISIBLE
-        }
-
         initListener()
     }
 
@@ -92,14 +84,7 @@ class SettingActivity : BaseActivity() {
         switch_test_model?.setOnCheckedChangeListener { _, isChecked ->
             MMKVSp.instance.setTestModel(isChecked)
             if (isChecked) {
-                menu_provision_model?.visibility = View.GONE
-                reset_dev_network?.visibility = View.GONE
-            } else {
-                menu_provision_model?.visibility = View.VISIBLE
-                reset_dev_network?.visibility = View.VISIBLE
-            }
-            if (isChecked) {
-                App.getInstance().defMeshConfigure()
+                App.getInstance().setTestMeshConfigure()
             } else {
                 App.getInstance().setMeshConfigure()
             }

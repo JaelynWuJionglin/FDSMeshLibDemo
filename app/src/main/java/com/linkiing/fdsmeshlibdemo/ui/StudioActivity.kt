@@ -179,6 +179,9 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun resetExtendBearerMode() {
+        if (MMKVSp.instance.isTestModel()) {
+            return
+        }
         val node = FDSMeshApi.instance.getConnectedFDSNodeInfo()
         if (node != null) {
             if (node.firmwareVersion >= 41) {

@@ -6,6 +6,7 @@ import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigPublishUtils : ConfigNodePublishStateListener {
@@ -36,7 +37,7 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         MeshLogin.instance.autoConnect(15 * 1000L) {
             if (it) {
                 for (fdsNode in fdsNodes) {
-                    if (fdsNode.firmwareVersion >= 0x49) {
+                    if (MMKVSp.instance.isTestModel() || fdsNode.firmwareVersion >= 0x49) {
                         FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNode)
                     } else {
                         publishNodeList.add(SetPublishNodeInfo(fdsNode))

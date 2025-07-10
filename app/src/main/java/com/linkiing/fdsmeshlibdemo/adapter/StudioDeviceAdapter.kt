@@ -105,20 +105,10 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
         }
 
         //在线状态
-        if (MMKVSp.instance.isTestModel()) {
-            //TestModel 连接上mesh，则全部上线
-            if (FDSMeshApi.instance.getConnectedFDSNodeInfo() == null) {
-                holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
-            } else {
-                holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
-            }
+        if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
+            holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
         } else {
-            //Godox
-            if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {
-                holder.iv_light.setBackgroundResource(R.drawable.device_image_off)
-            } else {
-                holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
-            }
+            holder.iv_light.setBackgroundResource(R.drawable.device_image_on)
         }
 
         //开关状态

@@ -107,7 +107,7 @@ class FastAddDeviceActivity : BaseActivity() {
                 firmwareVersion: Int
             ) {
                 //固件版本 >= 0x55
-                if (firmwareVersion >= 0x55) {
+                if (firmwareVersion >= 0x55 || MMKVSp.instance.isTestModel()) {
                     addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
                     tv_dev_network_equipment?.text =
                         "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"

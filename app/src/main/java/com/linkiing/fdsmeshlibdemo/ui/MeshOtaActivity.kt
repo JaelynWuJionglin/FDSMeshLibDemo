@@ -114,6 +114,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
                 return@setOnClickListener
             }
 
+            startBtEn(false)
+
             //start
             progressBar.progress = 0
             tv_progress.text = "0%"
@@ -122,8 +124,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
             val start = FDSMeshApi.instance.startMeshOTAWithOtaData(firmwareData, list, this)
             if (start) {
                 ConstantUtils.toast(this, "开始升级!")
-                bt_start?.isEnabled = false
-                bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
+            } else {
+                startBtEn(true)
             }
         }
 
@@ -147,6 +149,15 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
             } else {
                 finish()
             }
+        }
+    }
+
+    private fun startBtEn(isEn: Boolean) {
+        bt_start?.isEnabled = isEn
+        if (isEn) {
+            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+        } else {
+            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
         }
     }
 
@@ -235,22 +246,21 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     }
 
     override fun onComplete() {
+        LOGUtils.e("MeshOtaActivity onComplete")
         runOnUiThread {
             meshOtaDeviceAdapter?.updateAllItemSusOrFail(true)
             ConstantUtils.toast(this, "升级完成!")
-            bt_start?.isEnabled = true
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            startBtEn(true)
         }
     }
 
     override fun onFailed(errorCode: Int) {
+        LOGUtils.e("MeshOtaActivity onFailed  errorCode:$errorCode")
         runOnUiThread {
             meshOtaDeviceAdapter?.updateAllItemSusOrFail(false)
             ConstantUtils.toast(this, "升级失败! errorCode:$errorCode")
-            bt_start?.isEnabled = true
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            startBtEn(true)
         }
-        LOGUtils.e("MeshOtaActivity onFailed  errorCode:$errorCode")
     }
 
     override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
@@ -292,8 +302,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         exitWarningAlert?.show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun finish() {
+        super.finish()
         FDSMeshApi.instance.stopMeshOTA()
     }
 }

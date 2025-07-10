@@ -128,21 +128,17 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         tv_add_dev.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt("index", index)
-            if (MMKVSp.instance.isTestModel()) {
-                goActivityBundle(AddDeviceActivity::class.java, false, bundle)
-            } else {
-                when (MMKVSp.instance.getProvisionModel()) {
-                    MMKVSp.PROVISION_MODEL_FAST -> {
-                        goActivityBundle(FastAddDeviceActivity::class.java, false, bundle)
-                    }
+            when (MMKVSp.instance.getProvisionModel()) {
+                MMKVSp.PROVISION_MODEL_FAST -> {
+                    goActivityBundle(FastAddDeviceActivity::class.java, false, bundle)
+                }
 
-                    MMKVSp.PROVISION_MODEL_AUTO -> {
-                        goActivityBundle(VerAutoAddDeviceActivity::class.java, false, bundle)
-                    }
+                MMKVSp.PROVISION_MODEL_AUTO -> {
+                    goActivityBundle(VerAutoAddDeviceActivity::class.java, false, bundle)
+                }
 
-                    else -> {
-                        goActivityBundle(AddDeviceActivity::class.java, false, bundle)
-                    }
+                else -> {
+                    goActivityBundle(AddDeviceActivity::class.java, false, bundle)
                 }
             }
         }

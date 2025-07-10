@@ -34,7 +34,9 @@ class App : MeshApp() {
         /*
         * 配置mesh参数
         */
-        if (!MMKVSp.instance.isTestModel()) {
+        if (MMKVSp.instance.isTestModel()) {
+            setTestMeshConfigure()
+        } else {
             setMeshConfigure()
         }
 
@@ -83,8 +85,18 @@ class App : MeshApp() {
         meshConfigure.configureSet()
     }
 
-    fun defMeshConfigure() {
-        MeshConfigure().configureSet()
-        FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.NONE)
+    fun setTestMeshConfigure() {
+        val meshConfigure = MeshConfigure()
+
+        /*
+        * 是否支持节点主动上报在线状态
+        * (方案私有协议，具体看固件是否支持)
+        */
+        meshConfigure.nodePublishSupport = true
+
+        meshConfigure.configureSet()
+
+        //全部长包
+        FDSMeshApi.instance.resetExtendBearerMode(ExtendBearerMode.GATT_ADV)
     }
 }
