@@ -2,10 +2,11 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -28,7 +29,6 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileSelectorUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.telink.ble.mesh.foundation.MeshService
 import com.telink.ble.mesh.util.Arrays
 import kotlinx.android.synthetic.main.activity_mesh_ota.*
 import kotlinx.android.synthetic.main.activity_select_devices.recyclerView_devices
@@ -55,6 +55,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         initView()
         initRecyclerView()
         initListener()
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -154,10 +156,15 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
 
     private fun startBtEn(isEn: Boolean) {
         bt_start?.isEnabled = isEn
+        bt_fm?.isEnabled = isEn
         if (isEn) {
             bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            bt_fm?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            loading?.visibility = View.GONE
         } else {
             bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
+            bt_fm?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
+            loading?.visibility = View.VISIBLE
         }
     }
 
