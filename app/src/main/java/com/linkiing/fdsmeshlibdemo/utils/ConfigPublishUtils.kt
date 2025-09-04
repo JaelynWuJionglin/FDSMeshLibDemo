@@ -37,7 +37,7 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         MeshLogin.instance.autoConnect(15 * 1000L) {
             if (it) {
                 for (fdsNode in fdsNodes) {
-                    if (MMKVSp.instance.isTestModel() || fdsNode.firmwareVersion >= 0x49) {
+                    if (fdsNode.firmwareVersion >= 0x49) {
                         FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNode)
                     } else {
                         publishNodeList.add(SetPublishNodeInfo(fdsNode))

@@ -122,17 +122,10 @@ class AddDeviceAdapter : RecyclerView.Adapter<AddDeviceAdapter.MyHolder>() {
             deviceBean.deviceName
         }
 
-        if (MMKVSp.instance.isTestModel()) {
-            holder.tv_name.text = "name:$devName"
-            holder.tv_mac.text = "mac:${deviceBean.advertisingDevice.device.address}" +
-                    " - rssi:${deviceBean.advertisingDevice.rssi}"
-        } else {
-            holder.tv_name.text = "${devName}_${deviceBean.type}"
-            holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
-                    " - ver:${deviceBean.firmwareVersion.toString(16)}" +
-                    " - rssi:${deviceBean.advertisingDevice.rssi}"
-        }
-
+        holder.tv_name.text = "${devName}_${deviceBean.type}"
+        holder.tv_mac.text = deviceBean.advertisingDevice.device.address +
+                " - ver:${deviceBean.firmwareVersion.toString(16)}" +
+                " - rssi:${deviceBean.advertisingDevice.rssi}"
 
         if (deviceBean.isChecked) {
             holder.iv_check.setBackgroundResource(R.drawable.checked_image_on)

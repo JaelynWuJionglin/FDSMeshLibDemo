@@ -80,11 +80,7 @@ class ResetActivity : BaseActivity() {
 
         progressBar.visibility = View.VISIBLE
 
-        val filterName = if (MMKVSp.instance.isTestModel()) {
-            ""
-        } else {
-            "GD_LED"
-        }
+        val filterName = "GD_LED"
 
         /**
          * 搜索已入网的设备

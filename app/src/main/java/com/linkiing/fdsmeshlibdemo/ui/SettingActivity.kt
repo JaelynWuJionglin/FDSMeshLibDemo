@@ -43,7 +43,6 @@ class SettingActivity : BaseActivity() {
                 }
             }
         )
-        switch_test_model?.isChecked = MMKVSp.instance.isTestModel()
 
         initListener()
     }
@@ -78,15 +77,6 @@ class SettingActivity : BaseActivity() {
                 if (file != null) {
                     FileJaUtils.shareFile(this, file, getString(R.string.app_name))
                 }
-            }
-        }
-
-        switch_test_model?.setOnCheckedChangeListener { _, isChecked ->
-            MMKVSp.instance.setTestModel(isChecked)
-            if (isChecked) {
-                App.getInstance().setTestMeshConfigure()
-            } else {
-                App.getInstance().setMeshConfigure()
             }
         }
     }

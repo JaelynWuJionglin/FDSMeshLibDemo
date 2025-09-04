@@ -95,11 +95,7 @@ class VerAutoAddDeviceActivity : BaseActivity() {
 
         progressBar?.visibility = View.VISIBLE
 
-        val filterName = if (MMKVSp.instance.isTestModel()) {
-            ""
-        } else {
-            "GD_LED"
-        }
+        val filterName = "GD_LED"
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
 
             @SuppressLint("SetTextI18n")
@@ -183,16 +179,14 @@ class VerAutoAddDeviceActivity : BaseActivity() {
                 }
 
                 //节点设置默认名称
-                if (!MMKVSp.instance.isTestModel()) {
-                    Thread {
-                        val renameList = mutableListOf<RenameBean>()
-                        for (fdsNode in resultList) {
-                            renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
-                        }
-                        FDSMeshApi.instance.renameFDSNodeInfo(renameList)
+                Thread {
+                    val renameList = mutableListOf<RenameBean>()
+                    for (fdsNode in resultList) {
+                        renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
+                    }
+                    FDSMeshApi.instance.renameFDSNodeInfo(renameList)
 
-                    }.start()
-                }
+                }.start()
 
                 addDevicesAdapter.removeItemAtInNetWork(resultList)
 

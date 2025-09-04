@@ -72,10 +72,6 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             //Mesh网络断开，重新连接
             MeshLogin.instance.autoConnect()
         }
-
-        if(MMKVSp.instance.isTestModel()) {
-            deviceFragment.updateList()
-        }
     }
 
     override fun onMeshConnected() {
@@ -83,10 +79,6 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         //Mesh连接成功
 
         resetExtendBearerMode()
-
-        if(MMKVSp.instance.isTestModel()) {
-            deviceFragment.updateList()
-        }
     }
 
     private fun initView() {
@@ -179,9 +171,6 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun resetExtendBearerMode() {
-        if (MMKVSp.instance.isTestModel()) {
-            return
-        }
         val node = FDSMeshApi.instance.getConnectedFDSNodeInfo()
         if (node != null) {
             if (node.firmwareVersion >= 41) {

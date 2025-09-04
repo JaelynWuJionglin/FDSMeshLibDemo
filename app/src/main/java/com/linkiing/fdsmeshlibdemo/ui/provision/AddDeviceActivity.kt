@@ -100,11 +100,7 @@ class AddDeviceActivity : BaseActivity() {
 
         progressBar?.visibility = View.VISIBLE
 
-        val filterName = if (MMKVSp.instance.isTestModel()) {
-            ""
-        } else {
-            "GD_LED"
-        }
+        val filterName = "GD_LED"
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
             @SuppressLint("SetTextI18n")
             override fun onDeviceSearch(
@@ -179,13 +175,11 @@ class AddDeviceActivity : BaseActivity() {
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             //节点设置默认名称
-            if (!MMKVSp.instance.isTestModel()) {
-                val renameList = mutableListOf<RenameBean>()
-                for (fdsNode in fdsNodes) {
-                    renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
-                }
-                FDSMeshApi.instance.renameFDSNodeInfo(renameList)
+            val renameList = mutableListOf<RenameBean>()
+            for (fdsNode in fdsNodes) {
+                renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
             }
+            FDSMeshApi.instance.renameFDSNodeInfo(renameList)
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
@@ -217,24 +211,21 @@ class AddDeviceActivity : BaseActivity() {
             addDeviceSusSize++
             loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-            if (!MMKVSp.instance.isTestModel()) {
+            /**
+             * 配置节点主动上报在线状态
+             */
+            if (fdsNodeInfo.firmwareVersion >= 0x49) {
+                FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfo)
+                LOGUtils.i("setFDSNodePublishModel() =====> true")
+            } else {
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(
+                    true,
+                    fdsNodeInfo,
+                    configNodePublishStateListener
+                )
+                publishFdsNodeInfoList.add(fdsNodeInfo)
 
-                /**
-                 * 配置节点主动上报在线状态
-                 */
-                if (fdsNodeInfo.firmwareVersion >= 0x49) {
-                    FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfo)
-                    LOGUtils.i("setFDSNodePublishModel() =====> true")
-                } else {
-                    val isOk = FDSMeshApi.instance.configFDSNodePublishState(
-                        true,
-                        fdsNodeInfo,
-                        configNodePublishStateListener
-                    )
-                    publishFdsNodeInfoList.add(fdsNodeInfo)
-
-                    LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
-                }
+                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
             }
         }
 

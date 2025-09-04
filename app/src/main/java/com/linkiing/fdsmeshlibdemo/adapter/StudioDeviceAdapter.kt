@@ -92,17 +92,12 @@ class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>()
             }
         }"
 
-        if (MMKVSp.instance.isTestModel()) {
-            holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress}"
-        } else {
-            holder.tv_mac.text =
-                "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${
-                    fdsNodeInfo.firmwareVersion.toString(
-                        16
-                    )
-                }"
-        }
+        holder.tv_mac.text =
+            "mac:${fdsNodeInfo.macAddress} - ddr:${fdsNodeInfo.meshAddress} - v:${
+                fdsNodeInfo.firmwareVersion.toString(
+                    16
+                )
+            }"
 
         //在线状态
         if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE) {

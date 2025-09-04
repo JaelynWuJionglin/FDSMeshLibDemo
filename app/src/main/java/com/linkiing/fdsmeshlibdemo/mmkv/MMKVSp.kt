@@ -15,7 +15,7 @@ class MMKVSp {
     private lateinit var kv: MMKV
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val KV_StudioList = "KV_StudioList"
-    private val KV_IsTestModel = "KV_IsTestModel"
+    private val KV_AppKeyEn = "KV_AppKeyEn"
     private val KV_ProvisionModel = "KV_ProvisionModel"
     private val KV_SaveFmPath = "KV_SaveFmPath"
 
@@ -51,12 +51,12 @@ class MMKVSp {
         }
     }
 
-    fun setTestModel(isTestModel: Boolean) {
-        kv.encode(KV_IsTestModel, isTestModel)
+    fun setAppKeyEn(isTestModel: Boolean) {
+        kv.encode(KV_AppKeyEn, isTestModel)
     }
 
-    fun isTestModel(): Boolean {
-        return kv.decodeBool(KV_IsTestModel, false)
+    fun isAppKeyEn(): Boolean {
+        return kv.decodeBool(KV_AppKeyEn, false)
     }
 
     fun setProvisionModel(provisionModel: Int) {

@@ -124,18 +124,4 @@
             app:menu_text_end="v1.0.0" />
 
     </LinearLayout>
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switch_test_model"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textSize="14sp"
-        android:textColor="@color/grey"
-        android:text="TEST_MODEL(不要开启)"
-        android:checked="false"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/white_round_bg"
-        android:padding="10dp"/>
-
 </LinearLayout>
