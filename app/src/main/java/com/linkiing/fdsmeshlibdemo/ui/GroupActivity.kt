@@ -10,16 +10,12 @@ import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityGroupBinding
 import com.linkiing.fdsmeshlibdemo.adapter.GroupDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_add_device_in_group.recyclerView_devices
-import kotlinx.android.synthetic.main.activity_group.bt_add_device
-import kotlinx.android.synthetic.main.activity_group.bt_remove_device
-import kotlinx.android.synthetic.main.activity_group.iv_check
-
-class GroupActivity : BaseActivity() {
+class GroupActivity : BaseActivity<ActivityGroupBinding>() {
     private lateinit var loadingDialog: LoadingDialog
     private var fdsGroupInfo: FDSGroupInfo? = null
     private var groupAdapter: GroupDeviceAdapter? = null
@@ -30,10 +26,12 @@ class GroupActivity : BaseActivity() {
     private var subIndex = 0
     private var index = 0
 
+    override fun initBind(): ActivityGroupBinding {
+        return ActivityGroupBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_group)
 
         initView()
         initRecyclerView()
@@ -65,8 +63,8 @@ class GroupActivity : BaseActivity() {
         groupAdapter = GroupDeviceAdapter(groupAddress)
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices?.layoutManager = manager
-        this.groupAdapter.also { recyclerView_devices?.adapter = it }
+        binding.recyclerViewDevices.layoutManager = manager
+        this.groupAdapter.also { binding.recyclerViewDevices.adapter = it }
 
         groupAdapter?.setIsAllCheckListener {
             setCheck(it)
@@ -74,13 +72,13 @@ class GroupActivity : BaseActivity() {
     }
 
     private fun initListener() {
-        iv_check.setOnClickListener {
+        binding.ivCheck.setOnClickListener {
             val isCheck = !isAllCheck
             setCheck(isCheck)
             groupAdapter?.allCheck(isCheck)
         }
 
-        bt_add_device.setOnClickListener {
+        binding.btAddDevice.setOnClickListener {
             addDevInGroupActivityLauncher?.launch(
                 Intent(
                     this,
@@ -89,7 +87,7 @@ class GroupActivity : BaseActivity() {
             )
         }
 
-        bt_remove_device.setOnClickListener {
+        binding.btRemoveDevice.setOnClickListener {
             val checkDeviceList = groupAdapter?.getCheckDevices()
             if (checkDeviceList != null && checkDeviceList.isNotEmpty()) {
                 startSubscribe(checkDeviceList, false)
@@ -110,9 +108,9 @@ class GroupActivity : BaseActivity() {
     private fun setCheck(isCheck: Boolean) {
         isAllCheck = isCheck
         if (isAllCheck) {
-            iv_check.setBackgroundResource(R.drawable.checked_image_on)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_on)
         } else {
-            iv_check.setBackgroundResource(R.drawable.checked_image_off)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_off)
         }
     }
 

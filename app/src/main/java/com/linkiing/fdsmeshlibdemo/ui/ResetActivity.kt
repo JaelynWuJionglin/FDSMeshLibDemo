@@ -9,16 +9,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.godox.sdk.api.FDSResetDeviceApi
 import com.godox.sdk.api.FDSSearchDevicesApi
 import com.godox.sdk.callbacks.FDSBleDevCallBack
-import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityResetBinding
 import com.linkiing.fdsmeshlibdemo.adapter.ResetDeviceAdapter
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import kotlinx.android.synthetic.main.activity_reset.*
 
-class ResetActivity : BaseActivity() {
+class ResetActivity : BaseActivity<ActivityResetBinding>() {
     private val handler = Handler(Looper.myLooper()!!)
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var resetDeviceAdapter: ResetDeviceAdapter
@@ -27,9 +25,12 @@ class ResetActivity : BaseActivity() {
     private var isScanning = true
     private var resetSize = 0
 
+    override fun initBind(): ActivityResetBinding {
+        return ActivityResetBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reset)
 
         initView()
         initRecyclerView()
@@ -38,8 +39,8 @@ class ResetActivity : BaseActivity() {
     }
 
     private fun initView() {
-        titleBar?.initTitleBar(true, R.drawable.refresh)
-        titleBar?.setOnEndImageListener {
+        binding.titleBar.initTitleBar(true, R.drawable.refresh)
+        binding.titleBar.setOnEndImageListener {
             resetDeviceAdapter.clearList()
             if (isScanning) {
                 stopScan()
@@ -52,13 +53,13 @@ class ResetActivity : BaseActivity() {
     }
 
     private fun initListener() {
-        iv_check.setOnClickListener {
+        binding.ivCheck.setOnClickListener {
             val isCheck = !isAllCheck
             setCheck(isCheck)
             resetDeviceAdapter.allCheck(isCheck)
         }
 
-        bt_reset_device?.setOnClickListener {
+        binding.btResetDevice.setOnClickListener {
             resetDevice()
         }
     }
@@ -67,8 +68,8 @@ class ResetActivity : BaseActivity() {
         resetDeviceAdapter = ResetDeviceAdapter()
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices.layoutManager = manager
-        recyclerView_devices.adapter = resetDeviceAdapter
+        binding.recyclerViewDevices.layoutManager = manager
+        binding.recyclerViewDevices.adapter = resetDeviceAdapter
 
         resetDeviceAdapter.setIsAllCheckListener {
             setCheck(it)
@@ -78,7 +79,7 @@ class ResetActivity : BaseActivity() {
     private fun scanDevices() {
         isScanning = true
 
-        progressBar.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
 
         val filterName = "GD_LED"
 
@@ -99,14 +100,14 @@ class ResetActivity : BaseActivity() {
                 ) {
                     if (firmwareVersion >= 0x48) {
                         resetDeviceAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
-                        tv_dev_network_equipment?.text =
+                        binding.tvDevNetworkEquipment.text =
                             "${getString(R.string.text_dev_number)}:${resetDeviceAdapter.itemCount}"
                     }
                 }
 
                 override fun onScanTimeOut() {
                     isScanning = false
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
 
                 /*
@@ -114,7 +115,7 @@ class ResetActivity : BaseActivity() {
                  */
                 override fun onScanFail() {
                     isScanning = false
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
             })
     }
@@ -122,7 +123,7 @@ class ResetActivity : BaseActivity() {
     private fun stopScan() {
         searchDevices.stopScan()
         isScanning = false
-        progressBar.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun resetDevice() {
@@ -165,9 +166,9 @@ class ResetActivity : BaseActivity() {
     private fun setCheck(isCheck: Boolean) {
         isAllCheck = isCheck
         if (isAllCheck) {
-            iv_check.setBackgroundResource(R.drawable.checked_image_on)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_on)
         } else {
-            iv_check.setBackgroundResource(R.drawable.checked_image_off)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_off)
         }
     }
 

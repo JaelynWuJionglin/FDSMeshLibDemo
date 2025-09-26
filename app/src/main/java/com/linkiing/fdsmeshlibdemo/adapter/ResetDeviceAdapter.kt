@@ -9,11 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.godox.sdk.model.FDSNodeInfo
-import com.godox.sdk.tool.DevicesUtils
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.bean.DeviceLisBean
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import com.telink.ble.mesh.util.PermissionUtils
 
 class ResetDeviceAdapter : RecyclerView.Adapter<ResetDeviceAdapter.MyHolder>() {
     private val devList = mutableListOf<DeviceLisBean>()

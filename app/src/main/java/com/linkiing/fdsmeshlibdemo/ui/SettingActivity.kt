@@ -1,34 +1,35 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
-import android.view.View
 import com.base.mesh.api.log.FileJaUtils
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.app.App
+import com.linkiing.fdsmeshlibdemo.databinding.ActivitySettingBinding
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_setting.*
 import java.io.File
 
-class SettingActivity : BaseActivity() {
+class SettingActivity : BaseActivity<ActivitySettingBinding>() {
     private lateinit var loadingDialog: LoadingDialog
     private val jsonName = "JSON_NAME_SHEAR.json"
 
+    override fun initBind(): ActivitySettingBinding {
+        return ActivitySettingBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setting)
 
         loadingDialog = LoadingDialog(this)
 
-        mesh_lib_ver?.setTextHint("V${FDSMeshApi.instance.getVersion()}")
-        my_about?.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
+        binding.meshLibVer.setTextHint("V${FDSMeshApi.instance.getVersion()}")
+        binding.myAbout.setTextHint("V${ConstantUtils.getAppVerStr(this)}")
 
-        radio_group_pv?.check(
+        binding.radioGroupPv.check(
             when (MMKVSp.instance.getProvisionModel()) {
                 MMKVSp.PROVISION_MODEL_FAST -> {
                     R.id.rd_fast
@@ -48,11 +49,11 @@ class SettingActivity : BaseActivity() {
     }
 
     private fun initListener() {
-        reset_dev_network?.setOnClickListener {
+        binding.resetDevNetwork.setOnClickListener {
             goActivity(ResetActivity::class.java, false)
         }
 
-        radio_group_pv?.setOnCheckedChangeListener { _, checkedId ->
+        binding.radioGroupPv.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rd_def -> {
                     MMKVSp.instance.setProvisionModel(MMKVSp.PROVISION_MODEL_DEF)
@@ -68,11 +69,11 @@ class SettingActivity : BaseActivity() {
             }
         }
 
-        my_shear_json?.setOnClickListener {
+        binding.myShearJson.setOnClickListener {
             shareJson()
         }
 
-        my_shear_log?.setOnClickListener {
+        binding.myShearLog?.setOnClickListener {
             LOGUtils.shareAppLogFile { file ->
                 if (file != null) {
                     FileJaUtils.shareFile(this, file, getString(R.string.app_name))

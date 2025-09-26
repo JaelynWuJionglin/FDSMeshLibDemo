@@ -22,6 +22,7 @@ import com.godox.agm.callback.FirmwareCallBack
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityMeshOtaBinding
 import com.linkiing.fdsmeshlibdemo.adapter.MeshOtaDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.bean.FDSNodeBean
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
@@ -30,15 +31,13 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileSelectorUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.util.Arrays
-import kotlinx.android.synthetic.main.activity_mesh_ota.*
-import kotlinx.android.synthetic.main.activity_select_devices.recyclerView_devices
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import kotlin.math.floor
 
-class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
+class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCallback<ActivityResult>,
     MeshNetworkOtaListener, FirmwareCallBack {
     private lateinit var loadingDialog: LoadingDialog
     private var exitWarningAlert: AlertDialog.Builder? = null
@@ -48,9 +47,12 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     private var meshOtaDeviceAdapter: MeshOtaDeviceAdapter? = null
     private var isPa = 0
 
+    override fun initBind(): ActivityMeshOtaBinding {
+        return ActivityMeshOtaBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_mesh_ota)
 
         initView()
         initRecyclerView()
@@ -68,14 +70,14 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     }
 
     private fun initView() {
-        titleBar?.initTitleBar("MeshOta", "选择设备")
+        binding.titleBar.initTitleBar("MeshOta", "选择设备")
 
         loadingDialog = LoadingDialog(this)
 
         isPa = intent.getIntExtra("isPA", 0)
 
         path = MMKVSp.instance.getFmPath()
-        tv_fm?.text = "固件:$path"
+        binding.tvFm.text = "固件:$path"
 
         selectResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this)
@@ -85,11 +87,11 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
         meshOtaDeviceAdapter = MeshOtaDeviceAdapter()
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices.layoutManager = manager
-        recyclerView_devices.adapter = meshOtaDeviceAdapter
+        binding.recyclerViewDevices.layoutManager = manager
+        binding.recyclerViewDevices.adapter = meshOtaDeviceAdapter
 
         meshOtaDeviceAdapter?.itemListener = {
-            if (bt_start.isEnabled) {
+            if (binding.btStart.isEnabled) {
                 loadingDialog.showDialog(3000)
                 GodoxCommandApi.instance.getFirmwareVersion(it, this)
             }
@@ -98,7 +100,7 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
 
     @SuppressLint("SetTextI18n")
     private fun initListener() {
-        bt_start?.setOnClickListener {
+        binding.btStart.setOnClickListener {
             if (!MeshLogin.instance.isLogin()) {
                 ConstantUtils.toast(this, "Mesh未连接!")
                 return@setOnClickListener
@@ -119,8 +121,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
             startBtEn(false)
 
             //start
-            progressBar.progress = 0
-            tv_progress.text = "0%"
+            binding.progressBar.progress = 0
+            binding.tvProgress.text = "0%"
             meshOtaDeviceAdapter?.updateItemDef()
             val list = meshOtaDeviceAdapter?.getItemList() ?: mutableListOf()
             val start = FDSMeshApi.instance.startMeshOTAWithOtaData(firmwareData, list, this)
@@ -131,22 +133,22 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
             }
         }
 
-        bt_fm?.setOnClickListener {
+        binding.btFm.setOnClickListener {
             FileSelectorUtils.instance.goSelectBin(this) {
                 path = it
                 MMKVSp.instance.setFmPath(path)
-                tv_fm?.text = "固件:$path"
+                binding.tvFm.text = "固件:$path"
             }
         }
 
-        titleBar?.setOnEndTextListener {
+        binding.titleBar.setOnEndTextListener {
             val intent = Intent(this, SelectNetWorkDeviceActivity::class.java)
             intent.putExtra("isPA", isPa)
             selectResultLauncher?.launch(intent)
         }
 
-        titleBar?.getBackView()?.setOnClickListener {
-            if (!bt_start.isEnabled) {
+        binding.titleBar.getBackView().setOnClickListener {
+            if (!binding.btStart.isEnabled) {
                 showWarningDialog()
             } else {
                 finish()
@@ -155,16 +157,16 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     }
 
     private fun startBtEn(isEn: Boolean) {
-        bt_start?.isEnabled = isEn
-        bt_fm?.isEnabled = isEn
+        binding.btStart.isEnabled = isEn
+        binding.btFm.isEnabled = isEn
         if (isEn) {
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
-            bt_fm?.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
-            loading?.visibility = View.GONE
+            binding.btStart.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            binding.btFm.setBackgroundColor(ContextCompat.getColor(this, R.color.color_92e5e9))
+            binding.loading.visibility = View.GONE
         } else {
-            bt_start?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
-            bt_fm?.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
-            loading?.visibility = View.VISIBLE
+            binding.btStart.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
+            binding.btFm.setBackgroundColor(ContextCompat.getColor(this, R.color.grey))
+            binding.loading.visibility = View.VISIBLE
         }
     }
 
@@ -194,7 +196,7 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
                 val vidInfo = Arrays.bytesToHexString(vid, ":")
                 val firmVersion = "pid-$pidInfo vid-$vidInfo"
 
-                tv_msg?.text = "固件信息: firmVersion:$firmVersion"
+                binding.tvMsg.text = "固件信息: firmVersion:$firmVersion"
             } catch (e: IOException) {
                 e.printStackTrace()
                 firmwareData = byteArrayOf()
@@ -234,8 +236,8 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
             0
         }
         runOnUiThread {
-            progressBar?.progress = pro
-            tv_progress.text = "$pro%"
+            binding.progressBar.progress = pro
+            binding.tvProgress.text = "$pro%"
         }
     }
 
@@ -285,7 +287,7 @@ class MeshOtaActivity : BaseActivity(), ActivityResultCallback<ActivityResult>,
     }
 
     override fun onBackPressed() {
-       if (!bt_start.isEnabled) {
+       if (!binding.btStart.isEnabled) {
            showWarningDialog()
        } else {
            super.onBackPressed()

@@ -16,16 +16,15 @@ import com.godox.sdk.callbacks.FDSAddNetWorkCallBack
 import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityAddDeviceBinding
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
-import kotlinx.android.synthetic.main.activity_add_device.*
 
-class AddDeviceActivity : BaseActivity() {
+class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
     private val handler = Handler(Looper.getMainLooper())
@@ -40,9 +39,12 @@ class AddDeviceActivity : BaseActivity() {
     private var addDeviceFailSize = 0
     private var index = 0
 
+    override fun initBind(): ActivityAddDeviceBinding {
+        return ActivityAddDeviceBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_device)
 
         initView()
         initRecyclerView()
@@ -58,11 +60,11 @@ class AddDeviceActivity : BaseActivity() {
             finish()
         }
 
-        titleBar?.initTitleBar(true, R.drawable.refresh)
-        titleBar?.setTitle("搜索设备")
-        titleBar?.setOnEndImageListener {
+        binding.titleBar.initTitleBar(true, R.drawable.refresh)
+        binding.titleBar.setTitle("搜索设备")
+        binding.titleBar.setOnEndImageListener {
             addDevicesAdapter.clearList()
-            tv_dev_network_equipment?.text = "${getString(R.string.text_dev_number)}:0/0"
+            binding.tvDevNetworkEquipment.text = "${getString(R.string.text_dev_number)}:0/0"
             if (isScanning) {
                 stopScan()
             }
@@ -85,12 +87,12 @@ class AddDeviceActivity : BaseActivity() {
         addDevicesAdapter = AddDeviceAdapter()
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices.layoutManager = manager
-        recyclerView_devices.adapter = addDevicesAdapter
+        binding.recyclerViewDevices.layoutManager = manager
+        binding.recyclerViewDevices.adapter = addDevicesAdapter
 
         addDevicesAdapter.setIsAllCheckListener {
             setCheck(it)
-            tv_dev_network_equipment?.text =
+            binding.tvDevNetworkEquipment.text =
                 "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
     }
@@ -98,7 +100,7 @@ class AddDeviceActivity : BaseActivity() {
     private fun scanDevices() {
         isScanning = true
 
-        progressBar?.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
 
         val filterName = "GD_LED"
         searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
@@ -110,13 +112,13 @@ class AddDeviceActivity : BaseActivity() {
                 firmwareVersion: Int
             ) {
                 addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
-                tv_dev_network_equipment?.text =
+                binding.tvDevNetworkEquipment.text =
                     "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
             }
 
             override fun onScanTimeOut() {
                 isScanning = false
-                progressBar?.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
 
             /*
@@ -124,7 +126,7 @@ class AddDeviceActivity : BaseActivity() {
              */
             override fun onScanFail() {
                 isScanning = false
-                progressBar?.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
             }
         })
     }
@@ -132,7 +134,7 @@ class AddDeviceActivity : BaseActivity() {
     private fun stopScan() {
         searchDevices.stopScan()
         isScanning = false
-        progressBar?.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun addDevice() {
@@ -247,7 +249,7 @@ class AddDeviceActivity : BaseActivity() {
 
         ConstantUtils.saveJson(index)
         loadingDialog.dismissDialog()
-        tv_dev_network_equipment?.text =
+        binding.tvDevNetworkEquipment.text =
             "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
     }
 
@@ -271,18 +273,18 @@ class AddDeviceActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initListener() {
-        iv_check.setOnClickListener {
+        binding.ivCheck.setOnClickListener {
             //点击全选，停止搜索
             stopScan()
 
             val isCheck = !isAllCheck
             setCheck(isCheck)
             addDevicesAdapter.allCheck(isCheck)
-            tv_dev_network_equipment?.text =
+            binding.tvDevNetworkEquipment.text =
                 "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
 
-        bt_add_device.setOnClickListener {
+        binding.btAddDevice.setOnClickListener {
             addDevice()
         }
     }
@@ -290,9 +292,9 @@ class AddDeviceActivity : BaseActivity() {
     private fun setCheck(isCheck: Boolean) {
         isAllCheck = isCheck
         if (isAllCheck) {
-            iv_check.setBackgroundResource(R.drawable.checked_image_on)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_on)
         } else {
-            iv_check.setBackgroundResource(R.drawable.checked_image_off)
+            binding.ivCheck.setBackgroundResource(R.drawable.checked_image_off)
         }
     }
 

@@ -6,17 +6,16 @@ import com.godox.agm.GodoxCommandApi
 import com.godox.agm.bean.ColorBlockBean
 import com.godox.agm.bean.RainbowColorBlockBean
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.LightFxListActivityBinding
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import kotlinx.android.synthetic.main.light_fx_list_activity.titleBar
-import kotlinx.android.synthetic.main.mode_list_activity.recyclerView_v3
 
 /**
  * 修改灯光特效列表页
  */
-class LightFXListActivity : BaseActivity() {
+class LightFXListActivity : BaseActivity<LightFxListActivityBinding>() {
     private lateinit var modelAdapterV3: ModelAdapter
     private var modelListV3: MutableList<ModelInfo> = mutableListOf()
     private var address = -1//传入的地址
@@ -29,9 +28,12 @@ class LightFXListActivity : BaseActivity() {
     private val rainbowColorList: MutableList<RainbowColorBlockBean> = mutableListOf()
     private val fdsCommandApi = GodoxCommandApi.instance
 
+    override fun initBind(): LightFxListActivityBinding {
+        return LightFxListActivityBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.light_fx_list_activity)
 
         initData()
         initView()
@@ -39,15 +41,15 @@ class LightFXListActivity : BaseActivity() {
     }
 
     private fun initView() {
-        titleBar.initTitleBar(typeName, 0)
+        binding.titleBar.initTitleBar(typeName, 0)
     }
 
     private fun initRecyclerView() {
         modelAdapterV3 = ModelAdapter(this, modelListV3)
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_v3.layoutManager = manager
-        recyclerView_v3.adapter = modelAdapterV3
+        binding.recyclerViewV3.layoutManager = manager
+        binding.recyclerViewV3.adapter = modelAdapterV3
         modelAdapterV3.setOnItemClickListener { it, address ->
             when (it) {
                 0 -> {//闪光灯

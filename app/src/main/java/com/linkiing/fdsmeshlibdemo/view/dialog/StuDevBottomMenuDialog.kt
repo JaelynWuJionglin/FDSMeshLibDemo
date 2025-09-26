@@ -2,15 +2,14 @@ package com.linkiing.fdsmeshlibdemo.view.dialog
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_dev_bottom_dialog_layout.*
+import com.linkiing.fdsmeshlibdemo.databinding.StuDevBottomDialogLayoutBinding
+import androidx.core.graphics.drawable.toDrawable
 
-class StuDevBottomMenuDialog(context: Context) :
-    BaseFullDialog(context, R.layout.stu_dev_bottom_dialog_layout),
+class StuDevBottomMenuDialog(context: Context) : BaseFullDialog<StuDevBottomDialogLayoutBinding>(context),
     View.OnClickListener {
     private var listener: (Int) -> Unit = {}
 
@@ -24,7 +23,7 @@ class StuDevBottomMenuDialog(context: Context) :
     }
 
     init {
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         window?.setWindowAnimations(R.style.bomToTopDialogAnim) //设置窗口弹出动画
         window?.decorView?.setPadding(0, 0, 0, 0)
         window?.setGravity(Gravity.BOTTOM)
@@ -56,19 +55,23 @@ class StuDevBottomMenuDialog(context: Context) :
         }
     }
 
+    override fun initBind(): StuDevBottomDialogLayoutBinding {
+        return StuDevBottomDialogLayoutBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setCancelable(true)
         setCanceledOnTouchOutside(true)
 
-        tv_rename.setOnClickListener(this)
-        tv_delete.setOnClickListener(this)
-        tv_ble_upgrade.setOnClickListener(this)
-        tv_mcu_upgrade.setOnClickListener(this)
-        tv_delete_all.setOnClickListener(this)
-        tv_cancel.setOnClickListener(this)
-        tv_delete_force.setOnClickListener(this)
+        binding.tvRename.setOnClickListener(this)
+        binding.tvDelete.setOnClickListener(this)
+        binding.tvBleUpgrade.setOnClickListener(this)
+        binding.tvMcuUpgrade.setOnClickListener(this)
+        binding.tvDeleteAll.setOnClickListener(this)
+        binding.tvCancel.setOnClickListener(this)
+        binding.tvDeleteForce.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {

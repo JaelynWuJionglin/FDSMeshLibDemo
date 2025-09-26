@@ -4,20 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import com.base.mesh.api.listener.MeshOtaListener
-import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
-import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.LayoutDialogFmBinding
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
-import kotlinx.android.synthetic.main.layout_dialog_fm.*
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 
 @SuppressLint("SetTextI18n")
 class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Boolean) :
-    BaseFullDialog(activity, R.layout.layout_dialog_fm), MeshOtaListener {
+    BaseFullDialog<LayoutDialogFmBinding>(activity), MeshOtaListener {
+
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var isPa = false
@@ -33,12 +32,16 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         show()
     }
 
-    fun setListener(listener: (Boolean) -> Unit){
+    fun setListener(listener: (Boolean) -> Unit) {
         this.listener = listener
     }
 
     fun setOldFirmwareInfo(isPa: Boolean) {
         this.isPa = isPa
+    }
+
+    override fun initBind(): LayoutDialogFmBinding {
+        return LayoutDialogFmBinding.inflate(layoutInflater)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +52,8 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     override fun onStart() {
         super.onStart()
 
-        tv_progress?.text = "0%"
-        progressBar.progress = 0
+        binding.tvProgress.text = "0%"
+        binding.progressBar.progress = 0
 
         if (mFirmware.isNotEmpty() && fdsNodeInfo != null) {
             if (isMcuUpgrade) {
@@ -99,8 +102,8 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
 
     override fun onProgress(progress: Int) {
         activity.runOnUiThread {
-            tv_progress?.text = "$progress%"
-            progressBar.progress = progress
+            binding.tvProgress.text = "$progress%"
+            binding.progressBar.progress = progress
         }
     }
 

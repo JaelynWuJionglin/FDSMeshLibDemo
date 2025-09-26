@@ -122,6 +122,12 @@
 #spongycastle
 -keep class org.spongycastle** {*;}
 
+# Gson
+-keep class com.google.gson** {*;}
+-keep class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
 # SDK不混淆
 -keep class com.godox.sdk** {*;}
 -keep class com.base.mesh.api** {*;}

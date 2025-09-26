@@ -10,23 +10,20 @@ import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.BatteryPowerCallBack
 import com.godox.agm.callback.FirmwareCallBack
 import com.godox.agm.callback.MCUCallBack
-import com.godox.sdk.MeshApp
 import com.godox.sdk.api.FDSMeshApi
-import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ModeListActivityBinding
 import com.linkiing.fdsmeshlibdemo.adapter.ModelAdapter
 import com.linkiing.fdsmeshlibdemo.bean.ModelInfo
 import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import com.telink.ble.mesh.foundation.MeshService
-import kotlinx.android.synthetic.main.mode_list_activity.*
 
 /**
  * 功能列表页
  */
-class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack, MCUCallBack {
+class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBack, BatteryPowerCallBack, MCUCallBack {
     private lateinit var modelAdapter: ModelAdapter
     private lateinit var modelAdapterV3: ModelAdapter
     private var modelList: MutableList<ModelInfo> = mutableListOf()
@@ -39,10 +36,14 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     private val sendQueueUtils = SendQueueUtils.instance
     private var sendIntervalTime = 0L
     private var testNumber = 20
+    private var testBole = false
+
+    override fun initBind(): ModeListActivityBinding {
+        return ModeListActivityBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.mode_list_activity)
 
         initData()
         initView()
@@ -53,10 +54,10 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
 
     private fun initView() {
         loadingDialog = LoadingDialog(this)
-        mode_titleBar.initTitleBar(typeName, 0)
+        binding.modeTitleBar.initTitleBar(typeName, 0)
 
-        et_number?.setText("$testNumber")
-        et_inv_time?.setText("$sendIntervalTime")
+        binding.etNumber.setText("$testNumber")
+        binding.etInvTime.setText("$sendIntervalTime")
     }
 
     private fun initData() {
@@ -92,8 +93,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         modelAdapter = ModelAdapter(this, modelList)
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_v2.layoutManager = manager
-        recyclerView_v2.adapter = modelAdapter
+        binding.recyclerViewV2.layoutManager = manager
+        binding.recyclerViewV2.adapter = modelAdapter
         var isSwitch = true;
         modelAdapter.setOnItemClickListener { it, address ->
             when (it) {
@@ -144,8 +145,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         modelAdapterV3 = ModelAdapter(this, modelListV3)
         val managerV3 = LinearLayoutManager(this)
         managerV3.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_v3.layoutManager = managerV3
-        recyclerView_v3.adapter = modelAdapterV3
+        binding.recyclerViewV3.layoutManager = managerV3
+        binding.recyclerViewV3.adapter = modelAdapterV3
         modelAdapterV3.setOnItemClickListener { it, address ->
             when (it) {
                 0 -> {//修改灯光特效，跳转
@@ -235,13 +236,19 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
                         }
 
                         3 -> {
-                            fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
+//                            fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
+                            if (testBole) {
+                                fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
+                            } else {
+                                fdsCommandApi.getBatteryPower(address, this)
+                            }
+                            testBole = !testBole
                         }
                     }
                 }
             }
 
-        seekbarBrightness_v2?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        binding.seekbarBrightnessV2.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //isSmall 是否是小包数据
                 sendQueueUtils.addDataSampling(SeekBarBean(0, progress))
@@ -258,7 +265,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
             }
         })
 
-        seekbarBrightness_v3?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        binding.seekbarBrightnessV3.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 sendQueueUtils.addDataSampling(SeekBarBean(1, progress))
             }
@@ -276,7 +283,7 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
     }
 
     private fun initLister() {
-        bt_test1?.setOnClickListener {
+        binding.btTest1.setOnClickListener {
             testOnOff()
         }
     }
@@ -287,8 +294,8 @@ class ModeListActivity : BaseActivity(), FirmwareCallBack, BatteryPowerCallBack,
         }
         isTestOnOffStart = true
 
-        testNumber = et_number?.text?.toString()?.toInt() ?: 1
-        sendIntervalTime = et_inv_time?.text?.toString()?.toLong() ?: SendQueueUtils.SEND_INTERVAL_TIME
+        testNumber = binding.etNumber.text?.toString()?.toInt() ?: 1
+        sendIntervalTime = binding.etInvTime.text?.toString()?.toLong() ?: SendQueueUtils.SEND_INTERVAL_TIME
         sendQueueUtils.setSamplingTime(sendIntervalTime)//数据采样间隔
 
         Thread {

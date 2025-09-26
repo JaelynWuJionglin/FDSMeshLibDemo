@@ -12,16 +12,16 @@ import com.godox.agm.callback.OpenPaCallback
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityOtaBinding
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.utils.FileSelectorUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.MeshOtaDialog
-import kotlinx.android.synthetic.main.activity_ota.*
 import java.io.File
 
-class OtaActivity : BaseActivity() {
+class OtaActivity : BaseActivity<ActivityOtaBinding>() {
     private var loadingDialog: LoadingDialog? = null
     private var meshOtaDialog: MeshOtaDialog? = null
     private var meshMcuUpgradeDialog: MeshOtaDialog? = null
@@ -30,6 +30,10 @@ class OtaActivity : BaseActivity() {
     private var path = ""
     private var upFdsNodeInfo: FDSNodeInfo? = null
     private var upIsPa = false
+
+    override fun initBind(): ActivityOtaBinding {
+        return ActivityOtaBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +72,7 @@ class OtaActivity : BaseActivity() {
             finish()
         }
 
-        titleBar?.setTitle(
+        binding.titleBar.setTitle(
             if (isMcuUpgrade) {
                 "MCU-OTA"
             } else {
@@ -77,14 +81,14 @@ class OtaActivity : BaseActivity() {
         )
 
         path = MMKVSp.instance.getFmPath()
-        tv_fm?.text = "固件:$path"
+        binding.tvFm.text = "固件:$path"
 
         getVersion(false)
     }
 
     @SuppressLint("SetTextI18n")
     private fun initListener() {
-        bt_start?.setOnClickListener {
+        binding.btStart.setOnClickListener {
             if (TextUtils.isEmpty(path)) {
                 ConstantUtils.toast(this, "请选择固件!")
                 return@setOnClickListener
@@ -105,11 +109,11 @@ class OtaActivity : BaseActivity() {
             }
         }
 
-        bt_fm?.setOnClickListener {
+        binding.btFm.setOnClickListener {
             FileSelectorUtils.instance.goSelectBin(this) {
                 path = it
                 MMKVSp.instance.setFmPath(path)
-                tv_fm?.text = "固件:$path"
+                binding.tvFm.text = "固件:$path"
             }
         }
     }
@@ -124,8 +128,8 @@ class OtaActivity : BaseActivity() {
                 override fun onSuccess(address: Int, productVersion: String, mcuVersion: String) {
                     upFdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address)
 
-                    tv_msg1?.text = "产品版本:$productVersion"
-                    tv_msg2?.text = "MCU方案版本:$mcuVersion"
+                    binding.tvMsg1.text = "产品版本:$productVersion"
+                    binding.tvMsg2.text = "MCU方案版本:$mcuVersion"
 
                     loadingDialog?.dismissDialog()
 
@@ -145,8 +149,8 @@ class OtaActivity : BaseActivity() {
 
                     LOGUtils.v("OTA_VER ==> version:${version.toString(16)}")
 
-                    tv_msg1?.text = "固件版本:${version.toString(16)}"
-                    tv_msg2?.text = "是否是带PA的固件:${
+                    binding.tvMsg1.text = "固件版本:${version.toString(16)}"
+                    binding.tvMsg2.text = "是否是带PA的固件:${
                         if (isPa) {
                             "是"
                         } else {

@@ -2,13 +2,15 @@ package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
 import com.google.gson.Gson
-import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.GroupFragmentBinding
 import com.linkiing.fdsmeshlibdemo.adapter.StudioGroupAdapter
 import com.linkiing.fdsmeshlibdemo.ui.GroupActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
@@ -16,10 +18,8 @@ import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuGpBottomMenuDialog
-import kotlinx.android.synthetic.main.group_fragment.recyclerView_group
-import kotlinx.android.synthetic.main.group_fragment.tv_add_group
 
-class GroupFragment : BaseFragment(R.layout.group_fragment) {
+class GroupFragment : BaseFragment<GroupFragmentBinding>() {
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var stuGpBottomMenuDialog: StuGpBottomMenuDialog
     private lateinit var createGroupTextDialog: InputTextDialog
@@ -27,6 +27,12 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
     private var studioGroupAdapter: StudioGroupAdapter? = null
     private var fdsGroupInfo: FDSGroupInfo? = null
     private var index = 0
+    override fun initBind(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): GroupFragmentBinding {
+        return GroupFragmentBinding.inflate(inflater, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,8 +62,8 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
         studioGroupAdapter = StudioGroupAdapter()
         val manager = LinearLayoutManager(mContext)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_group?.layoutManager = manager
-        recyclerView_group?.adapter = studioGroupAdapter
+        binding.recyclerViewGroup.layoutManager = manager
+        binding.recyclerViewGroup.adapter = studioGroupAdapter
 
         studioGroupAdapter?.setItemLongClickListener {
             fdsGroupInfo = it
@@ -73,7 +79,7 @@ class GroupFragment : BaseFragment(R.layout.group_fragment) {
     }
 
     private fun initListener() {
-        tv_add_group?.setOnClickListener {
+        binding.tvAddGroup.setOnClickListener {
             createGroupTextDialog.setDefText("Group-${studioGroupAdapter?.itemCount?.plus(1)}")
             createGroupTextDialog.showDialog()
         }

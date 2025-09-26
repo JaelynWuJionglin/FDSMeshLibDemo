@@ -1,7 +1,9 @@
 package com.linkiing.fdsmeshlibdemo.ui.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.log.LOGUtils
@@ -14,8 +16,8 @@ import com.godox.sdk.callbacks.FDSRemoveNodeCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.adapter.StudioDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.databinding.DeviceFragmentBinding
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
-import com.linkiing.fdsmeshlibdemo.ui.MeshOtaActivity
 import com.linkiing.fdsmeshlibdemo.ui.provision.AddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.provision.FastAddDeviceActivity
 import com.linkiing.fdsmeshlibdemo.ui.ModeListActivity
@@ -26,13 +28,8 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
-import kotlinx.android.synthetic.main.device_fragment.dev_switch
-import kotlinx.android.synthetic.main.device_fragment.recyclerView_devices
-import kotlinx.android.synthetic.main.device_fragment.tv_add_dev
-import kotlinx.android.synthetic.main.device_fragment.tv_dev_list_msg
-import kotlinx.android.synthetic.main.device_fragment.tv_refresh
 
-class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeListener {
+class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeListener {
     private lateinit var stuDevBottomMenuDialog: StuDevBottomMenuDialog
     private lateinit var loadingDialog: LoadingDialog
     private lateinit var renameTextDialog: InputTextDialog
@@ -46,6 +43,10 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private var resetDeviceSusSize = 0
     private var resetDeviceFailSize = 0
 
+    override fun initBind(inflater: LayoutInflater, container: ViewGroup?): DeviceFragmentBinding {
+        return DeviceFragmentBinding.inflate(inflater, container, false)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -58,7 +59,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         super.onResume()
         LOGUtils.v("DeviceFragment onResume()")
         studioDeviceAdapter?.update()
-        tv_dev_list_msg?.text =
+        binding.tvDevListMsg.text =
             "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
     }
 
@@ -67,7 +68,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         LOGUtils.v("DeviceFragment onHiddenChanged() hidden:$hidden")
         if (!hidden) {
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text =
+            binding.tvDevListMsg.text =
                 "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }
@@ -86,8 +87,8 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         studioDeviceAdapter = StudioDeviceAdapter()
         val manager = LinearLayoutManager(mContext)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_devices?.layoutManager = manager
-        recyclerView_devices?.adapter = studioDeviceAdapter
+        binding.recyclerViewDevices.layoutManager = manager
+        binding.recyclerViewDevices.adapter = studioDeviceAdapter
 
         studioDeviceAdapter?.setItemLongClickListener {
             fdsNodeInfo = it
@@ -109,7 +110,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     private fun initListener() {
         FDSMeshApi.instance.addFDSNodeStatusChangeCallBack(this)
 
-        dev_switch.setOnCheckedChangeListener { compoundButton, isSwitch ->
+        binding.devSwitch.setOnCheckedChangeListener { compoundButton, isSwitch ->
             //设备全开全关
             if (!compoundButton.isPressed) {
                 return@setOnCheckedChangeListener
@@ -119,13 +120,13 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
             studioDeviceAdapter?.allOnOrOff(isSwitch)
         }
 
-        tv_refresh.setOnClickListener {
+        binding.tvRefresh.setOnClickListener {
             //刷新设备在线状态
             val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
             LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
         }
 
-        tv_add_dev.setOnClickListener {
+        binding.tvAddDev.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt("index", index)
             when (MMKVSp.instance.getProvisionModel()) {
@@ -149,9 +150,16 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                  * 重命名节点
                  * type == "", 则不修改类型
                  */
-                FDSMeshApi.instance.renameFDSNodeInfo(mutableListOf(RenameBean(fdsNodeInfo!!.meshAddress, it)))
+                FDSMeshApi.instance.renameFDSNodeInfo(
+                    mutableListOf(
+                        RenameBean(
+                            fdsNodeInfo!!.meshAddress,
+                            it
+                        )
+                    )
+                )
                 studioDeviceAdapter?.update()
-                tv_dev_list_msg?.text =
+                binding.tvDevListMsg.text =
                     "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
 
                 ConstantUtils.saveJson(index)
@@ -189,7 +197,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                     //从Mesh中删除设备
                     if (fdsNodeInfo != null) {
                         loadingDialog.showDialog()
-                        resetDevice(mutableListOf(fdsNodeInfo!!),false)
+                        resetDevice(mutableListOf(fdsNodeInfo!!), false)
                     }
                 }
 
@@ -197,14 +205,14 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
                     //强制删除离线设备
                     if (fdsNodeInfo != null) {
                         loadingDialog.showDialog()
-                        resetDevice(mutableListOf(fdsNodeInfo!!),true)
+                        resetDevice(mutableListOf(fdsNodeInfo!!), true)
                     }
                 }
 
                 StuDevBottomMenuDialog.MENU_DELETE_ALL -> {
                     if (studioDeviceAdapter != null && studioDeviceAdapter!!.itemCount > 0) {
                         loadingDialog.showDialog()
-                        resetDevice(studioDeviceAdapter!!.getAllFdsNodeList(),false)
+                        resetDevice(studioDeviceAdapter!!.getAllFdsNodeList(), false)
                     }
                 }
             }
@@ -223,7 +231,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         ) {
             LOGUtils.d("DeviceFragment fdsRemoveNodeCallBack isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text =
+            binding.tvDevListMsg.text =
                 "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
 
             ConstantUtils.saveJson(index)
@@ -288,7 +296,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
         }
     }
 
-    private fun resetDevice(list: MutableList<FDSNodeInfo>, isSupportOutOfLine: Boolean,){
+    private fun resetDevice(list: MutableList<FDSNodeInfo>, isSupportOutOfLine: Boolean) {
 
         resetDeviceSize = list.size
         resetDeviceSusSize = 0
@@ -329,7 +337,7 @@ class DeviceFragment : BaseFragment(R.layout.device_fragment), NodeStatusChangeL
     fun updateList() {
         mActivity.runOnUiThread {
             studioDeviceAdapter?.update()
-            tv_dev_list_msg?.text =
+            binding.tvDevListMsg.text =
                 "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
         }
     }

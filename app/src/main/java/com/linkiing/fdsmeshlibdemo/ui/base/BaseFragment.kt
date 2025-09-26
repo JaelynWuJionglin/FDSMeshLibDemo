@@ -9,12 +9,19 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.viewbinding.ViewBinding
 
-abstract class BaseFragment(@LayoutRes resource:Int) : Fragment() {
-    private var resourceId:Int = resource
-    lateinit var mView: View
-    lateinit var mActivity: FragmentActivity
-    lateinit var mContext: Context
+abstract class BaseFragment<B : ViewBinding> : Fragment() {
+    protected lateinit var binding: B
+    protected lateinit var mView: View
+    protected lateinit var mActivity: FragmentActivity
+    protected lateinit var mContext: Context
+
+    /**
+     * 初始化UI绑定类
+     * @return xxxBind
+     */
+    protected abstract fun initBind(inflater: LayoutInflater, container: ViewGroup?): B
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -23,7 +30,8 @@ abstract class BaseFragment(@LayoutRes resource:Int) : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mView = inflater.inflate(resourceId, container, false)
+        binding = initBind(inflater, container)
+        mView = binding.root
         return mView
     }
 

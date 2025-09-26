@@ -4,15 +4,22 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.annotation.LayoutRes
+import androidx.viewbinding.ViewBinding
 import com.linkiing.fdsmeshlibdemo.R
 
-open class BaseFullDialog(context: Context, @LayoutRes private val layoutResID: Int)
-    : Dialog(context, R.style.Dialog_bocop) {
+abstract class BaseFullDialog<B : ViewBinding>(context: Context) :
+    Dialog(context, R.style.Dialog_bocop) {
+    protected val binding: B by lazy { initBind() }
+
+    /**
+     * 初始化UI绑定类
+     * @return xxxBind
+     */
+    protected abstract fun initBind(): B
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(layoutResID)
+        setContentView(binding.root)
         initView()
     }
 

@@ -3,10 +3,9 @@ package com.linkiing.fdsmeshlibdemo.app
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshConfigure
 import com.godox.sdk.MeshApp
-import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.utils.BleUtils
-import com.telink.ble.mesh.core.networking.ExtendBearerMode
+import com.telink.ble.mesh.foundation.Event
 
 class App : MeshApp() {
     private val appId = "185BD3FB2532A7CE6BF4B2C15B8C27F06E0554779140BF726A929128FD0514BE"

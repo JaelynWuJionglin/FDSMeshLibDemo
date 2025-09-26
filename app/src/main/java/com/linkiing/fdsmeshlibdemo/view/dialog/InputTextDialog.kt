@@ -4,14 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.annotation.StringRes
-import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.input_text_dialog_layout.et_input
-import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_cancel
-import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_confirm
-import kotlinx.android.synthetic.main.input_text_dialog_layout.tv_title
+import com.linkiing.fdsmeshlibdemo.databinding.InputTextDialogLayoutBinding
 
-class InputTextDialog(context: Context)
-    : BaseFullDialog(context, R.layout.input_text_dialog_layout) {
+class InputTextDialog(context: Context) : BaseFullDialog<InputTextDialogLayoutBinding>(context) {
     private var listener: (String) -> Unit = {}
     private var defText = ""
     private var titleText = ""
@@ -28,16 +23,12 @@ class InputTextDialog(context: Context)
      */
     fun setTitleText(@StringRes id:Int){
         titleText = context.resources.getString(id)
-        if (tv_title!=null){
-            tv_title.text = titleText
-        }
+        binding.tvTitle.text = titleText
     }
 
     fun setTitleText(text:String){
         titleText = text
-        if (tv_title!=null){
-            tv_title.text = titleText
-        }
+        binding.tvTitle.text = titleText
     }
 
     /**
@@ -47,10 +38,7 @@ class InputTextDialog(context: Context)
         if (!TextUtils.isEmpty(str)){
             defText = str!!
         }
-        
-        if (et_input!=null){
-            et_input.setText(defText)
-        }
+        binding.etInput.setText(defText)
         return this
     }
 
@@ -68,26 +56,30 @@ class InputTextDialog(context: Context)
         }
     }
 
+    override fun initBind(): InputTextDialogLayoutBinding {
+        return InputTextDialogLayoutBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (titleText != ""){
-            tv_title.text = titleText
+            binding.tvTitle.text = titleText
         }
 
         if (defText != ""){
-            et_input.setText(defText)
-            et_input.setSelection(defText.length)
+            binding.etInput.setText(defText)
+            binding.etInput.setSelection(defText.length)
         }
 
         //设置确定按钮被点击后，向外界提供监听
-        tv_confirm.setOnClickListener {
+        binding.tvConfirm.setOnClickListener {
             dismissDialog()
-            val text: String = et_input.text.toString()
+            val text: String = binding.etInput.text.toString()
             listener(text)
         }
         //设置取消按钮被点击后，向外界提供监听
-        tv_cancel.setOnClickListener {
+        binding.tvCancel.setOnClickListener {
             dismissDialog()
         }
     }

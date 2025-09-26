@@ -2,17 +2,14 @@ package com.linkiing.fdsmeshlibdemo.view.dialog
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import com.linkiing.fdsmeshlibdemo.R
-import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_cancel
-import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_delete
-import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_edit
-import kotlinx.android.synthetic.main.stu_gp_bottom_dialog_layout.tv_rename
+import com.linkiing.fdsmeshlibdemo.databinding.StuGpBottomDialogLayoutBinding
+import androidx.core.graphics.drawable.toDrawable
 
-class StuGpBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout.stu_gp_bottom_dialog_layout),
+class StuGpBottomMenuDialog(context: Context) : BaseFullDialog<StuGpBottomDialogLayoutBinding>(context),
     View.OnClickListener {
     private var listener: (Int) -> Unit = {}
 
@@ -23,7 +20,7 @@ class StuGpBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout
     }
 
     init {
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         window?.setWindowAnimations(R.style.bomToTopDialogAnim) //设置窗口弹出动画
         window?.decorView?.setPadding(0, 0, 0, 0)
         window?.setGravity(Gravity.BOTTOM)
@@ -55,16 +52,20 @@ class StuGpBottomMenuDialog(context: Context) : BaseFullDialog(context, R.layout
         }
     }
 
+    override fun initBind(): StuGpBottomDialogLayoutBinding {
+        return StuGpBottomDialogLayoutBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setCancelable(true)
         setCanceledOnTouchOutside(true)
 
-        tv_rename.setOnClickListener(this)
-        tv_delete.setOnClickListener(this)
-        tv_edit.setOnClickListener(this)
-        tv_cancel.setOnClickListener(this)
+        binding.tvRename.setOnClickListener(this)
+        binding.tvDelete.setOnClickListener(this)
+        binding.tvEdit.setOnClickListener(this)
+        binding.tvCancel.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {

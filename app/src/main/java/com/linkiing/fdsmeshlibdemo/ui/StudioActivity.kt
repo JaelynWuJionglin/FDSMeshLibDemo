@@ -11,28 +11,26 @@ import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityStudioBinding
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.DeviceFragment
 import com.linkiing.fdsmeshlibdemo.ui.fragment.GroupFragment
-import com.linkiing.fdsmeshlibdemo.view.dialog.StuDevBottomMenuDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.StuPaBottomMenuDialog
 import com.telink.ble.mesh.core.networking.ExtendBearerMode
-import kotlinx.android.synthetic.main.activity_studio.tab_devices
-import kotlinx.android.synthetic.main.activity_studio.tab_group
-import kotlinx.android.synthetic.main.activity_studio.titleBar
 
 class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListener {
+    private lateinit var binding: ActivityStudioBinding
     private lateinit var stuPaBottomMenuDialog: StuPaBottomMenuDialog
     private val deviceFragment = DeviceFragment()
     private val groupFragment = GroupFragment()
-    private var nowFragment: BaseFragment? = null
+    private var nowFragment: BaseFragment<*>? = null
     private var tabId: Int = -1
     private var index = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_studio)
+        binding = ActivityStudioBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         initView()
         initListener()
@@ -82,7 +80,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun initView() {
-        titleBar?.initTitleBar("","MeshOta")
+        binding.titleBar.initTitleBar("","MeshOta")
         index = intent.getIntExtra("index", 0)
         LOGUtils.d("StudioActivity =============> index:$index")
         if (index == 0) {
@@ -98,10 +96,10 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
     }
 
     private fun initListener() {
-        tab_devices.setOnClickListener(this)
-        tab_group.setOnClickListener(this)
+        binding.tabDevices.setOnClickListener(this)
+        binding.tabGroup.setOnClickListener(this)
 
-        titleBar?.setOnEndTextListener{
+        binding.titleBar.setOnEndTextListener{
             stuPaBottomMenuDialog.showDialog()
         }
 
@@ -127,13 +125,13 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             return
         }
         this.tabId = id
-        tab_devices.setCk(id == 0)
-        tab_group.setCk(id == 1)
+        binding.tabDevices.setCk(id == 0)
+        binding.tabGroup.setCk(id == 1)
         if (id == 0) {
-            titleBar?.setTitle("节点")
+            binding.titleBar.setTitle("节点")
             showFragment(deviceFragment)
         } else if (id == 1) {
-            titleBar?.setTitle("组别")
+            binding.titleBar.setTitle("组别")
             showFragment(groupFragment)
         }
     }
@@ -150,7 +148,7 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
         }
     }
 
-    private fun showFragment(fragment: BaseFragment) {
+    private fun showFragment(fragment: BaseFragment<*>) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         //先hide之前的fragment
         if (nowFragment != null) {

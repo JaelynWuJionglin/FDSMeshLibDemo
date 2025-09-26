@@ -10,6 +10,7 @@ import com.godox.sdk.api.FDSMeshApi
 import com.google.gson.Gson
 import com.hjq.permissions.OnPermissionCallback
 import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityMainBinding
 import com.linkiing.fdsmeshlibdemo.adapter.StudioAdapter
 import com.linkiing.fdsmeshlibdemo.bean.HttpProvisionBean
 import com.linkiing.fdsmeshlibdemo.bean.StudioListBean
@@ -20,20 +21,19 @@ import com.linkiing.fdsmeshlibdemo.utils.FileUtils
 import com.linkiing.fdsmeshlibdemo.utils.PermissionsUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.InputTextDialog
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
-import kotlinx.android.synthetic.main.activity_main.bt_add_studio
-import kotlinx.android.synthetic.main.activity_main.bt_import_json
-import kotlinx.android.synthetic.main.activity_main.recyclerView_studio
-import kotlinx.android.synthetic.main.activity_main.titleBar
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var studioAdapter: StudioAdapter
     private lateinit var inputTextDialog: InputTextDialog
     private lateinit var loadingDialog: LoadingDialog
     private var jsonStr = ""
 
+    override fun initBind(): ActivityMainBinding {
+        return ActivityMainBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         LOGUtils.d("MainActivity onCreate()")
 
         initView()
@@ -47,9 +47,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initView() {
-        titleBar?.initTitleBar(false, R.drawable.settings_image)
+        binding.titleBar.initTitleBar(false, R.drawable.settings_image)
 
-        titleBar?.setOnEndImageListener{
+        binding.titleBar.setOnEndImageListener{
             goActivity(SettingActivity::class.java,false)
         }
 
@@ -87,8 +87,8 @@ class MainActivity : BaseActivity() {
         studioAdapter = StudioAdapter()
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_studio.layoutManager = manager
-        recyclerView_studio.adapter = studioAdapter
+        binding.recyclerViewStudio.layoutManager = manager
+        binding.recyclerViewStudio.adapter = studioAdapter
 
         studioAdapter.setOnItemClickListener {
             //权限请求
@@ -122,14 +122,14 @@ class MainActivity : BaseActivity() {
     private fun initListener() {
 
         //新增Studio
-        bt_add_studio.setOnClickListener {
+        binding.btAddStudio.setOnClickListener {
             jsonStr = ""
             inputTextDialog.setDefText("Studio-${studioAdapter.getStudioNextIndex()}")
             inputTextDialog.showDialog()
         }
 
         //导入json数据
-        bt_import_json?.setOnClickListener {
+        binding.btImportJson.setOnClickListener {
             FileSelectorUtils.instance.goSelectJson(this) { path ->
                 if (!TextUtils.isEmpty(path)) {
                     jsonStr = FileUtils.getJsonSelect(path)

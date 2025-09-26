@@ -16,7 +16,6 @@ import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
 import com.google.gson.Gson
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 
 class StudioDeviceAdapter : RecyclerView.Adapter<StudioDeviceAdapter.MyHolder>() {
     private var fdsNodeList = mutableListOf<FDSNodeInfo>()
