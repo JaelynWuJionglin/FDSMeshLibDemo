@@ -11,7 +11,6 @@ import com.godox.agm.callback.MCUCallBack
 import com.godox.agm.callback.OpenPaCallback
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
-import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.databinding.ActivityOtaBinding
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
@@ -37,7 +36,6 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ota)
 
         initView()
         initListener()
