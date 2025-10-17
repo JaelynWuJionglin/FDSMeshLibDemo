@@ -15,7 +15,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_studio"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/titleBar"
         android:paddingStart="15dp"
         android:layout_marginStart="15dp"
@@ -23,6 +23,7 @@
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
         android:background="@drawable/white_round_bg"
+        android:layout_above="@+id/bt_add_studio"
         tools:ignore="RtlSymmetry" />
 
     <Button
@@ -32,7 +33,6 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="20dp"
         android:background="@drawable/blue_round_bg"
         android:layout_gravity="center_horizontal"
         android:textSize="14sp"

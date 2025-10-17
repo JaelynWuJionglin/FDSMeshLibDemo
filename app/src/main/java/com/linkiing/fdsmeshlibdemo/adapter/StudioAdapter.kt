@@ -114,11 +114,11 @@ class StudioAdapter : RecyclerView.Adapter<StudioAdapter.MyHolder>() {
             holder.tv_delete.visibility = View.VISIBLE
         }
 
-        if (position == studioList.size - 1) {
-            holder.view_line.visibility = View.GONE
-        } else {
-            holder.view_line.visibility = View.VISIBLE
-        }
+//        if (position == studioList.size - 1) {
+//            holder.view_line.visibility = View.GONE
+//        } else {
+//            holder.view_line.visibility = View.VISIBLE
+//        }
 
         //点击事件
         holder.itemView.setOnClickListener {
