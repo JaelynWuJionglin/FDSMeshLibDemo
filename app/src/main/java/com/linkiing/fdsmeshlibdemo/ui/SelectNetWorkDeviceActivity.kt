@@ -15,7 +15,7 @@ import java.io.Serializable
 class SelectNetWorkDeviceActivity : BaseActivity<ActivityAddDeviceInGroupBinding>() {
     private var selectNetWorkDeviceAdapter: SelectNetWorkDeviceAdapter? = null
     private var isAllCheck = false
-    private var isPa = -1 // -1: 无PA过滤项目， 0:非PA固件  1:PA固件
+    private var paValue = -1 // -1: 无PA过滤项目， 0:非PA固件  1:PA固件 3:类型03
 
     override fun initBind(): ActivityAddDeviceInGroupBinding {
         return ActivityAddDeviceInGroupBinding.inflate(layoutInflater)
@@ -24,8 +24,8 @@ class SelectNetWorkDeviceActivity : BaseActivity<ActivityAddDeviceInGroupBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (intent.hasExtra("isPA")) {
-            isPa = intent.getIntExtra("isPA",0)
+        if (intent.hasExtra("paValue")) {
+            paValue = intent.getIntExtra("paValue",0)
         }
 
         initTitleBar()
@@ -44,7 +44,7 @@ class SelectNetWorkDeviceActivity : BaseActivity<ActivityAddDeviceInGroupBinding
     }
 
     private fun initRecyclerView() {
-        selectNetWorkDeviceAdapter = SelectNetWorkDeviceAdapter(isPa)
+        selectNetWorkDeviceAdapter = SelectNetWorkDeviceAdapter(paValue)
         val manager = LinearLayoutManager(this)
         manager.orientation = LinearLayoutManager.VERTICAL
         binding.recyclerViewDevices.layoutManager = manager

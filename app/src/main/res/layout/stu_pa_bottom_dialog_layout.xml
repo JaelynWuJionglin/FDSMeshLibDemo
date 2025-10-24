@@ -43,6 +43,20 @@
         android:background="@color/grey" />
 
     <TextView
+        android:id="@+id/tv_type_03"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="TYPE_03"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey" />
+
+    <TextView
         android:id="@+id/tv_cancel"
         android:layout_width="match_parent"
         android:layout_height="50dp"

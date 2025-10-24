@@ -45,7 +45,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
     private var path = ""
     private var firmwareData = byteArrayOf()
     private var meshOtaDeviceAdapter: MeshOtaDeviceAdapter? = null
-    private var isPa = 0
+    private var paValue = 0
 
     override fun initBind(): ActivityMeshOtaBinding {
         return ActivityMeshOtaBinding.inflate(layoutInflater)
@@ -74,7 +74,9 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
 
         loadingDialog = LoadingDialog(this)
 
-        isPa = intent.getIntExtra("isPA", 0)
+        if (intent.hasExtra("paValue")) {
+            paValue = intent.getIntExtra("paValue",0)
+        }
 
         path = MMKVSp.instance.getFmPath()
         binding.tvFm.text = "固件:$path"
@@ -143,7 +145,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
 
         binding.titleBar.setOnEndTextListener {
             val intent = Intent(this, SelectNetWorkDeviceActivity::class.java)
-            intent.putExtra("isPA", isPa)
+            intent.putExtra("paValue", paValue)
             selectResultLauncher?.launch(intent)
         }
 
@@ -272,7 +274,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
         }
     }
 
-    override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
+    override fun onSuccess(address: Int, version: Int, paValue: Int) {
         loadingDialog.dismissDialog()
 
         //更新蓝牙固件版本

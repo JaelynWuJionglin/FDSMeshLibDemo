@@ -9,13 +9,15 @@ import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.databinding.StuPaBottomDialogLayoutBinding
 import androidx.core.graphics.drawable.toDrawable
 
-class StuPaBottomMenuDialog(context: Context) : BaseFullDialog<StuPaBottomDialogLayoutBinding>(context),
+class StuPaBottomMenuDialog(context: Context) :
+    BaseFullDialog<StuPaBottomDialogLayoutBinding>(context),
     View.OnClickListener {
     private var listener: (Int) -> Unit = {}
 
     companion object {
-        const val MENU_PA = 0
-        const val MENU_NOT_PA = 1
+        const val MENU_NOT_PA = 0
+        const val MENU_PA = 1
+        const val MENU_TYPE_03 = 3
     }
 
     init {
@@ -61,9 +63,11 @@ class StuPaBottomMenuDialog(context: Context) : BaseFullDialog<StuPaBottomDialog
         setCancelable(true)
         setCanceledOnTouchOutside(true)
 
+        binding.tvCancel.setOnClickListener(this)
+
         binding.tvPa.setOnClickListener(this)
         binding.tvNotPa.setOnClickListener(this)
-        binding.tvCancel.setOnClickListener(this)
+        binding.tvType03.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -71,9 +75,15 @@ class StuPaBottomMenuDialog(context: Context) : BaseFullDialog<StuPaBottomDialog
             R.id.tv_pa -> {
                 listener(MENU_PA)
             }
+
             R.id.tv_not_pa -> {
                 listener(MENU_NOT_PA)
             }
+
+            R.id.tv_type_03 -> {
+                listener(MENU_TYPE_03)
+            }
+
             R.id.tv_cancel -> {
 
             }

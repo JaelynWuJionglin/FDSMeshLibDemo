@@ -107,13 +107,19 @@ class StudioActivity : FragmentActivity(), View.OnClickListener, MeshLoginListen
             when(it) {
                 StuPaBottomMenuDialog.MENU_NOT_PA -> {
                     val intent = Intent(this, MeshOtaActivity::class.java)
-                    intent.putExtra("isPA",0)
+                    intent.putExtra("paValue",0)
                     startActivity(intent)
                 }
 
                 StuPaBottomMenuDialog.MENU_PA -> {
                     val intent = Intent(this, MeshOtaActivity::class.java)
-                    intent.putExtra("isPA",1)
+                    intent.putExtra("paValue",1)
+                    startActivity(intent)
+                }
+
+                StuPaBottomMenuDialog.MENU_TYPE_03 -> {
+                    val intent = Intent(this, MeshOtaActivity::class.java)
+                    intent.putExtra("paValue",3)
                     startActivity(intent)
                 }
             }

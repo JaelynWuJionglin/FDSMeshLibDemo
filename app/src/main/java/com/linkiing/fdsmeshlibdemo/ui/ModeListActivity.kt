@@ -331,14 +331,14 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
      * @param address 地址
      * @param version 固件版本
      */
-    override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
+    override fun onSuccess(address: Int, version: Int, paValue: Int) {
         loadingDialog.dismissDialog()
 
         //更新蓝牙固件版本
         val fdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address) ?: return
         FDSMeshApi.instance.updateFirmwareVersion(fdsNodeInfo, version)
 
-        val msg = "固件版本:$version"
+        val msg = "固件版本:$version paValue:$paValue"
         LOGUtils.i("GATT_OTA ==> $msg")
         ConstantUtils.toast(this, msg)
     }

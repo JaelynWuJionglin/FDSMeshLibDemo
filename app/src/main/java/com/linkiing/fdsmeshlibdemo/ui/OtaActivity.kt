@@ -28,7 +28,7 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
     private var meshAddress = 0
     private var path = ""
     private var upFdsNodeInfo: FDSNodeInfo? = null
-    private var upIsPa = false
+    private var fmPaValue = 0
 
     override fun initBind(): ActivityOtaBinding {
         return ActivityOtaBinding.inflate(layoutInflater)
@@ -100,7 +100,7 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
                 if (isMcuUpgrade) {
                     mcuUpgrade(upFdsNodeInfo)
                 } else {
-                    bleUpgrade(upFdsNodeInfo, upIsPa)
+                    bleUpgrade(upFdsNodeInfo, fmPaValue)
                 }
             } else {
                 getVersion(true)
@@ -140,21 +140,15 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
         } else {
             GodoxCommandApi.instance.getFirmwareVersion(meshAddress, object : FirmwareCallBack {
                 @SuppressLint("SetTextI18n")
-                override fun onSuccess(address: Int, version: Int, isPa: Boolean) {
+                override fun onSuccess(address: Int, version: Int, paValue: Int) {
                     upFdsNodeInfo = FDSMeshApi.instance.getFDSNodeInfoByMeshAddress(address)
 
-                    upIsPa = isPa
+                    fmPaValue = paValue
 
                     LOGUtils.v("OTA_VER ==> version:${version.toString(16)}")
 
-                    binding.tvMsg1.text = "固件版本:${version.toString(16)}"
-                    binding.tvMsg2.text = "是否是带PA的固件:${
-                        if (isPa) {
-                            "是"
-                        } else {
-                            "否"
-                        }
-                    }"
+                    binding.tvMsg1.text = "固件版本: ${version.toString(16)}"
+                    binding.tvMsg2.text = "当前固件 paValue: $fmPaValue"
 
                     loadingDialog?.dismissDialog()
 
@@ -168,14 +162,14 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
                     //==============================================================================
 
                     if (isStart) {
-                        bleUpgrade(upFdsNodeInfo,upIsPa)
+                        bleUpgrade(upFdsNodeInfo, fmPaValue)
                     }
                 }
             })
         }
     }
 
-    private fun bleUpgrade(fdsNodeInfo: FDSNodeInfo?, isPa: Boolean) {
+    private fun bleUpgrade(fdsNodeInfo: FDSNodeInfo?, paValue: Int) {
         if (fdsNodeInfo == null) {
             return
         }
@@ -184,7 +178,7 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
          * 1,比对固件版本
          * 2,判断是否是PA固件
          */
-        if (isPa) {
+        if (paValue == 1) {
             //PA固件打开PA升级功能
             GodoxCommandApi.instance.openPaUpgrade(meshAddress, object : OpenPaCallback {
                 override fun openPaComplete() {
