@@ -36,7 +36,6 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
     private val sendQueueUtils = SendQueueUtils.instance
     private var sendIntervalTime = 0L
     private var testNumber = 20
-    private var testBole = false
 
     override fun initBind(): ModeListActivityBinding {
         return ModeListActivityBinding.inflate(layoutInflater)
@@ -236,13 +235,7 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
                         }
 
                         3 -> {
-//                            fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
-                            if (testBole) {
-                                fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
-                            } else {
-                                fdsCommandApi.getBatteryPower(address, this)
-                            }
-                            testBole = !testBole
+                            fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
                         }
                     }
                 }
