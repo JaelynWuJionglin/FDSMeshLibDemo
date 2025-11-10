@@ -73,7 +73,7 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
             shareJson()
         }
 
-        binding.myShearLog?.setOnClickListener {
+        binding.myShearLog.setOnClickListener {
             LOGUtils.shareAppLogFile { file ->
                 if (file != null) {
                     FileJaUtils.shareFile(this, file, getString(R.string.app_name))
