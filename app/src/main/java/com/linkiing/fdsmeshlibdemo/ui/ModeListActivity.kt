@@ -5,6 +5,7 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.main.MeshSend
 import com.base.mesh.api.utils.SendQueueUtils
 import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.BatteryPowerCallBack
@@ -288,7 +289,7 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
         isTestOnOffStart = true
 
         testNumber = binding.etNumber.text?.toString()?.toInt() ?: 1
-        sendIntervalTime = binding.etInvTime.text?.toString()?.toLong() ?: SendQueueUtils.SEND_INTERVAL_TIME
+        sendIntervalTime = binding.etInvTime.text?.toString()?.toLong() ?: 0L
         sendQueueUtils.setSamplingTime(sendIntervalTime)//数据采样间隔
 
         Thread {
@@ -352,5 +353,8 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
     override fun onDestroy() {
         super.onDestroy()
         sendQueueUtils.destroy()
+
+        //清空数据发送队列
+        MeshSend.instance.sendClear()
     }
 }
