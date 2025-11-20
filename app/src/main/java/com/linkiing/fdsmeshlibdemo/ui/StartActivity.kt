@@ -38,6 +38,8 @@ class StartActivity: BaseActivity<ActivityStartBinding>() {
             goActivity(MainActivity::class.java, true)
         }, 1000)
 
-        LOGUtils.d("StartActivity systemStr --> \n ${SystemUtils.getSystemStr()}")
+        LOGUtils.d("StartActivity systemStr ------------------------------------------> " +
+                "\nisHarmonyOS:${SystemUtils.isHuawei()}" +
+                "\nsystemStr:${SystemUtils.getSystemStr()}")
     }
 }
