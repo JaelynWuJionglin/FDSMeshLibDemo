@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.utils.SystemUtils
 import com.linkiing.fdsmeshlibdemo.databinding.ActivityStartBinding
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
@@ -35,5 +37,7 @@ class StartActivity: BaseActivity<ActivityStartBinding>() {
         handler.postDelayed({
             goActivity(MainActivity::class.java, true)
         }, 1000)
+
+        LOGUtils.d("StartActivity systemStr --> \n ${SystemUtils.getSystemStr()}")
     }
 }
