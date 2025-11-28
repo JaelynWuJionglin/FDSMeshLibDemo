@@ -106,7 +106,7 @@
                     android:layout_weight="1"
                     android:textSize="16sp"
                     android:textColor="@color/black1"
-                    android:text="0"
+                    android:text="20"
                     android:gravity="center"
                     android:inputType="number"/>
 
@@ -128,7 +128,7 @@
                     android:layout_weight="1"
                     android:textSize="16sp"
                     android:textColor="@color/black1"
-                    android:hint="0"
+                    android:text="100"
                     android:gravity="center"
                     android:inputType="number"/>
 

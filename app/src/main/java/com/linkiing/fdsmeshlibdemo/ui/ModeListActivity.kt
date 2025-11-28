@@ -35,7 +35,7 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
     private lateinit var loadingDialog: LoadingDialog
     private val fdsCommandApi = GodoxCommandApi.instance
     private val sendQueueUtils = SendQueueUtils.instance
-    private var sendIntervalTime = 0L
+    private var sendIntervalTime = 100L
     private var testNumber = 20
 
     override fun initBind(): ModeListActivityBinding {
