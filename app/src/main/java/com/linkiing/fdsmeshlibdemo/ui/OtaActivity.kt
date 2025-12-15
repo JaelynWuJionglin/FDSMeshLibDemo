@@ -4,13 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.TypedValue
+import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
 import com.godox.agm.callback.FirmwareCallBack
 import com.godox.agm.callback.MCUCallBack
 import com.godox.agm.callback.OpenPaCallback
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
+import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.databinding.ActivityOtaBinding
 import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
@@ -24,11 +30,13 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
     private var loadingDialog: LoadingDialog? = null
     private var meshOtaDialog: MeshOtaDialog? = null
     private var meshMcuUpgradeDialog: MeshOtaDialog? = null
+    private var alertDialog: AlertDialog? = null
     private var isMcuUpgrade: Boolean = false
     private var meshAddress = 0
     private var path = ""
     private var upFdsNodeInfo: FDSNodeInfo? = null
     private var fmPaValue = 0
+    private var otaSusCount = 0
 
     override fun initBind(): ActivityOtaBinding {
         return ActivityOtaBinding.inflate(layoutInflater)
@@ -36,9 +44,16 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         initView()
         initListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        binding.tvMsg3.text = "连续升级成功次数 otaSusCount:$otaSusCount"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -49,6 +64,7 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initView() {
         isMcuUpgrade = intent.getBooleanExtra("isMcuUpgrade", false)
         meshAddress = intent.getIntExtra("meshAddress", 0)
@@ -61,13 +77,50 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
         loadingDialog = LoadingDialog(this)
 
         meshOtaDialog = MeshOtaDialog(this, false)
-        meshOtaDialog?.setListener {
-            finish()
+        meshOtaDialog?.setListener { isSus, code ->
+            showMsgDialog(
+                if (isSus) {
+                    "升级成功!"
+                } else {
+                    "升级失败! code:$code"
+                }
+            ) {
+                if (it) {
+                    finish()
+                }
+            }
+//            //自动连续升级测试=====================================================================
+//            if (isSus) {
+//                otaSusCount++
+//                MeshLogin.instance.autoConnect(30 * 60 * 1000L){
+//                    if (it) {
+//                        bleUpgrade(upFdsNodeInfo, fmPaValue)
+//                    }
+//                }
+//                binding.tvMsg3.text = "连续升级成功次数 otaSusCount:$otaSusCount"
+//            } else {
+//                showMsgDialog("升级失败! otaSusCount:$otaSusCount code:$code") {
+//                    if (it) {
+//                        finish()
+//                    }
+//                }
+//            }
+//            //=====================================================================================
         }
 
         meshMcuUpgradeDialog = MeshOtaDialog(this, true)
-        meshMcuUpgradeDialog?.setListener {
-            finish()
+        meshMcuUpgradeDialog?.setListener { isSus, code ->
+            showMsgDialog(
+                if (isSus) {
+                    "升级成功!"
+                } else {
+                    "升级失败! code:$code"
+                }
+            ) {
+                if (it) {
+                    finish()
+                }
+            }
         }
 
         binding.titleBar.setTitle(
@@ -201,9 +254,41 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
         }
     }
 
+    private fun showMsgDialog(msg: String, listener: (Boolean) -> Unit) {
+        runOnUiThread {
+            if (alertDialog == null) {
+                alertDialog = AlertDialog.Builder(this)
+                    .setMessage(msg)
+                    .setCancelable(false)
+                    .setPositiveButton("确定") { dialog, which ->
+                        alertDialog?.dismiss()
+                        listener(true)
+                    }
+                    .show()
+
+                //设置字体大小
+                val button =  alertDialog?.getButton(AlertDialog.BUTTON_POSITIVE)
+                button?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                button?.setTextColor(ContextCompat.getColor(this, R.color.black1))
+            } else {
+                if (alertDialog?.isShowing == true) {
+                    alertDialog?.dismiss()
+                }
+                alertDialog?.setMessage(msg)
+                alertDialog?.show()
+            }
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        MeshLogin.instance.stopAutoConnectListener()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         meshOtaDialog?.dismiss()
         meshMcuUpgradeDialog?.dismiss()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }

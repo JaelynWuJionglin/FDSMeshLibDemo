@@ -1,7 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -210,7 +209,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
         if (result == null) {
             return
         }
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
             val checkDeviceList = result.data?.getSerializableExtra("checkDeviceList")
             if (checkDeviceList != null && checkDeviceList is MutableList<*>) {
                 meshOtaDeviceAdapter?.updateItem(checkDeviceList as MutableList<FDSNodeInfo>)

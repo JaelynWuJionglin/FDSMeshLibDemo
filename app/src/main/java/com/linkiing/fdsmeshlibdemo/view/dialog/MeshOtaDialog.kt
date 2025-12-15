@@ -20,7 +20,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     private var mFirmware = ByteArray(0)
     private var fdsNodeInfo: FDSNodeInfo? = null
     private var isPa = false
-    private var listener: (Boolean) -> Unit = {}
+    private var listener: (Boolean, Int) -> Unit = { _, _ -> }
 
     fun showDialog(fdsNodeInfo: FDSNodeInfo, path: String) {
         this.fdsNodeInfo = fdsNodeInfo
@@ -32,7 +32,7 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
         show()
     }
 
-    fun setListener(listener: (Boolean) -> Unit) {
+    fun setListener(listener: (Boolean, Int) -> Unit) {
         this.listener = listener
     }
 
@@ -110,16 +110,14 @@ class MeshOtaDialog(private val activity: Activity, private val isMcuUpgrade: Bo
     override fun onSuccess() {
         activity.runOnUiThread {
             dismiss()
-            ConstantUtils.toast(activity, "升级成功！")
-            listener(true)
+            listener(true, 0)
         }
     }
 
     override fun onFailed(errorCode: Int) {
         activity.runOnUiThread {
             dismiss()
-            ConstantUtils.toast(activity, "升级失败！errorCode：$errorCode")
-            listener(false)
+            listener(false, errorCode)
         }
     }
 
