@@ -1,6 +1,7 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +25,8 @@ import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 /**
  * 功能列表页
  */
-class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBack, BatteryPowerCallBack, MCUCallBack {
+class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBack,
+    BatteryPowerCallBack, MCUCallBack {
     private lateinit var modelAdapter: ModelAdapter
     private lateinit var modelAdapterV3: ModelAdapter
     private var modelList: MutableList<ModelInfo> = mutableListOf()
@@ -58,6 +60,16 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
 
         binding.etNumber.setText("$testNumber")
         binding.etInvTime.setText("$sendIntervalTime")
+
+        //直连设备 Gatt 测试
+        binding.gattTest.visibility = View.GONE
+        val connectedFDSNodeInfo = FDSMeshApi.instance.getConnectedFDSNodeInfo()
+        if (connectedFDSNodeInfo != null) {
+            if (connectedFDSNodeInfo.meshAddress == address) {
+                //直连设备
+                binding.gattTest.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun initData() {
@@ -210,37 +222,37 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
          * 注：非直连节点，同步性时间间隔，取决于固件命令处理时间间隔。
          */
         sendQueueUtils.start {
-                if (it is SeekBarBean) {
-                    when (it.model) {
-                        0 -> {
-                            val color = (0xFFFFFF * (it.value / 100.0f)).toInt()
-                            fdsCommandApi.changeLightRGBW(
-                                address,
-                                10,
-                                0,
-                                (color shr 16) and 0xFF,
-                                (color shr 8) and 0xFF,
-                                color and 0xFF,
-                                0
-                            )
-                        }
+            if (it is SeekBarBean) {
+                when (it.model) {
+                    0 -> {
+                        val color = (0xFFFFFF * (it.value / 100.0f)).toInt()
+                        fdsCommandApi.changeLightRGBW(
+                            address,
+                            10,
+                            0,
+                            (color shr 16) and 0xFF,
+                            (color shr 8) and 0xFF,
+                            color and 0xFF,
+                            0
+                        )
+                    }
 
-                        1 -> {
-                            fdsCommandApi.changeLightXY(
-                                address,
-                                it.value,
-                                0,
-                                0,
-                                0,
-                            )
-                        }
+                    1 -> {
+                        fdsCommandApi.changeLightXY(
+                            address,
+                            it.value,
+                            0,
+                            0,
+                            0,
+                        )
+                    }
 
-                        3 -> {
-                            fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
-                        }
+                    3 -> {
+                        fdsCommandApi.changeLightSwitch(address, it.value % 2 == 0)
                     }
                 }
             }
+        }
 
         binding.seekbarBrightnessV2.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -280,6 +292,10 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
         binding.btTest1.setOnClickListener {
             testOnOff()
         }
+
+        binding.gattTest.setOnClickListener {
+            goActivity(GattTestActivity::class.java, false)
+        }
     }
 
     private fun testOnOff() {
@@ -313,9 +329,17 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
      * @param option 0-电量百分比，1-电量格子
      * @param power 如果option为0则范围0-100，如果option为1则范围0-3
      */
-    override fun onSuccess(address: Int, state: Int, hour: Int, minute: Int, option: Int, power: Int) {
+    override fun onSuccess(
+        address: Int,
+        state: Int,
+        hour: Int,
+        minute: Int,
+        option: Int,
+        power: Int,
+    ) {
         loadingDialog.dismissDialog()
-        val msg = "设备地址：$address 充电状态：${state} 使用时间小时部分：${hour} 使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
+        val msg =
+            "设备地址：$address 充电状态：${state} 使用时间小时部分：${hour} 使用时间分钟部分：${minute}，电量格式：${option}，电量：${power}"
         LOGUtils.d(msg)
         ConstantUtils.toast(this, msg)
     }

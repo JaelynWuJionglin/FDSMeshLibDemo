@@ -142,6 +142,16 @@
                 android:textSize="14sp"
                 android:textColor="@color/black"/>
 
+            <Button
+                android:id="@+id/gatt_test"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="直连设备Gatt测试"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="15dp"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
