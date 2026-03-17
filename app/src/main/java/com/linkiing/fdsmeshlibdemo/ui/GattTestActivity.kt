@@ -98,16 +98,15 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     }
 
     override fun onNotify(
+        macAddress: String,
         serviceUUID: UUID,
         charUUID: UUID,
         data: ByteArray,
     ) {
-        LOGUtils.d(
-            "$tag onNotify serviceUUID:$serviceUUID charUUID:$charUUID data:${
-                ByteUtils.toHexString(
-                    data
-                )
-            }"
+        LOGUtils.d("$tag onNotify macAddress:$macAddress " +
+                "serviceUUID:$serviceUUID " +
+                "charUUID:$charUUID " +
+                "data:${ByteUtils.toHexString(data)}"
         )
     }
 
