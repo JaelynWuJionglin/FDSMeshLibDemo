@@ -2,6 +2,7 @@ package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
 import com.base.mesh.api.listener.GattNotifyListener
+import com.base.mesh.api.listener.MeshLoginListener
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.base.mesh.api.utils.ByteUtils
@@ -12,7 +13,8 @@ import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.telink.ble.mesh.core.ble.GattRequest
 import java.util.UUID
 
-class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyListener {
+class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyListener,
+    MeshLoginListener {
     private val tag = "GattTestActivity"
     private val MCU_UUID_SERVER = "0000fff0-0000-1000-8000-00805f9b34fb"
     private val MCU_UUID_CHAR = "0000fff3-0000-1000-8000-00805f9b34fb"
@@ -26,8 +28,16 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
 
         initView()
 
+        //mesh连接断开监听
+        MeshLogin.instance.addLoginListener(this)
+
         //GattNotify监听
         FDSMeshApi.instance.addGattNotifyListener(this)
+
+        //开启Notify，设备连接之后。
+        if (MeshLogin.instance.isLogin()) {
+            enableNotify()
+        }
     }
 
     private fun initView() {
@@ -64,11 +74,19 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         }
     }
 
+    //开启Notify
+    private fun enableNotify() {
+        /*
+         * 此方法会自动去重，已经enable过的不会再重复enable。需要开启多个不同通道Notify，可分别多次调用。
+         */
+        FDSMeshApi.instance.enableNotify(MCU_UUID_SERVER, MCU_UUID_CHAR)
+    }
+
     /**
      * 切换BLE直连设备。
      */
     private fun checkConnectDevice() {
-        MeshLogin.instance.checkConnectDevice("A4:C1:38:C5:8C:F5",30 * 1000L) {
+        MeshLogin.instance.checkConnectDevice("A4:C1:38:C5:8C:F5", 30 * 1000L) {
             if (it) {
                 LOGUtils.d("$tag 连接成功!")
             } else {
@@ -94,7 +112,11 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
             LOGUtils.e("$tag sendCallBack timeout")
             return false
         }
+    }
 
+    override fun onMeshConnected() {
+        super.onMeshConnected()
+        enableNotify()
     }
 
     override fun onNotify(
@@ -103,15 +125,17 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         charUUID: UUID,
         data: ByteArray,
     ) {
-        LOGUtils.d("$tag onNotify macAddress:$macAddress " +
-                "serviceUUID:$serviceUUID " +
-                "charUUID:$charUUID " +
-                "data:${ByteUtils.toHexString(data)}"
+        LOGUtils.d(
+            "$tag onNotify macAddress:$macAddress " +
+                    "serviceUUID:$serviceUUID " +
+                    "charUUID:$charUUID " +
+                    "data:${ByteUtils.toHexString(data)}"
         )
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        MeshLogin.instance.removeLoginListener(this)
         FDSMeshApi.instance.removeGattNotifyListener(this)
     }
 }
