@@ -34,8 +34,7 @@
         android:layout_gravity="center_horizontal"
         android:textSize="14sp"
         android:textColor="@color/white"
-        android:text="发送"
-        android:layout_above="@+id/bt_import_json" />
+        android:text="发送"/>
 
     <Button
         android:id="@+id/bt_check_connect"
@@ -48,6 +47,19 @@
         android:layout_gravity="center_horizontal"
         android:textSize="14sp"
         android:textColor="@color/white"
-        android:text="切换直连设备"
-        android:layout_above="@+id/bt_import_json" />
+        android:text="切换直连设备" />
+
+
+    <Button
+        android:id="@+id/bt_send_test"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/blue_round_bg"
+        android:layout_gravity="center_horizontal"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:text="连续发送测试"/>
 </LinearLayout>

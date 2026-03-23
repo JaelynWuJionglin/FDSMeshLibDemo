@@ -1,5 +1,6 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
+import android.bluetooth.BluetoothGatt
 import android.os.Bundle
 import com.base.mesh.api.listener.GattNotifyListener
 import com.base.mesh.api.listener.MeshLoginListener
@@ -16,8 +17,15 @@ import java.util.UUID
 class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyListener,
     MeshLoginListener {
     private val tag = "GattTestActivity"
-    private val MCU_UUID_SERVER = "0000fff0-0000-1000-8000-00805f9b34fb"
-    private val MCU_UUID_CHAR = "0000fff3-0000-1000-8000-00805f9b34fb"
+    private var sendTestNumber = 0
+    private var sendTestTimeMi = 0L
+
+    //    private val MCU_UUID_SERVER = "0000fff0-0000-1000-8000-00805f9b34fb"
+    //    private val MCU_UUID_CHAR = "0000fff3-0000-1000-8000-00805f9b34fb"
+
+    private val SERVICE_TEST2 = "0000fff0-0000-1000-8000-00805f9b34fb" // 服务
+    private val SEND_UUID_TEST2 = "0000fff2-0000-1000-8000-00805f9b34fb" // 通道
+    private val NOTIF_UUID_TEST2 = "0000fff1-0000-1000-8000-00805f9b34fb" // 通道
 
     override fun initBind(): ActivityGattTestBinding {
         return ActivityGattTestBinding.inflate(layoutInflater)
@@ -61,8 +69,8 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
             }
 
             val gattRequest = GattRequest.newInstance()
-            gattRequest.serviceUUID = UUID.fromString(MCU_UUID_SERVER)
-            gattRequest.characteristicUUID = UUID.fromString(MCU_UUID_CHAR)
+            gattRequest.serviceUUID = UUID.fromString(SERVICE_TEST2)
+            gattRequest.characteristicUUID = UUID.fromString(SEND_UUID_TEST2)
             gattRequest.data = sendBytes
             gattRequest.type = GattRequest.RequestType.WRITE_NO_RESPONSE
             gattRequest.callback = sendCallBack
@@ -72,6 +80,24 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         binding.btCheckConnect.setOnClickListener {
             checkConnectDevice()
         }
+
+        binding.btSendTest.setOnClickListener {
+            sendTestNumber = 0
+            sendTest()
+        }
+    }
+
+    private fun sendTest() {
+        sendTestTimeMi = System.currentTimeMillis()
+
+        val gattRequest = GattRequest.newInstance()
+        gattRequest.serviceUUID = UUID.fromString(SERVICE_TEST2)
+        gattRequest.characteristicUUID = UUID.fromString(SEND_UUID_TEST2)
+        gattRequest.data = "SWSON".toByteArray(Charsets.UTF_8)
+        gattRequest.type = GattRequest.RequestType.WRITE_NO_RESPONSE
+        gattRequest.callback = sendCallBack
+        FDSMeshApi.instance.sendGattRequest(gattRequest)
+        LOGUtils.i("$tag sendTest success!")
     }
 
     //开启Notify
@@ -79,7 +105,7 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         /*
          * 此方法会自动去重，已经enable过的不会再重复enable。需要开启多个不同通道Notify，可分别多次调用。
          */
-        FDSMeshApi.instance.enableNotify(MCU_UUID_SERVER, MCU_UUID_CHAR)
+        FDSMeshApi.instance.enableNotify(SERVICE_TEST2, NOTIF_UUID_TEST2)
     }
 
     /**
@@ -131,6 +157,14 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
                     "charUUID:$charUUID " +
                     "data:${ByteUtils.toHexString(data)}"
         )
+        LOGUtils.v("$tag onNotify sendTest 间隔ms:${System.currentTimeMillis() - sendTestTimeMi}")
+
+        if (charUUID == UUID.fromString(NOTIF_UUID_TEST2)) {
+            if (sendTestNumber < 10) {
+                sendTestNumber++
+                sendTest()
+            }
+        }
     }
 
     override fun onDestroy() {

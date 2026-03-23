@@ -5,8 +5,8 @@ buildscript {
         gson_version = "2.10"
         minSdk = 21
         targetSdk = 35
-        versionCode = 155
-        versionName = "1.5.5"
+        versionCode = 156
+        versionName = "1.5.6"
     }
 }
 
