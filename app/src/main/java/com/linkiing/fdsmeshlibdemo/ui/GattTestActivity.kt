@@ -11,12 +11,14 @@ import com.godox.sdk.api.FDSMeshApi
 import com.linkiing.fdsmeshlibdemo.databinding.ActivityGattTestBinding
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
+import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.core.ble.GattRequest
 import java.util.UUID
 
 class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyListener,
     MeshLoginListener {
     private val tag = "GattTestActivity"
+    private var loadingDialog: LoadingDialog? = null
     private var sendTestNumber = 0
     private var sendTestTimeMi = 0L
 
@@ -26,6 +28,11 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     private val SERVICE_TEST2 = "0000fff0-0000-1000-8000-00805f9b34fb" // 服务
     private val SEND_UUID_TEST2 = "0000fff2-0000-1000-8000-00805f9b34fb" // 通道
     private val NOTIF_UUID_TEST2 = "0000fff1-0000-1000-8000-00805f9b34fb" // 通道
+
+    private val testMacList = mutableListOf(
+        "A4:C1:38:A0:49:C2 ", "A4:C1:38:7F:92:1D", "A4:C1:38:FD:FA:90"
+    )
+    private var checkIndex = 0
 
     override fun initBind(): ActivityGattTestBinding {
         return ActivityGattTestBinding.inflate(layoutInflater)
@@ -50,6 +57,8 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
 
     private fun initView() {
         binding.titleBar.initTitleBar("MeshGattTest", "")
+
+        loadingDialog = LoadingDialog(this)
 
         binding.btSend.setOnClickListener {
             val sendStr = binding.etSend.text?.toString()?.trim() ?: ""
@@ -78,7 +87,13 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         }
 
         binding.btCheckConnect.setOnClickListener {
-            checkConnectDevice()
+            if (checkIndex < testMacList.size - 1) {
+                checkIndex++
+            } else {
+                checkIndex = 0
+            }
+            LOGUtils.i("$tag checkConnectDevice -- checkIndex:$checkIndex | mac:${testMacList[checkIndex]}")
+            checkConnectDevice(testMacList[checkIndex])
         }
 
         binding.btSendTest.setOnClickListener {
@@ -101,8 +116,7 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     }
 
     //开启Notify
-    private fun enableNotify() {
-        /*
+    private fun enableNotify() {/*
          * 此方法会自动去重，已经enable过的不会再重复enable。需要开启多个不同通道Notify，可分别多次调用。
          */
         FDSMeshApi.instance.enableNotify(SERVICE_TEST2, NOTIF_UUID_TEST2)
@@ -111,8 +125,11 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     /**
      * 切换BLE直连设备。
      */
-    private fun checkConnectDevice() {
-        MeshLogin.instance.checkConnectDevice("A4:C1:38:C5:8C:F5", 30 * 1000L) {
+    private fun checkConnectDevice(macAddress: String) {
+        val outTime = 30 * 1000L
+        loadingDialog?.showDialog(outTime)
+        MeshLogin.instance.checkConnectDevice(macAddress, outTime) {
+            loadingDialog?.dismissDialog()
             if (it) {
                 LOGUtils.d("$tag 连接成功!")
             } else {
@@ -152,10 +169,11 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         data: ByteArray,
     ) {
         LOGUtils.d(
-            "$tag onNotify macAddress:$macAddress " +
-                    "serviceUUID:$serviceUUID " +
-                    "charUUID:$charUUID " +
-                    "data:${ByteUtils.toHexString(data)}"
+            "$tag onNotify macAddress:$macAddress serviceUUID:$serviceUUID charUUID:$charUUID " + "data:${
+                ByteUtils.toHexString(
+                    data
+                )
+            }"
         )
         LOGUtils.v("$tag onNotify sendTest 间隔ms:${System.currentTimeMillis() - sendTestTimeMi}")
 
