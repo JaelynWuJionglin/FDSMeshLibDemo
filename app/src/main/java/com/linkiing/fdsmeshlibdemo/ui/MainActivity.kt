@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.utils.HttpMethod
 import com.base.mesh.api.utils.HttpUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.google.gson.Gson
@@ -49,8 +50,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun initView() {
         binding.titleBar.initTitleBar(false, R.drawable.settings_image)
 
-        binding.titleBar.setOnEndImageListener{
-            goActivity(SettingActivity::class.java,false)
+        binding.titleBar.setOnEndImageListener {
+            goActivity(SettingActivity::class.java, false)
         }
 
         loadingDialog = LoadingDialog(this)
@@ -69,13 +70,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 //导入json数据
                 loadingDialog.showDialog()
                 updateProvisionerAddress(jsonStr) { newJson ->
-                    runOnUiThread{
+                    runOnUiThread {
                         loadingDialog.dismissDialog()
                         if (!TextUtils.isEmpty(newJson)) {
                             studioListBean.meshJsonStr = newJson
                             studioAdapter.addStudio(studioListBean)
                         } else {
-                            ConstantUtils.toast(this,"导入失败！")
+                            ConstantUtils.toast(this, "导入失败！")
                         }
                     }
                 }
@@ -108,7 +109,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                         FDSMeshApi.instance.importMeshJson(it.meshJsonStr)
                     }
                     studioAdapter.changeChoose(it)
-                    goActivity(StudioActivity::class.java, "index",it.index,false)
+                    goActivity(StudioActivity::class.java, "index", it.index, false)
                 }
 
                 override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
@@ -137,7 +138,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                         inputTextDialog.setDefText("Studio-${studioAdapter.getStudioNextIndex()}")
                         inputTextDialog.showDialog()
                     } else {
-                        ConstantUtils.toast(this,"选择错误！")
+                        ConstantUtils.toast(this, "选择错误！")
                     }
                 }
             }
@@ -156,30 +157,48 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
      *    之后保存修改后的json可直接使用。
      *    同一台手机相同的json信息，每次从后台请求的provisionerAddress相同，应尽量避免多次调用给后台制造压力。
      */
-    private fun updateProvisionerAddress(jsonStr: String, updateProvisionerAddressListener: (String) -> Unit) {
+    private fun updateProvisionerAddress(
+        jsonStr: String,
+        updateProvisionerAddressListener: (String) -> Unit,
+    ) {
+        /*
+         * requireValidated: false：只判断是否连接到“声明可访问互联网”的网络，兼容性最好；
+         *                   true ：Android 6.0+ 会额外要求系统已验证可访问互联网，更准确，但更严格。
+         */
+        if (!HttpUtils.instance.isNetworkConnected(this, false)) {
+            //无网络
+            LOGUtils.e("Error! updateProvisionerAddress无网络！")
+            updateProvisionerAddressListener("")
+            return
+        }
+
         //从json中获取信息
         val meshJsonInfo = FDSMeshApi.instance.getMeshInfoByJson(jsonStr)
         LOGUtils.i("HTTP importMeshJson ==> netWorkKey:${meshJsonInfo.netWorkKey}  provisionAddress:${meshJsonInfo.provisionerAddress}")
 
         //从服务器获取分配的provisionerAddress
-        val getProvisionAddressUrlStr = "http://godox.light.belvie-iot.com/api/provision/queryAndSync?" +
-                "app_uuid=${FDSMeshApi.instance.getAppLocalUUID()}" +
-                "&network_key=${meshJsonInfo.netWorkKey}" +
-                "&address=${meshJsonInfo.provisionerAddress}"
-        HttpUtils().httpRequest(this,HttpUtils.GET,getProvisionAddressUrlStr){
+        val getProvisionAddressUrlStr =
+            "http://godox.light.belvie-iot.com/api/provision/queryAndSync?" +
+                    "app_uuid=${FDSMeshApi.instance.getAppLocalUUID()}" +
+                    "&network_key=${meshJsonInfo.netWorkKey}" +
+                    "&address=${meshJsonInfo.provisionerAddress}"
+        HttpUtils.instance.httpRequest(HttpMethod.GET, getProvisionAddressUrlStr) {
             LOGUtils.i("HTTP getProvisionAddressUrlStr ==> it:$it")
 
             if (!TextUtils.isEmpty(it)) {
                 try {
                     //请求到服务器的provisionAddress，根据provisionAddress导入json
-                    val httpProvisionBean = Gson().fromJson(it,HttpProvisionBean::class.java)
+                    val httpProvisionBean = Gson().fromJson(it, HttpProvisionBean::class.java)
                     LOGUtils.i("HTTP ==> address:${httpProvisionBean.data.address}")
 
                     var newMeshJson = jsonStr
                     if (httpProvisionBean.code == 0) {
                         //获取到ProvisionerAddress，更新到要导入的JSON文件中
                         val serverProvisionAddress = httpProvisionBean.data.address
-                        newMeshJson = FDSMeshApi.instance.updateMeshJsonProvisionerAddress(jsonStr,serverProvisionAddress)
+                        newMeshJson = FDSMeshApi.instance.updateMeshJsonProvisionerAddress(
+                            jsonStr,
+                            serverProvisionAddress
+                        )
                     }
                     updateProvisionerAddressListener(newMeshJson)
                 } catch (e: Exception) {
