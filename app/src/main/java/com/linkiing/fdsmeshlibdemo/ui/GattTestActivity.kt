@@ -1,6 +1,5 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
-import android.bluetooth.BluetoothGatt
 import android.os.Bundle
 import com.base.mesh.api.listener.GattNotifyListener
 import com.base.mesh.api.listener.MeshLoginListener
@@ -29,9 +28,7 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     private val SEND_UUID_TEST2 = "0000fff2-0000-1000-8000-00805f9b34fb" // 通道
     private val NOTIF_UUID_TEST2 = "0000fff1-0000-1000-8000-00805f9b34fb" // 通道
 
-    private val testMacList = mutableListOf(
-        "A4:C1:38:A0:49:C2 ", "A4:C1:38:7F:92:1D", "A4:C1:38:FD:FA:90"
-    )
+    private val testMacList = mutableListOf<String>()
     private var checkIndex = 0
 
     override fun initBind(): ActivityGattTestBinding {
@@ -59,6 +56,10 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         binding.titleBar.initTitleBar("MeshGattTest", "")
 
         loadingDialog = LoadingDialog(this)
+
+        for (fdsNode in FDSMeshApi.instance.getFDSNodes()) {
+            testMacList.add(fdsNode.macAddress)
+        }
 
         binding.btSend.setOnClickListener {
             val sendStr = binding.etSend.text?.toString()?.trim() ?: ""
@@ -129,6 +130,7 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
         val outTime = 30 * 1000L
         loadingDialog?.showDialog(outTime)
         MeshLogin.instance.checkConnectDevice(macAddress, outTime) {
+            LOGUtils.d("$tag checkConnectDevice -- macAddress:$macAddress it:$it")
             loadingDialog?.dismissDialog()
             if (it) {
                 LOGUtils.d("$tag 连接成功!")
