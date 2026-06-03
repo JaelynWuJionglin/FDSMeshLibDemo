@@ -117,7 +117,8 @@ class GattTestActivity : BaseActivity<ActivityGattTestBinding>(), GattNotifyList
     }
 
     //开启Notify
-    private fun enableNotify() {/*
+    private fun enableNotify() {
+        /*
          * 此方法会自动去重，已经enable过的不会再重复enable。需要开启多个不同通道Notify，可分别多次调用。
          */
         FDSMeshApi.instance.enableNotify(SERVICE_TEST2, NOTIF_UUID_TEST2)
