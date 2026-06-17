@@ -1,50 +1,65 @@
 # Android Mesh SDK说明⽂档
 ## ⼀.SDK说明
 ### 1，mesh核心库
-GodoxMeshLib_v1.2.3  
-LsTiBleMeshLib_v1.2.3   
-
-### 2，mesh数据协议库
-GodoxAgmLib_v1.1.2  
-
-### 3，⽀持的Android版本：
+```
+GodoxMeshLib_vX.X.X  
+LsTiBleMeshLib_vX.X.X
+```
+### 2，⽀持的Android版本：
+```
 Android5.0以上（包含）
+```
 
-### 4，开发语⾔：
+### 3，开发语⾔：
+```
 kotlin Java
+```
 
-### 5，编译环境：
-gradle-7.3.3
+### 4，编译环境：
+```
+gradle-8.13
+```
 
 ## ⼆.⼯程介绍
-### 1.下载和集成
-代码仓库：  
-https://github.com/JaelynWuJionglin/FDSMeshLibDemo.git  
-aar路径：  
-FDSMeshLibDemo -> App -> libs
-
-### 2.权限配置
-注意：蓝牙权限动态需动态申请，并且需要开启GPS，具体参考Demo
-
+### 1,aar路径
 ```
-<!-- 网络 -->  
-<uses-permission android:name="android.permission.INTERNET" />  
-<!-- 定位 蓝牙需要 -->  
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />   
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
-<!-- 蓝牙 -->  
-<uses-permission android:name="android.permission.BLUETOOTH"  
-  android:maxSdkVersion="30" />  
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"   
-  android:maxSdkVersion="30" />  
-<uses-permission android:name="android.permission.BLUETOOTH_SCAN" />  
-<uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />  
+demo -> app -> libs
 ``` 
 
-### 3.SDK集成配置
-（1）build.gradle中配置
+### 2，权限配置
+注意：蓝牙权限动态需动态申请，并且需要开启GPS，具体参考Demo
 
+```xml
+<manifest>
+    <!-- 网络 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 定位 蓝牙需要 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 蓝牙 -->
+    <uses-permission 
+        android:maxSdkVersion="30" 
+        android:name="android.permission.BLUETOOTH" />
+    <uses-permission 
+        android:maxSdkVersion="30" 
+        android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission 
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" 
+        tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+</manifest>
+``` 
+
+### 3，网络安全策略配置
 ```
+（1）如果app中增加了networkSecurityConfig的网络安全配置，需要将域名"godox.light.belvie-iot.com"也添加到配置中并允许，如果没有则忽略本条。
+```
+
+### 4，SDK集成配置
+（1）build.gradle中配置
+```groovy
   //引入aar包  
   implementation fileTree(dir: 'libs', include: ['*.aar'])  
   //加密（SDK需要） 
@@ -56,21 +71,36 @@ FDSMeshLibDemo -> App -> libs
 
 （2）Sdk的MeshApp继承自Application，需要将app的Application继承MeshApp。
 
-（3）MeshConfigure为sdk的初始化配置，在Application中，建议使用demo中的默认配置。
+（3）MeshConfigure为sdk的初始功能配置，某些参数需要跟设备端固件对应，一般在Application中使用，无特殊要求使用默认配置即可。
 
 （4）初始化mesh数据
 
-```
- App.instance.initMeshData()
- 注意：会获取Android_ID等设备信息，生成唯一ID，故首次启动app，需要在用户同意隐私政策后调用，避免商店上架问题。
+```kotlin
+/**
+ * appId提供应用包名向我们申请
+ * 注意：会获取Android_ID等设备信息，生成唯一ID，故首次启动app，需要在用户同意隐私政策后调用，避免商店上架问题。
+ */
+ val appId = ""
+ App.getInstance().initMesh(appId)
+ 
 ```
 
 （5）混淆
-```
--keep class org.spongycastle** {*;}  
--keep class com.godox.sdk** {*;}  
--keep class com.base.mesh.api** {*;}  
--keep class com.telink.ble.mesh** {*;}  
+
+```text
+#spongycastle
+-keep class org.spongycastle** {*;}
+
+# Gson
+-keep class com.google.gson** {*;}
+-keep class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# SDK不混淆
+-keep class com.godox.sdk** {*;}
+-keep class com.base.mesh.api** {*;}
+-keep class com.telink.ble.mesh** {*;}
 ```
 
 ## 三. Api接⼝
@@ -78,18 +108,30 @@ FDSMeshLibDemo -> App -> libs
 接⼝类：FDSSearchDevicesApi
 调⽤⽅式：类⽅法调⽤
 
-```
-
+```kotlin
 /**
- * 扫描设备
- * @param filterName 基于设备的localname进行过滤，传空默认不过滤
+ * 搜索未配网设备
+ * @param filterName 基于设备的localName进行过滤，传空默认不过滤
  * @param scanOutTime 扫描超时时间
  * @param callBack 蓝牙外设对象回调
  */
 fun startScanDevice(context: Context,filterName: String, scanOutTime: Long, callBack: FDSBleDevCallBack)
 
 /**
- * 停止扫描
+ * 搜索已配网设备
+ * @param filterName 基于设备的localName进行过滤，传空默认不过滤
+ * @param scanOutTime 扫描超时时间
+ * @param callBack 蓝牙外设对象回调
+ */
+fun startScanProvisionedDevice(
+    context: Context,
+    filterName: String,
+    scanOutTime: Long,
+    callBack: FDSBleDevCallBack
+)
+        
+/**
+ * 停止搜索
  */
 fun stopScan()
 
@@ -104,8 +146,7 @@ fun destroy()
 接⼝类：FDSAddOrRemoveDeviceApi
 调⽤⽅式：类⽅法调⽤
 
-```
-
+```kotlin
 /**
  * 设备组网
  * @param advertisingDevice 蓝牙外设对象
@@ -120,6 +161,23 @@ fun deviceAddNetWork(
         advertisingDeviceList: MutableList<AdvertisingDevice>,
         fdsAddNetworkCallBack: FDSAddNetWorkCallBack
 )
+
+/**
+ * 设备组网 （FastProvision）
+ * @param advertisingDeviceList 蓝牙外设对象列表
+ * @param fdsFastAddNetWorkCallBack 组网回调
+ */
+fun deviceFastAddNetWork(
+    advertisingDeviceList: MutableList<AdvertisingDevice>,
+    fdsFastAddNetWorkCallBack: FDSFastAddNetWorkCallBack
+): Boolean
+
+/**
+ * 停止设备组网
+ *（注意:调用方法后不会立即停止配网，会等待当前正在配网的设备配网完成，且需要回调onComplete()之后，才可以重新使用deviceAddNetWork()方法）
+ * @param fdsAddNetworkCallBack 组网回调
+ */
+fun stopDeviceAddNetWork(fdsAddNetworkCallBack: FDSAddNetWorkCallBack)
 
 /**
  * 移除节点(退网)
@@ -146,11 +204,67 @@ fun destroy()
 
 ```
 
-### 3，MeshApi
+### 3，Mesh网络连接管理
+接⼝类： MeshLogin
+调⽤⽅式：单例模式
+
+```kotlin
+
+/**
+* mesh网络是否已经连接
+*/
+fun isLogin(): Boolean
+
+/**
+ * 自动连接mesh网络
+ */
+fun autoConnect(): Boolean
+
+/**
+ * 自动连接mesh网络
+ */
+fun autoConnect(outTime: Long, loginListener: (Boolean) -> Unit): Boolean
+
+/**
+ * 取消autoConnect loginListener
+ */
+fun stopAutoConnectListener()
+
+/**
+ * 添加mesh连接监听
+ */
+fun addLoginListener(loginListener: MeshLoginListener)
+
+/**
+ * 删除mesh连接状态监听
+ */
+fun removeLoginListener(loginListener: MeshLoginListener)
+
+/**
+ * 切换直连节点
+ * @param macAddress 需要连接的直连设备mac地址
+ * @param outTime 超时时间
+ */
+fun checkConnectDevice(macAddress: String, outTime: Long, loginListener: (Boolean) -> Unit)
+
+/**
+ * 设置autoConnect使能禁能
+ */
+fun setAutoConnectEnable(isEnable: Boolean)
+
+/**
+ * 断开并停止连接。
+ */
+fun disconnect()
+
+
+```
+
+### 4，MeshApi
 接⼝类： FDSMeshApi
 调⽤⽅式：单例模式
 
-```
+```kotlin
 /**
  * 设置接入使用需要申请AppId
  * @param appId 应用AppId
@@ -293,7 +407,6 @@ fun configSubscribe(
  */
 fun refreshFDSNodeInfoState(): Boolean
 
-
 /**
  * 设置节点在线状态改变的监听
  */
@@ -322,10 +435,17 @@ fun configFDSNodePublishState(isOn: Boolean, fdsNodeInfo: FDSNodeInfo): Boolean
 fun sendData(address: Int, data: ByteArray, responseOpcode: Int): Boolean
 
 /**
- * 发送数据响应
+ * 设置Mesh设备数据响应回调
  * @param fdsResponseCallBack 发送数据响应回调
  */
 fun setResponseDataCallBack(fdsResponseCallBack: FDSResponseCallBack)
+
+/**
+ * 设置Mesh设备数据响应回调并注册resOpcode
+ * @param resOpcodes 注册的resOpcode
+ * @param fdsResponseCallBack 发送数据响应回调
+ */
+fun setResponseDataCallBack(resOpcodes: IntArray, fdsResponseCallBack: FDSResponseCallBack)
 
 /**
  * 获取当前使用的Mesh信息
@@ -412,6 +532,39 @@ fun startMcuOTAWithOtaData(
  * 结束MCU OTA升级
  */
 fun stopMcuOTA()
+
+/**
+ * mcu是否正在升级
+ */
+fun isMcuOtaIng(): Boolean
+
+/**
+ * 给直连设备发送gatt数据
+ */
+fun sendGattRequest(gattRequest: GattRequest)
+
+/**
+ * 开启Notify
+ */
+fun enableNotify(serviceUUID: String, characteristicUUID: String)
+
+/**
+ * 添加gatt数据接收监听
+ */
+fun addGattNotifyListener(gattNotifyListener: GattNotifyListener)
+
+/**
+ * 移除gatt数据接收监听
+ */
+fun removeGattNotifyListener(gattNotifyListener: GattNotifyListener)
+
+/**
+ * 请求连接参数更新
+ * @param connectionPriority CONNECTION_PRIORITY_BALANCED（平衡模式）
+ *                           CONNECTION_PRIORITY_HIGH（高性能模式）
+ *                           CONNECTION_PRIORITY_LOW_POWER（低功耗模式）
+ */
+fun requestConnectionPriority(connectionPriority: Int)
 
 /**
  * 销毁并释放资源
