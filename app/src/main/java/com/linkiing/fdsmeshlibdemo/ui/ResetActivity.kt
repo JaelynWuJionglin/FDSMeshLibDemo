@@ -129,28 +129,28 @@ class ResetActivity : BaseActivity<ActivityResetBinding>() {
     private fun resetDevice() {
         stopScan()
 
-        val list = resetDeviceAdapter.getCheckDevices()
-        if (list.isEmpty()) {
+        //需要重置的设备列表
+        val deviceList = resetDeviceAdapter.getCheckDevices()
+        if (deviceList.isEmpty()) {
             return
         }
 
-        resetSize = list.size
+        resetSize = deviceList.size
 
         loadingDialog.showDialog()
         loadingDialog.updateLoadingMsg("重置中...0/$resetSize")
 
         /**
-         * 重置设备入网状态
+         * 重置设备入网状态。
+         *（不安全的操作，用于测试或紧急调试，不建议用在正式项目）
          * (注：1，本质是通过蓝牙Advertise的方式，给特定设备发特定的广播。
          *     2，使用这个方法注意程序是否已经开启了其他Advertise，避免广播的占用导致调用方法的失败。
          *     3，此方式适用于丢失了mesh的网络数据，又需要重置设备的时候使用。
          *     4，此方式禁止用于恶意破坏其他的mesh网络。)
-         *  @param deviceList 需要重置的设备列表
-         *  @param advertiseTime 单个设备重置广播的时长
-         *  @param fixedKey 密钥，和固件端协定
          */
-        val fixedKey = resources.getInteger(R.integer.reset_private_key_fixed)
-        FDSResetDeviceApi.instance.startResetAdvertise(list, 2000L, fixedKey) { isOk, number ->
+        val advertiseTime = 2000L //单个设备重置广播的时长
+        val fixedKey: Int = resources.getInteger(R.integer.reset_private_key_fixed) //密钥，和固件端协定
+        FDSResetDeviceApi.instance.startResetAdvDevice(deviceList, advertiseTime, fixedKey) { isOk, number ->
             runOnUiThread {
                 loadingDialog.updateLoadingMsg("重置中...$number/$resetSize")
 
