@@ -4,21 +4,17 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
+import android.widget.ArrayAdapter
 import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.databinding.StuPaBottomDialogLayoutBinding
 import androidx.core.graphics.drawable.toDrawable
+import com.godox.sdk.api.FDSMeshApi
 
-class StuPaBottomMenuDialog(context: Context) :
-    BaseFullDialog<StuPaBottomDialogLayoutBinding>(context),
-    View.OnClickListener {
+class StuPaBottomMenuDialog(private val context: Context) :
+    BaseFullDialog<StuPaBottomDialogLayoutBinding>(context) {
     private var listener: (Int) -> Unit = {}
-
-    companion object {
-        const val MENU_NOT_PA = 0
-        const val MENU_PA = 1
-        const val MENU_TYPE_03 = 3
-    }
+    private var adapter: ArrayAdapter<String>? = null
+    private val dataList = mutableListOf<String>()
 
     init {
         window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
@@ -40,6 +36,7 @@ class StuPaBottomMenuDialog(context: Context) :
      */
     fun showDialog() {
         if (!isShowing) {
+            updateData()
             super.show()
         }
     }
@@ -63,31 +60,58 @@ class StuPaBottomMenuDialog(context: Context) :
         setCancelable(true)
         setCanceledOnTouchOutside(true)
 
-        binding.tvCancel.setOnClickListener(this)
+        binding.tvCancel.setOnClickListener {
+            dismissDialog()
+        }
 
-        binding.tvPa.setOnClickListener(this)
-        binding.tvNotPa.setOnClickListener(this)
-        binding.tvType03.setOnClickListener(this)
+        updateDataList()
+        adapter = ArrayAdapter(context, R.layout.item_custom_text, dataList)
+        binding.listView.setAdapter(adapter)
+
+        binding.listView.setOnItemClickListener { parent, view, position, id ->
+            if (position >= 0 && position < dataList.size) {
+                when (val itemStr = dataList[position]) {
+                    "NOT_PA" -> {
+                        listener(0)
+                    }
+
+                    "NEED_PA" -> {
+                        listener(1)
+                    }
+
+                    else -> {
+                        val strPa = itemStr.removePrefix("FM_TYPE_")
+                        val isPa = try {
+                            Integer.parseInt(strPa)
+                        } catch (n: NumberFormatException) {
+                            n.printStackTrace()
+                            -1
+                        }
+                        listener(isPa)
+                    }
+                }
+            }
+            dismissDialog()
+        }
     }
 
-    override fun onClick(v: View) {
-        when (v.id) {
-            R.id.tv_pa -> {
-                listener(MENU_PA)
-            }
-
-            R.id.tv_not_pa -> {
-                listener(MENU_NOT_PA)
-            }
-
-            R.id.tv_type_03 -> {
-                listener(MENU_TYPE_03)
-            }
-
-            R.id.tv_cancel -> {
-
+    private fun updateDataList() {
+        dataList.clear()
+        dataList.add("NOT_PA") //非PA
+        dataList.add("NEED_PA") //需要开启PA指令
+        for (node in FDSMeshApi.instance.getFDSNodes()) {
+            if (node.isPA != 0 && node.isPA != 1 ) {
+                //其他类型
+                val fmType = "FM_TYPE_${node.isPA}"
+                if (!dataList.contains(fmType)) {
+                    dataList.add(fmType)
+                }
             }
         }
-        dismissDialog()
+    }
+
+    private fun updateData() {
+        updateDataList()
+        adapter?.notifyDataSetChanged()
     }
 }

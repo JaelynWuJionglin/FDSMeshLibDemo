@@ -151,7 +151,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         addDeviceSize = deviceList.size
         addDeviceSusSize = 0
         addDeviceFailSize = 0
-        loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
         publishFdsNodeInfoList.clear()
         fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, fdeAddNetWorkCallBack)

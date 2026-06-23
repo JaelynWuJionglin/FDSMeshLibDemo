@@ -242,7 +242,7 @@ class OtaActivity : BaseActivity<ActivityOtaBinding>() {
             })
 
         } else {
-            //非PA固件，直接升级
+            //其他类型固件，直接升级
             meshOtaDialog?.setOldFirmwareInfo(false)
             meshOtaDialog?.showDialog(fdsNodeInfo, path)
         }

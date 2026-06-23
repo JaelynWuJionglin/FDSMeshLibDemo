@@ -174,14 +174,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         //从json中获取信息
         val meshJsonInfo = FDSMeshApi.instance.getMeshInfoByJson(jsonStr)
-        LOGUtils.i("HTTP importMeshJson ==> netWorkKey:${meshJsonInfo.netWorkKey}  provisionAddress:${meshJsonInfo.provisionerAddress}")
+        LOGUtils.i("HTTP importMeshJson ==> meshJsonInfo:${meshJsonInfo}")
 
         //从服务器获取分配的provisionerAddress
         val getProvisionAddressUrlStr =
             "http://godox.light.belvie-iot.com/api/provision/queryAndSync?" +
                     "app_uuid=${FDSMeshApi.instance.getAppLocalUUID()}" +
                     "&network_key=${meshJsonInfo.netWorkKey}" +
-                    "&address=${meshJsonInfo.provisionerAddress}"
+                    "&address=${meshJsonInfo.maxUnicastAddress}"
         HttpUtils.instance.httpRequest(HttpMethod.GET, getProvisionAddressUrlStr) {
             LOGUtils.i("HTTP getProvisionAddressUrlStr ==> it:$it")
 
