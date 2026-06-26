@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.log.LOGUtils
-import com.base.mesh.api.main.MeshLogin
 import com.godox.agm.GodoxCommandApi
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
@@ -42,6 +41,7 @@ class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeLi
     private var resetDeviceSize = 0
     private var resetDeviceSusSize = 0
     private var resetDeviceFailSize = 0
+    private var startRemoveTime = 0L
 
     override fun initBind(inflater: LayoutInflater, container: ViewGroup?): DeviceFragmentBinding {
         return DeviceFragmentBinding.inflate(inflater, container, false)
@@ -236,7 +236,16 @@ class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeLi
 
             ConstantUtils.saveJson(index)
 
-            loadingDialog.dismissDialog()
+            //保证Dialog 能显示出来
+            val dTime = System.currentTimeMillis() - startRemoveTime
+            val invTime = 1000L - dTime
+            if (invTime > 0) {
+                binding.tvDevListMsg.postDelayed({
+                    loadingDialog.dismissDialog()
+                }, invTime)
+            } else {
+                loadingDialog.dismissDialog()
+            }
         }
 
         override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
@@ -297,7 +306,7 @@ class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeLi
     }
 
     private fun resetDevice(list: MutableList<FDSNodeInfo>, isSupportOutOfLine: Boolean) {
-
+        startRemoveTime = System.currentTimeMillis()
         resetDeviceSize = list.size
         resetDeviceSusSize = 0
         resetDeviceFailSize = 0
@@ -311,35 +320,8 @@ class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeLi
         )
     }
 
-    /**
-     * 切换直连节点
-     */
-    private fun resetConnectDevice(fdsNodeInfo: FDSNodeInfo) {
-        if (!isResetConnectDevice) {
-            isResetConnectDevice = true
-
-            val list = arrayListOf<String>()
-            for (device in FDSMeshApi.instance.getFDSNodes()) {
-                if (device.meshAddress != fdsNodeInfo.meshAddress) {
-                    list.add(device.macAddress)
-                }
-            }
-            MeshLogin.instance.setAutoConnectFilterDevicesList(list)
-            MeshLogin.instance.disconnect()
-            MeshLogin.instance.autoConnect()
-        }
-    }
-
     fun setIndex(index: Int) {
         this.index = index
-    }
-
-    fun updateList() {
-        mActivity.runOnUiThread {
-            studioDeviceAdapter?.update()
-            binding.tvDevListMsg.text =
-                "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"
-        }
     }
 
     override fun onDestroy() {
