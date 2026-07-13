@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
@@ -100,11 +101,16 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
                 advertisingDevice: AdvertisingDevice,
                 deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
                 type: String,
-                firmwareVersion: Int
+                firmwareVersion: Int,
             ) {
                 //固件版本 >= 0x55
                 if (firmwareVersion >= 0x55) {
-                    addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
+                    addDevicesAdapter.addDevices(
+                        advertisingDevice,
+                        deviceName,
+                        type,
+                        firmwareVersion
+                    )
                     binding.tvDevNetworkEquipment.text =
                         "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
                 }
@@ -164,10 +170,17 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
 
         //配网完成
         @SuppressLint("SetTextI18n")
-        override fun onInNetworkComplete(isSuccess: Boolean, resultList: MutableList<FDSNodeInfo>) {
-            LOGUtils.d("FastAddDeviceActivity onSuccess() size:${resultList.size}")
+        override fun onInNetworkComplete(
+            meshCode: MeshCode,
+            resultList: MutableList<FDSNodeInfo>,
+        ) {
+            LOGUtils.d("FastAddDeviceActivity meshCode:$meshCode size:${resultList.size}")
 
-            if (isSuccess) {
+            if (meshCode == MeshCode.AddressRange) {
+                LOGUtils.e("FastAddDeviceActivity 最大MeshAddress超出范围，拒绝入网!")
+            }
+
+            if (meshCode == MeshCode.Success) {
                 loadingDialog.updateLoadingMsg("配网完成!")
                 if (resultList.isEmpty()) {
                     loadingDialog.dismissDialog()
@@ -178,7 +191,7 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
                 Thread {
                     val renameList = mutableListOf<RenameBean>()
                     for (fdsNode in resultList) {
-                        renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
+                        renameList.add(RenameBean(fdsNode.meshAddress, "GD_LED_${fdsNode.type}"))
                     }
                     FDSMeshApi.instance.renameFDSNodeInfo(renameList)
                 }.start()
@@ -202,7 +215,7 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
                     }
                 }
             } else {
-                loadingDialog.updateLoadingMsg("配网失败!")
+                loadingDialog.updateLoadingMsg("配网失败! code:${meshCode.value}")
                 ConstantUtils.saveJson(index)
                 loadingDialog.dismissDialog()
             }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.listener.NodeStatusChangeListener
 import com.base.mesh.api.log.LOGUtils
 import com.godox.agm.GodoxCommandApi
@@ -226,10 +227,10 @@ class DeviceFragment : BaseFragment<DeviceFragmentBinding>(), NodeStatusChangeLi
          * fdsNodes 退网成功的节点列表
          */
         override fun onComplete(
-            isAllSuccess: Boolean,
+            meshCode: MeshCode,
             fdsNodes: MutableList<FDSNodeInfo>,
         ) {
-            LOGUtils.d("DeviceFragment fdsRemoveNodeCallBack isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+            LOGUtils.d("DeviceFragment fdsRemoveNodeCallBack meshCode:${meshCode.value} size:${fdsNodes.size}")
             studioDeviceAdapter?.update()
             binding.tvDevListMsg.text =
                 "${getString(R.string.text_device_list)}:${studioDeviceAdapter?.itemCount}"

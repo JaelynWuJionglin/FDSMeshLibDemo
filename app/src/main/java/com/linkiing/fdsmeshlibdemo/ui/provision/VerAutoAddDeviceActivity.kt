@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
@@ -168,10 +169,14 @@ class VerAutoAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
 
         //配网完成
         @SuppressLint("SetTextI18n")
-        override fun onInNetworkComplete(isSuccess: Boolean, resultList: MutableList<FDSNodeInfo>) {
-            LOGUtils.d("VerAutoAddDeviceActivity onSuccess() size:${resultList.size}")
+        override fun onInNetworkComplete(meshCode: MeshCode, resultList: MutableList<FDSNodeInfo>) {
+            LOGUtils.d("FastAddDeviceActivity meshCode:$meshCode size:${resultList.size}")
 
-            if (isSuccess) {
+            if (meshCode == MeshCode.AddressRange) {
+                LOGUtils.e("VerAutoAddDeviceActivity 最大MeshAddress超出范围，拒绝入网!")
+            }
+
+            if (meshCode == MeshCode.Success) {
                 loadingDialog.updateLoadingMsg("配网完成!")
                 if (resultList.isEmpty()) {
                     loadingDialog.dismissDialog()

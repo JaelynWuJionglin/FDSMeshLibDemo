@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
@@ -109,7 +110,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
                 advertisingDevice: AdvertisingDevice,
                 deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
                 type: String,
-                firmwareVersion: Int
+                firmwareVersion: Int,
             ) {
                 addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
                 binding.tvDevNetworkEquipment.text =
@@ -167,19 +168,23 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
          * fdsNodes 入网成功的节点
          */
         override fun onComplete(
-            isAllSuccess: Boolean,
-            fdsNodes: MutableList<FDSNodeInfo>
+            meshCode: MeshCode,
+            fdsNodes: MutableList<FDSNodeInfo>,
         ) {
-            LOGUtils.d("AddDeviceActivity isAllSuccess:$isAllSuccess size:${fdsNodes.size}")
+            LOGUtils.d("AddDeviceActivity meshCode:$meshCode size:${fdsNodes.size}")
+
+            if (meshCode == MeshCode.AddressRange) {
+                LOGUtils.e("AddDeviceActivity 最大MeshAddress超出范围，拒绝入网!")
+            }
 
             addDeviceSusSize = fdsNodes.size
             addDeviceFailSize = addDeviceSize - addDeviceSusSize
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             //节点设置默认名称
             val renameList = mutableListOf<RenameBean>()
             for (fdsNode in fdsNodes) {
-                renameList.add(RenameBean(fdsNode.meshAddress,"GD_LED_${fdsNode.type}"))
+                renameList.add(RenameBean(fdsNode.meshAddress, "GD_LED_${fdsNode.type}"))
             }
             FDSMeshApi.instance.renameFDSNodeInfo(renameList)
 
@@ -211,7 +216,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
             super.onFDSNodeSuccess(fdsNodeInfo)
             addDeviceSusSize++
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             /**
              * 配置节点主动上报在线状态
@@ -237,7 +242,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
             super.onFDSNodeFail(fdsNodeInfo)
             addDeviceFailSize++
-            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
         }
     }
 
