@@ -2,25 +2,24 @@ package com.linkiing.fdsmeshlibdemo.ui.provision
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
-import com.godox.sdk.api.bean.RenameBean
 import com.godox.sdk.callbacks.FDSAddNetWorkCallBack
 import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.godox.sdk.model.FDSNodeInfo
-import com.linkiing.fdsmeshlibdemo.R
 import com.linkiing.fdsmeshlibdemo.databinding.ActivityAddDeviceBinding
-import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
-import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
+import com.linkiing.fdsmeshlibdemo.R
+import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.app.App
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -28,10 +27,8 @@ import com.telink.ble.mesh.entity.AdvertisingDevice
 class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
     private lateinit var addDevicesAdapter: AddDeviceAdapter
     private lateinit var loadingDialog: LoadingDialog
-    private val handler = Handler(Looper.getMainLooper())
     private val searchDevices = FDSSearchDevicesApi()
     private val fdsAddOrRemoveDeviceApi = FDSAddOrRemoveDeviceApi(this)
-    private val configPublishUtils = ConfigPublishUtils()
     private var isAllCheck = false
     private var publishFdsNodeInfoList = mutableListOf<FDSNodeInfo>()//保存配置在线状态失败的设备。
     private var isScanning = true
@@ -39,6 +36,9 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
     private var addDeviceSusSize = 0
     private var addDeviceFailSize = 0
     private var index = 0
+    private var allNumber = 0
+    private var susNumber = 0
+    private var failNumber = 0
 
     override fun initBind(): ActivityAddDeviceBinding {
         return ActivityAddDeviceBinding.inflate(layoutInflater)
@@ -104,32 +104,41 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         binding.progressBar.visibility = View.VISIBLE
 
         val filterName = "GD_LED"
-        searchDevices.startScanDevice(this, filterName, 10 * 60 * 1000, object : FDSBleDevCallBack {
-            @SuppressLint("SetTextI18n")
-            override fun onDeviceSearch(
-                advertisingDevice: AdvertisingDevice,
-                deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
-                type: String,
-                firmwareVersion: Int,
-            ) {
-                addDevicesAdapter.addDevices(advertisingDevice, deviceName, type, firmwareVersion)
-                binding.tvDevNetworkEquipment.text =
-                    "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
-            }
+        searchDevices.startScanDevice(
+            this,
+            filterName,
+            10 * 60 * 1000,
+            object : FDSBleDevCallBack {
+                @SuppressLint("SetTextI18n")
+                override fun onDeviceSearch(
+                    advertisingDevice: AdvertisingDevice,
+                    deviceName: String,//设备名(广播中解析的,有时有些手机从“advertisingDevice.device.name”获取的广播名可能为空或null)
+                    type: String,
+                    firmwareVersion: Int,
+                ) {
+                    addDevicesAdapter.addDevices(
+                        advertisingDevice,
+                        deviceName,
+                        type,
+                        firmwareVersion
+                    )
+                    binding.tvDevNetworkEquipment.text =
+                        "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
+                }
 
-            override fun onScanTimeOut() {
-                isScanning = false
-                binding.progressBar.visibility = View.GONE
-            }
+                override fun onScanTimeOut() {
+                    isScanning = false
+                    binding.progressBar.visibility = View.GONE
+                }
 
-            /*
-             * 开启搜索设备失败。
-             */
-            override fun onScanFail() {
-                isScanning = false
-                binding.progressBar.visibility = View.GONE
-            }
-        })
+                /*
+                 * 开启搜索设备失败。
+                 */
+                override fun onScanFail() {
+                    isScanning = false
+                    binding.progressBar.visibility = View.GONE
+                }
+            })
     }
 
     private fun stopScan() {
@@ -152,7 +161,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         addDeviceSize = deviceList.size
         addDeviceSusSize = 0
         addDeviceFailSize = 0
-        loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
         publishFdsNodeInfoList.clear()
         fdsAddOrRemoveDeviceApi.deviceAddNetWork(deviceList, fdeAddNetWorkCallBack)
@@ -164,7 +173,7 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
     private val fdeAddNetWorkCallBack = object : FDSAddNetWorkCallBack {
         /*
          * 入网完成回调
-         * isAllSuccess 是否全部入网成功
+         * meshCode 是否成功
          * fdsNodes 入网成功的节点
          */
         override fun onComplete(
@@ -173,41 +182,15 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         ) {
             LOGUtils.d("AddDeviceActivity meshCode:$meshCode size:${fdsNodes.size}")
 
-            if (meshCode == MeshCode.AddressRange) {
-                LOGUtils.e("AddDeviceActivity 最大MeshAddress超出范围，拒绝入网!")
-            }
-
             addDeviceSusSize = fdsNodes.size
             addDeviceFailSize = addDeviceSize - addDeviceSusSize
-            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
-
-            //节点设置默认名称
-            val renameList = mutableListOf<RenameBean>()
-            for (fdsNode in fdsNodes) {
-                renameList.add(RenameBean(fdsNode.meshAddress, "GD_LED_${fdsNode.type}"))
-            }
-            FDSMeshApi.instance.renameFDSNodeInfo(renameList)
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
             addDevicesAdapter.removeItemAtInNetWork(fdsNodes)
 
-
-            if (publishFdsNodeInfoList.isEmpty()) {
-                onAddDeviceComplete()
-            } else {
-                //配置未配置成功的节点在线状态
-                configPublishUtils.startConfigPublish(
-                    publishFdsNodeInfoList,
-                    handler
-                ) { isComplete, allNumber, susNumber, failNumber ->
-                    runOnUiThread {
-                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
-
-                        if (isComplete) {
-                            onAddDeviceComplete()
-                        }
-                    }
-                }
-            }
+            //在线状态配置失败的设备，重新配置设备在线状态上报。
+            //版本>=0x49的设备不会在publishFdsNodeInfoList内，所有这里不用区分是那种配置方式。
+            configFDSNodePublishState(publishFdsNodeInfoList)
         }
 
         /*
@@ -216,24 +199,10 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         override fun onFDSNodeSuccess(fdsNodeInfo: FDSNodeInfo) {
             super.onFDSNodeSuccess(fdsNodeInfo)
             addDeviceSusSize++
-            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
 
-            /**
-             * 配置节点主动上报在线状态
-             */
-            if (fdsNodeInfo.firmwareVersion >= 0x49) {
-                FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfo)
-                LOGUtils.i("setFDSNodePublishModel() =====> true")
-            } else {
-                val isOk = FDSMeshApi.instance.configFDSNodePublishState(
-                    true,
-                    fdsNodeInfo,
-                    configNodePublishStateListener
-                )
-                publishFdsNodeInfoList.add(fdsNodeInfo)
-
-                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
-            }
+            //配置设备在线状态上报(这里有500ms的BLE直连时间发送指令)
+            configFDSNodePublishState(fdsNodeInfo)
         }
 
         /*
@@ -242,37 +211,104 @@ class AddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
         override fun onFDSNodeFail(fdsNodeInfo: FDSNodeInfo) {
             super.onFDSNodeFail(fdsNodeInfo)
             addDeviceFailSize++
-            loadingDialog.updateLoadingMsg("成功:$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+            loadingDialog.updateLoadingMsg("$addDeviceSusSize/$addDeviceSize 失败:$addDeviceFailSize")
+        }
+    }
+
+    /**
+     * 配置节点主动上报在线状态
+     */
+    private fun configFDSNodePublishState(fdsNodeInfo: FDSNodeInfo) {
+        if (fdsNodeInfo.firmwareVersion < 0x49) {
+            //设备需要sdk发指令配置
+            publishFdsNodeInfoList.add(fdsNodeInfo)
+            val isOk = FDSMeshApi.instance.configFDSNodePublishState(
+                true,
+                fdsNodeInfo,
+                object : ConfigNodePublishStateListener {
+
+                    // 当前设备配置结果回调
+                    override fun onComplete(
+                        meshCode: MeshCode,
+                        meshAddress: Int,
+                    ) {
+                        LOGUtils.d("configFDSNodePublishState onComplete() =====> meshCode:$meshCode  meshAddress:$meshAddress")
+
+                        //配置成功从失败列表删除
+                        if (meshCode == MeshCode.Success) {
+                            val iterator = publishFdsNodeInfoList.iterator()
+                            while (iterator.hasNext()) {
+                                val fdsNodeInfo = iterator.next()
+                                if (fdsNodeInfo.meshAddress == meshAddress) {
+                                    iterator.remove()
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+            LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+        } else {
+            //设备不需要sdk发指令配置，sdk只需要配置本地
+            val isOk = FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfo)
+            LOGUtils.i("setFDSNodePublishModel() =====> isOk:$isOk")
+        }
+    }
+
+    /**
+     * 批量配置设备在线状态
+     */
+    private fun configFDSNodePublishState(fdsNodeInfoList: MutableList<FDSNodeInfo>) {
+        //设备需要sdk发指令配置
+        if (fdsNodeInfoList.isEmpty()) {
+            onAddDeviceComplete()
+            return
+        }
+        MeshLogin.instance.autoConnect(30 * 1000L) {
+            if (it) {
+                allNumber = fdsNodeInfoList.size
+                val isOk = FDSMeshApi.instance.configFDSNodePublishState(
+                    true,
+                    fdsNodeInfoList,
+                    object : ConfigNodePublishStateListener {
+
+                        // 当前设备配置结果回调
+                        override fun onComplete(
+                            meshCode: MeshCode,
+                            meshAddress: Int,
+                        ) {
+                            LOGUtils.d("configFDSNodePublishState onComplete() =====> meshCode:$meshCode  meshAddress:$meshAddress")
+                            if (meshCode == MeshCode.Success) {
+                                susNumber++
+                            } else {
+                                failNumber++
+                            }
+                            runOnUiThread {
+                                loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
+                            }
+                        }
+
+                        //全部结果回调
+                        override fun onAllComplete(meshCode: MeshCode, failedList: MutableList<Int>) {
+                            onAddDeviceComplete()
+                        }
+                    }
+                )
+                LOGUtils.i("configFDSNodePublishState() =====> isOk:$isOk")
+            } else {
+                onAddDeviceComplete()
+                ConstantUtils.toast(this,"配置在线状态失败!")
+            }
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun onAddDeviceComplete() {
-        //主动查询在线状态
-        val isOk = FDSMeshApi.instance.refreshFDSNodeInfoState()
-        LOGUtils.v("refreshFDSNodeInfoState() =====> isOk:$isOk")
-
         ConstantUtils.saveJson(index)
-        loadingDialog.dismissDialog()
-        binding.tvDevNetworkEquipment.text =
-            "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
-    }
-
-    /**
-     * 配置节点主动上报在线状态 结果回调
-     */
-    private val configNodePublishStateListener = object : ConfigNodePublishStateListener {
-        override fun onComplete(success: Boolean, meshAddress: Int) {
-            LOGUtils.d("configFDSNodePublishState onComplete() =====> success:$success  meshAddress:$meshAddress")
-            if (success) {
-                val iterator = publishFdsNodeInfoList.iterator()
-                while (iterator.hasNext()) {
-                    val fdsNodeInfo = iterator.next()
-                    if (fdsNodeInfo.meshAddress == meshAddress) {
-                        iterator.remove()
-                    }
-                }
-            }
+        runOnUiThread {
+            loadingDialog.dismissDialog()
+            binding.tvDevNetworkEquipment.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
     }
 

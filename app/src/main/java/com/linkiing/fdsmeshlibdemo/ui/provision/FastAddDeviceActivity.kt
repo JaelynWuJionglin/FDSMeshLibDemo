@@ -7,7 +7,9 @@ import android.os.Looper
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.base.mesh.api.bean.MeshCode
+import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.base.mesh.api.log.LOGUtils
+import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSAddOrRemoveDeviceApi
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.api.FDSSearchDevicesApi
@@ -16,10 +18,11 @@ import com.godox.sdk.callbacks.FDSBleDevCallBack
 import com.godox.sdk.callbacks.FDSFastAddNetWorkCallBack
 import com.godox.sdk.model.FDSNodeInfo
 import com.linkiing.fdsmeshlibdemo.R
-import com.linkiing.fdsmeshlibdemo.databinding.ActivityAddDeviceBinding
 import com.linkiing.fdsmeshlibdemo.adapter.AddDeviceAdapter
+import com.linkiing.fdsmeshlibdemo.app.App
+import com.linkiing.fdsmeshlibdemo.databinding.ActivityAddDeviceBinding
+import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
-import com.linkiing.fdsmeshlibdemo.utils.ConfigPublishUtils
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
 import com.telink.ble.mesh.entity.AdvertisingDevice
@@ -36,7 +39,6 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
     private var deviceSetFailNumber = 0
     private var addDeviceSize = 0
     private var index = 0
-    private val configPublishUtils = ConfigPublishUtils()
 
     override fun initBind(): ActivityAddDeviceBinding {
         return ActivityAddDeviceBinding.inflate(layoutInflater)
@@ -199,21 +201,7 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
                 addDevicesAdapter.removeItemAtInNetWork(resultList)
 
                 //配置节点在线状态
-                configPublishUtils.startConfigPublish(
-                    resultList,
-                    handler
-                ) { isComplete, allNumber, susNumber, failNumber ->
-                    runOnUiThread {
-                        loadingDialog.updateLoadingMsg("配置在线:$susNumber/$allNumber 失败:$failNumber")
-
-                        if (isComplete) {
-                            ConstantUtils.saveJson(index)
-                            loadingDialog.dismissDialog()
-                            binding.tvDevNetworkEquipment.text =
-                                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
-                        }
-                    }
-                }
+                configFDSNodePublishState(resultList)
             } else {
                 loadingDialog.updateLoadingMsg("配网失败! code:${meshCode.value}")
                 ConstantUtils.saveJson(index)
@@ -250,6 +238,29 @@ class FastAddDeviceActivity : BaseActivity<ActivityAddDeviceBinding>() {
 
         binding.btAddDevice.setOnClickListener {
             addDevice()
+        }
+    }
+
+    /**
+     * 配置节点主动上报在线状态
+     */
+    private fun configFDSNodePublishState(fdsNodeInfoList: MutableList<FDSNodeInfo>) {
+        /*
+         * 支持Fast配网的设备版本>=0x55
+         * 设备不需要sdk发指令配置，sdk只需要配置本地
+         */
+        val isOk = FDSMeshApi.instance.setFDSNodePublishModel(true, fdsNodeInfoList)
+        LOGUtils.i("setFDSNodePublishModel() =====> isOk:$isOk")
+        onAddDeviceComplete()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun onAddDeviceComplete(){
+        ConstantUtils.saveJson(index)
+        runOnUiThread {
+            loadingDialog.dismissDialog()
+            binding.tvDevNetworkEquipment.text =
+                "${getString(R.string.text_dev_number)}:${addDevicesAdapter.itemCount}/${addDevicesAdapter.getCheckDevices().size}"
         }
     }
 

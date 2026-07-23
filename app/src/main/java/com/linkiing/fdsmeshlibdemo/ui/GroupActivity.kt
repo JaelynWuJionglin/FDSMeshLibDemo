@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.base.mesh.api.bean.MeshCode
+import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.base.mesh.api.log.LOGUtils
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSGroupInfo
@@ -25,6 +27,8 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
     private var checkDeviceList = mutableListOf<FDSNodeInfo>()
     private var subIndex = 0
     private var index = 0
+    private var isSubscribe = true
+    private var allCheckSize = 0
 
     override fun initBind(): ActivityGroupBinding {
         return ActivityGroupBinding.inflate(layoutInflater)
@@ -89,8 +93,20 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
 
         binding.btRemoveDevice.setOnClickListener {
             val checkDeviceList = groupAdapter?.getCheckDevices()
-            if (checkDeviceList != null && checkDeviceList.isNotEmpty()) {
-                startSubscribe(checkDeviceList, false)
+            if (!checkDeviceList.isNullOrEmpty()) {
+                //订阅组
+                //startSubscribe(checkDeviceList, false)
+
+                //批量订阅组
+                loadingDialog.showDialog()
+                allCheckSize = checkDeviceList.size
+                isSubscribe = false
+                FDSMeshApi.instance.configSubscribe(
+                    checkDeviceList,
+                    groupAddress,
+                    isSubscribe,
+                    subscribeListener
+                )
             }
         }
 
@@ -99,7 +115,21 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
                 if (result.resultCode == RESULT_OK) {
                     val checkDeviceList = result.data?.getSerializableExtra("checkDeviceList")
                     if (checkDeviceList != null && checkDeviceList is MutableList<*>) {
-                        startSubscribe(checkDeviceList as MutableList<FDSNodeInfo>, true)
+                        val devList = checkDeviceList as MutableList<FDSNodeInfo>
+
+                        //订阅组
+                        //startSubscribe(devList, true)
+
+                        //批量订阅组
+                        loadingDialog.showDialog()
+                        allCheckSize = checkDeviceList.size
+                        isSubscribe = true
+                        FDSMeshApi.instance.configSubscribe(
+                            devList,
+                            groupAddress,
+                            isSubscribe,
+                            subscribeListener
+                        )
                     }
                 }
             }
@@ -114,6 +144,33 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
         }
     }
 
+    private val subscribeListener: ((MeshCode, MutableList<Int>) -> Unit) = { meshCode, list ->
+        loadingDialog.dismissDialog()
+        setCheck(false)
+
+        runOnUiThread {
+            groupAdapter?.update()
+        }
+
+        //保存json修改
+        ConstantUtils.saveJson(index)
+
+        if (meshCode == MeshCode.Success) {
+            if (isSubscribe) {
+                ConstantUtils.toast(this, "订阅完成！${list.size}/$allCheckSize")
+            } else {
+                ConstantUtils.toast(this, "取消订阅完成！${list.size}/$allCheckSize")
+            }
+        } else {
+            if (isSubscribe) {
+                ConstantUtils.toast(this, "订阅失败！info:${meshCode.info}")
+            } else {
+                ConstantUtils.toast(this, "取消订阅失败！info:${meshCode.info}")
+            }
+        }
+    }
+
+    //==============================================================================================
     private fun startSubscribe(checkDeviceList: MutableList<FDSNodeInfo>, isSubscribe: Boolean) {
         if (fdsGroupInfo != null && checkDeviceList.isNotEmpty()) {
             loadingDialog.showDialog()
@@ -160,7 +217,7 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
             val fdsNodeInfo = checkDeviceList[subIndex]
             if (fdsNodeInfo.getFDSNodeState() == FDSNodeInfo.ON_OFF_STATE_OFFLINE){
                 //离线设备不可进行订阅操作
-                LOGUtils.e("Error! nextSubscribe 设备离线 ==> MAC:${fdsNodeInfo.macAddress}")
+                LOGUtils.e("MeshNodeSub Error! 设备离线 ==> MAC:${fdsNodeInfo.macAddress}")
                 subIndex++
                 nextSubscribe(isSubscribe)
             } else {
@@ -168,8 +225,8 @@ class GroupActivity : BaseActivity<ActivityGroupBinding>() {
                  * 同一个节点订阅组的上限是32个，超过32个便无法再订阅其他组。
                  * 删除组的时候，务必要取消不必要的订阅关系。
                  */
-                FDSMeshApi.instance.configSubscribe(fdsNodeInfo, fdsGroupInfo!!, isSubscribe) {
-                    LOGUtils.d("nextSubscribe 订阅结果 ==>Mac:${fdsNodeInfo.macAddress} GroupAddress${fdsGroupInfo?.address}  it:$it")
+                FDSMeshApi.instance.configSubscribe(fdsNodeInfo, groupAddress, isSubscribe) { meshCode,failedList ->
+                    LOGUtils.d("MeshNodeSub 订阅结果 ==>Mac:${fdsNodeInfo.macAddress} GroupAddress${fdsGroupInfo?.address}  it:${meshCode == MeshCode.Success}")
                     subIndex++
                     nextSubscribe(isSubscribe)
                 }

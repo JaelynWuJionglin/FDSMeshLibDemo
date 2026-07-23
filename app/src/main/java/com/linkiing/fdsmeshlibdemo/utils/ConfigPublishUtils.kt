@@ -1,12 +1,12 @@
 package com.linkiing.fdsmeshlibdemo.utils
 
 import android.os.Handler
+import com.base.mesh.api.bean.MeshCode
 import com.base.mesh.api.listener.ConfigNodePublishStateListener
 import com.base.mesh.api.log.LOGUtils
 import com.base.mesh.api.main.MeshLogin
 import com.godox.sdk.api.FDSMeshApi
 import com.godox.sdk.model.FDSNodeInfo
-import com.linkiing.fdsmeshlibdemo.mmkv.MMKVSp
 import java.util.concurrent.CopyOnWriteArrayList
 
 class ConfigPublishUtils : ConfigNodePublishStateListener {
@@ -108,9 +108,11 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
         nextConfigPublish()
     }
 
-    override fun onComplete(success: Boolean, meshAddress: Int) {
-        LOGUtils.d("$tag onComplete() =====> success:$success  meshAddress:$meshAddress")
-        if (!success && nowPublishNodeInfo != null) {
+
+    //单设备完成结果回调
+    override fun onComplete(meshCode: MeshCode, meshAddress: Int) {
+        LOGUtils.d("$tag onComplete() =====> meshCode:$meshCode  meshAddress:$meshAddress")
+        if (meshCode == MeshCode.Success && nowPublishNodeInfo != null) {
             nowPublishNodeInfo!!.retryIndex++
             if (nowPublishNodeInfo!!.retryIndex < 3) {
                 publishNodeList.add(nowPublishNodeInfo)
@@ -119,7 +121,7 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
                 failNumber++
             }
         }
-        if (success) {
+        if (meshCode == MeshCode.Success) {
             successNumber++
         }
 
@@ -127,6 +129,11 @@ class ConfigPublishUtils : ConfigNodePublishStateListener {
 
         handler?.removeCallbacks(nextConfigRunnable)
         handler?.postDelayed(nextConfigRunnable, 300)
+    }
+
+    //全部设备完成结果回调
+    override fun onAllComplete(meshCode: MeshCode, failedList: MutableList<Int>) {
+
     }
 
     data class SetPublishNodeInfo constructor(val fdsNodeInfo: FDSNodeInfo) {
