@@ -1,6 +1,8 @@
 package com.linkiing.fdsmeshlibdemo.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -21,6 +23,7 @@ import com.linkiing.fdsmeshlibdemo.bean.SeekBarBean
 import com.linkiing.fdsmeshlibdemo.ui.base.BaseActivity
 import com.linkiing.fdsmeshlibdemo.utils.ConstantUtils
 import com.linkiing.fdsmeshlibdemo.view.dialog.LoadingDialog
+import kotlinx.coroutines.Runnable
 
 /**
  * 功能列表页
@@ -291,6 +294,8 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
     private fun initLister() {
         binding.btTest1.setOnClickListener {
             testOnOff()
+
+            //startTest()
         }
 
         binding.gattTest.setOnClickListener {
@@ -380,5 +385,69 @@ class ModeListActivity : BaseActivity<ModeListActivityBinding>(), FirmwareCallBa
 
         //清空数据发送队列
         MeshSend.instance.sendClear()
+    }
+
+
+    
+
+    //===========================================================================================
+    //TEST
+    private var handler = Handler(Looper.getMainLooper())
+    private val maxIndex = 20
+    private var index = 0
+    private var isRunning = false
+
+    private fun startTest() {
+        loadingDialog.showDialog()
+        index = 0
+        nextCmd()
+    }
+
+    private fun nextCmd() {
+        if (isRunning) return
+        isRunning = true
+
+        GodoxCommandApi.instance.getMcuVersion(address, fdsMCUCallBack)
+
+        handler.removeCallbacks(outTimeRunnable)
+        handler.postDelayed(outTimeRunnable, 10000L)
+    }
+
+    private val fdsMCUCallBack: MCUCallBack = object : MCUCallBack {
+        override fun onSuccess(
+            address: Int,
+            productVersion: String,
+            mcuVersion: String,
+        ) {
+            removeOutTimeR()
+            isRunning = false
+            handler.removeCallbacks(nextRunnable)
+            handler.postDelayed(nextRunnable, 50L)
+        }
+    }
+
+    private fun removeOutTimeR() {
+        handler.removeCallbacks(outTimeRunnable)
+    }
+
+    private fun removeNextR() {
+        handler.removeCallbacks(nextRunnable)
+    }
+
+    private val nextRunnable = Runnable {
+        if (index < maxIndex) {
+            nextCmd()
+            index++
+        } else {
+            loadingDialog.dismissDialog()
+            ConstantUtils.toast(this@ModeListActivity, "成功！！！")
+        }
+    }
+
+    private val outTimeRunnable = Runnable {
+        loadingDialog.dismissDialog()
+        removeNextR()
+        isRunning = false
+        ConstantUtils.toast(this@ModeListActivity, ">>> 超时 <<<")
     }
 }

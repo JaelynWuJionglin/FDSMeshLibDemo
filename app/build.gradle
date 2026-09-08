@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -5,15 +7,15 @@ plugins {
 
 android {
     namespace 'com.linkiing.fdsmeshlibdemo'
-    compileSdk project.targetSdk
+    compileSdkVersion libs.versions.targetSdk.get().toInteger()
 
     defaultConfig {
         applicationId "com.linkiing.FDSMeshLibDemo"
 
-        minSdk project.minSdk
-        targetSdk project.targetSdk
-        versionCode project.versionCode
-        versionName project.versionName
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        versionCode libs.versions.versionCode.get().toInteger()
+        versionName libs.versions.versionName.get()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,24 +50,26 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
     buildFeatures {
         buildConfig true
         viewBinding true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_1_8)
+    }
 }
 
 dependencies {
-    implementation "androidx.core:core-ktx:${project.kotlin_version}"
-    implementation "androidx.appcompat:appcompat:${project.appcompat_version}"
+    implementation libs.coreKtx
+    implementation libs.appcompat
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     testImplementation 'junit:junit:4.13.2'
@@ -74,14 +78,14 @@ dependencies {
 
     //SDK需要#######################################################################################
     //引入sdk
-    implementation fileTree(dir: 'libs', include: ['Godox*.aar','LsTi*.aar'])
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     //加密（SDK需要）
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+    implementation libs.madgagSyCore
+    implementation libs.madgagSyProv
 
     //gson（SDK需要）
-    implementation "com.google.code.gson:gson:${project.gson_version}"
+    implementation libs.gson
     //END###########################################################################################
 
 //    implementation project(path: ':GodoxAgmLib')

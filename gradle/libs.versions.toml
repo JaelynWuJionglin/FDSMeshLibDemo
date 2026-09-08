@@ -1,0 +1,20 @@
+[versions]
+#SdkVersion=======================
+minSdk = "23"
+targetSdk = "36"
+versionCode = "233"
+versionName = "2.3.3"
+#lib version
+coreKtx = "1.13.0"
+appcompat = "1.7.1"
+gson = "2.14.0"
+madgagSy = "1.58.0.0"
+#End===============================
+
+
+[libraries]
+coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+madgagSyCore = { module = "com.madgag.spongycastle:core", version.ref = "madgagSy" }
+madgagSyProv = { module = "com.madgag.spongycastle:prov", version.ref = "madgagSy" }

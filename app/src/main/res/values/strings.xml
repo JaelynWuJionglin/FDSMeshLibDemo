@@ -20,4 +20,5 @@
     <string name="text_pv_model_def">Def默认配网模式</string>
     <string name="text_pv_model_fast">Fast配网模式</string>
     <string name="text_pv_model_auto">Auto版本自适应</string>
+    <string name="text_time_out">超时</string>
 </resources>

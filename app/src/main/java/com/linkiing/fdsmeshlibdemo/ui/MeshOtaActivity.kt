@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -58,6 +59,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
         initListener()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -205,7 +207,7 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
         }
     }
 
-    override fun onActivityResult(result: ActivityResult?) {
+    override fun onActivityResult(result: ActivityResult) {
         if (result == null) {
             return
         }
@@ -287,12 +289,14 @@ class MeshOtaActivity : BaseActivity<ActivityMeshOtaBinding>(), ActivityResultCa
         meshOtaDeviceAdapter?.updateItemFDSNodeInfo(fdsNodeInfo)
     }
 
-    override fun onBackPressed() {
-       if (!binding.btStart.isEnabled) {
-           showWarningDialog()
-       } else {
-           super.onBackPressed()
-       }
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!binding.btStart.isEnabled) {
+                showWarningDialog()
+            } else {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun showWarningDialog() {
