@@ -2,8 +2,8 @@
 #SdkVersion=======================
 minSdk = "23"
 targetSdk = "36"
-versionCode = "233"
-versionName = "2.3.3"
+versionCode = "160"
+versionName = "1.6.0"
 #lib version
 coreKtx = "1.13.0"
 appcompat = "1.7.1"
